@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  keycloak:
+      image: quay.io/keycloak/keycloak:19.0.3
+      environment:
+        KEYCLOAK_ADMIN: admin
+        KEYCLOAK_ADMIN_PASSWORD: admin
+        KC_HTTP_RELATIVE_PATH: /auth
+      ports:
+        - 8080:8080
+      volumes: 
+        - ./target/keycloak-themes-0.1-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-themes.jar
+      command: [ "start-dev" ] 

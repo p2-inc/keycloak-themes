@@ -1,0 +1,15 @@
+.login-pf body {
+  background: #FFFFFF;
+}
+
+div.kc-logo-text {
+  background-image: url("img/logo-phasetwo.png");
+  background-size: contain;
+  background-position: center;
+  height: 70px;
+  width: 130px;
+}
+
+#kc-header-wrapper {
+  color: #363636;
+}

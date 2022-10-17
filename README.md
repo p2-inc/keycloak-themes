@@ -34,7 +34,7 @@ The login theme is named `attributes`. It assumes you will store the values as R
 - `_providerConfig.assets.login.backgroundColor`: 
 - `_providerConfig.assets.login.primaryColor`: 
 - `_providerConfig.assets.login.secondaryColor`:
-- `_providerConfig.assets.logo.url`: URL of logo file that will be served as the `div.kc-logo-text.background-image`. Constrained to 130x130.
+- `_providerConfig.assets.logo.url`: URL of logo file that will be served as the `div.kc-logo-text.background-image`. Constrained to 150x150.
 - `_providerConfig.assets.favicon.url`: URL of the favicon
 
 ### Email theme

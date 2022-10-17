@@ -1,13 +1,13 @@
 package io.phasetwo.keycloak.themes.theme;
 
 import com.google.common.collect.ImmutableSet;
+import java.io.File;
+import java.io.IOException;
+import java.util.Set;
 import lombok.extern.jbosslog.JBossLog;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.theme.Theme;
 import org.keycloak.theme.ThemeProvider;
-import org.keycloak.models.KeycloakSession;
-import java.io.File;
-import java.util.Set;
-import java.io.IOException;
 
 /** */
 @JBossLog
@@ -15,7 +15,7 @@ public class AttributeThemeProvider implements ThemeProvider {
 
   private final KeycloakSession session;
   private final File tmpdir;
-  
+
   public AttributeThemeProvider(KeycloakSession session, File tmpdir) {
     this.session = session;
     this.tmpdir = tmpdir;
@@ -34,7 +34,7 @@ public class AttributeThemeProvider implements ThemeProvider {
 
   public static final String ATTRIBUTE_THEME_NAME = "attributes";
   public static final Set<String> ATTRIBUTE_NAME_SET = ImmutableSet.of(ATTRIBUTE_THEME_NAME);
-      
+
   @Override
   public Set<String> nameSet(Theme.Type type) {
     if (type == Theme.Type.EMAIL) return ATTRIBUTE_NAME_SET;
@@ -47,6 +47,5 @@ public class AttributeThemeProvider implements ThemeProvider {
   }
 
   @Override
-  public void close() {
-  }
+  public void close() {}
 }

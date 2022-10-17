@@ -3,10 +3,9 @@
 }
 
 div.kc-logo-text {
-  background-image: url("img/logo-phasetwo.png");
   background-size: contain;
   background-position: center;
-  height: 70px;
+  height: 130px;
   width: 130px;
 }
 

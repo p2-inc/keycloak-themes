@@ -1,21 +1,18 @@
 package io.phasetwo.keycloak.themes.resource;
 
-import com.google.common.collect.Maps;
 import com.google.common.io.CharSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 import javax.ws.rs.*;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.services.Urls;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.theme.Theme;
 
@@ -29,12 +26,70 @@ public class AssetsResourceProvider implements RealmResourceProvider {
   }
 
   public static final String ASSETS_LOGIN_CSS_PREFIX = "_providerConfig.assets.login.css";
-  public static final String ASSETS_LOGIN_LOGO_URL = "_providerConfig.assets.logo.url";
-  public static final String ASSETS_LOGIN_FAVICON_URL = "_providerConfig.assets.favicon.url";
+  public static final String ASSETS_LOGIN_PRIMARY_COLOR =
+      "_providerConfig.assets.login.primaryColor";
+  public static final String ASSETS_LOGIN_SECONDARY_COLOR =
+      "_providerConfig.assets.login.secondaryColor";
+  public static final String ASSETS_LOGIN_BACKGROUND_COLOR =
+      "_providerConfig.assets.login.backgroundColor";
 
   @Override
   public Object getResource() {
     return this;
+  }
+
+  public static final String ASSETS_LOGO_URL = "_providerConfig.assets.logo.url";
+  public static final String ASSETS_FAVICON_URL = "_providerConfig.assets.favicon.url";
+  public static final String DEFAULT_LOGO_PATH = "img/empty.png";
+  public static final String DEFAULT_FAVICON_PATH = "img/default-favicon.ico";
+
+  @GET
+  @Path("img/logo")
+  public Response logo(@Context HttpHeaders headers, @Context UriInfo uriInfo) throws IOException {
+    return resourceRedirect(uriInfo, ASSETS_LOGO_URL, DEFAULT_LOGO_PATH);
+  }
+
+  @GET
+  @Path("img/favicon")
+  public Response favicon(@Context HttpHeaders headers, @Context UriInfo uriInfo)
+      throws IOException {
+    return resourceRedirect(uriInfo, ASSETS_FAVICON_URL, DEFAULT_FAVICON_PATH);
+  }
+
+  private Response resourceRedirect(UriInfo uriInfo, String key, String defaultPath) {
+    String imgUrl = session.getContext().getRealm().getAttribute(key);
+    URI redir = null;
+    try {
+      if (imgUrl == null) {
+        Theme theme = session.theme().getTheme(Theme.Type.LOGIN);
+        URI baseUri = session.getContext().getUri().getBaseUri();
+        URI themeRoot = new URI(Urls.themeRoot(baseUri).toString() + "/");
+        redir =
+            themeRoot.resolve(
+                String.format(
+                    "%s/%s/%s",
+                    theme.getType().toString().toLowerCase(), theme.getName(), defaultPath));
+      } else {
+        redir = new URI(imgUrl);
+      }
+      log.infof("redirecting to %s", redir);
+      return Response.seeOther(redir).build();
+    } catch (Exception e) {
+      throw new NotFoundException(e);
+    }
+  }
+
+  private void setColors(StringBuilder o) {
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--primary-color--100");
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--secondary-color--100");
+    setColor(o, ASSETS_LOGIN_BACKGROUND_COLOR, "--pf-global--BackgroundColor--100");
+  }
+
+  private void setColor(StringBuilder o, String key, String name) {
+    String v = session.getContext().getRealm().getAttribute(key);
+    if (v != null) {
+      o.append(name).append(": ").append(v).append(";\n");
+    }
   }
 
   @GET
@@ -46,6 +101,7 @@ public class AssetsResourceProvider implements RealmResourceProvider {
     if (css == null) {
       StringBuilder o = new StringBuilder("/* login css */\n");
       o.append(":root {\n");
+      setColors(o);
       session
           .getContext()
           .getRealm()
@@ -65,49 +121,6 @@ public class AssetsResourceProvider implements RealmResourceProvider {
     return null == resource
         ? Response.status(Response.Status.NOT_FOUND).build()
         : Response.ok(resource, mimeType).build();
-  }
-
-  ////////////////////////////////////////////////////////////////////////////
-  //
-  ////////////////////////////////////////////////////////////////////////////
-
-  @GET
-  @Path("/debug")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response debug(@Context HttpHeaders headers, @Context UriInfo uriInfo) {
-    log.infof("query string %s", uriInfo.getRequestUri().getQuery());
-    Map<String, Object> m = Maps.newHashMap();
-    m.put("base_uri", uriInfo.getBaseUri().toString());
-    m.put("request_uri", uriInfo.getRequestUri().toString());
-    m.put("query_string", uriInfo.getRequestUri().getQuery());
-    m.put("path", uriInfo.getPath());
-    Map<String, List<String>> h = headers.getRequestHeaders();
-    m.put("headers", h);
-    return Response.ok().entity(m).build();
-  }
-
-  /*
-  @GET
-  public Response portal() {
-    Theme theme = getTheme();
-    UriInfo uriInfo = session.getContext().getUri();
-    UriBuilder uriBuilder =
-        UriBuilder.fromUri(uriInfo.getBaseUri())
-            .path("resources")
-            .path(Version.RESOURCES_VERSION)
-            .path(theme.getType().toString().toLowerCase())
-            .path(theme.getName())
-            .path("index.html");
-    return Response.temporaryRedirect(uriBuilder.build()).build();
-  }
-  */
-
-  private Theme getCurrentLoginTheme() {
-    try {
-      return session.theme().getTheme(Theme.Type.LOGIN);
-    } catch (IOException e) {
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
   }
 
   @Override

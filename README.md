@@ -1,4 +1,4 @@
-> :rocket: **Try it for free** in the new Phase Two [keycloak managed service](https://phasetwo.io/dashboard/?utm_source=github&utm_medium=readme&utm_campaign=keycloak-magic-link). See the [announcement and demo video](https://phasetwo.io/blog/self-service/) for more information.
+> :rocket: **Try it for free** in the new Phase Two [keycloak managed service](https://phasetwo.io/dashboard/?utm_source=github&utm_medium=readme&utm_campaign=keycloak-themes). See the [announcement and demo video](https://phasetwo.io/blog/self-service/) for more information.
 
 # keycloak-themes
 
@@ -31,9 +31,9 @@ mvn clean install
 The login theme is named `attributes`. It assumes you will store the values as Realm attributes with the following keys:
 
 - `_providerConfig.assets.login.css`: CSS you want to be loaded after the standard login.css
-- `_providerConfig.assets.login.backgroundColor`: 
-- `_providerConfig.assets.login.primaryColor`: 
-- `_providerConfig.assets.login.secondaryColor`:
+- `_providerConfig.assets.login.backgroundColor`: override for `--pf-global--primary-color--100`.
+- `_providerConfig.assets.login.primaryColor`: override for `--pf-global--secondary-color--100`.
+- `_providerConfig.assets.login.secondaryColor`: override for `--pf-global--BackgroundColor--100`.
 - `_providerConfig.assets.logo.url`: URL of logo file that will be served as the `div.kc-logo-text.background-image`. Constrained to 150x150.
 - `_providerConfig.assets.favicon.url`: URL of the favicon
 
@@ -57,4 +57,3 @@ _providerConfig.theme.email.parent
 ---
 
 All documentation, source code and other files in this repository are Copyright 2022 Phase Two, Inc.
-

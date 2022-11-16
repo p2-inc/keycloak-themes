@@ -5,7 +5,7 @@
 Themes and theme utilities meant for simple theme customization without deploying a packaged theme.
 
 - A modified login theme that allows colors, logo, CSS to be loaded from Realm attributes. 
-- An implementation of `ThemeProvider` that loads named Freemarker templates from Realm attributes. Currently only for email.
+- An implementation of `ThemeProvider` that loads named Freemarker templates and messages from Realm attributes. Currently only for email.
 
 This extension is used in the [Phase Two](https://phasetwo.io) cloud offering, and is released here as part of its commitment to making its [core extensions](https://phasetwo.io/docs/introduction/open-source) open source. Please consult the [license](COPYING) for information regarding use.
 

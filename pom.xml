@@ -30,7 +30,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <main.java.package>io.phasetwo.keycloak.themes</main.java.package>
     <junit.version>4.13.2</junit.version>
-    <keycloak.version>18.0.0</keycloak.version>
+    <keycloak.version>20.0.1</keycloak.version>
     <lombok.version>1.18.22</lombok.version>
     <auto-service.version>1.0.1</auto-service.version>
     <ossrh.url>https://s01.oss.sonatype.org</ossrh.url>
@@ -198,6 +198,13 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- 3rd party deps -->
+    <dependency>
+      <groupId>com.github.spullara.mustache.java</groupId>
+      <artifactId>compiler</artifactId>
+      <version>0.9.10</version>
+    </dependency>
+    
     <!-- testing -->
     <dependency>
       <groupId>junit</groupId>

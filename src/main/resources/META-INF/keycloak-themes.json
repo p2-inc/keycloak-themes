@@ -5,6 +5,12 @@
       "types": [
         "login"
       ]
+    },
+    {
+      "name": "mustache-test",
+      "types": [
+        "email"
+      ]
     }
   ]
 }

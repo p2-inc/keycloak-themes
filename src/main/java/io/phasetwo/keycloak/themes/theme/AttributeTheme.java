@@ -35,9 +35,9 @@ public class AttributeTheme implements Theme {
 
   private File createRealmDir() {
     try {
-      return Files.createDirectory(
-              Paths.get(tmpdir.getAbsolutePath(), session.getContext().getRealm().getName()))
-          .toFile();
+      Path dir = Paths.get(tmpdir.getAbsolutePath(), session.getContext().getRealm().getName());
+      if (Files.exists(dir)) return dir.toFile();
+      else return Files.createDirectory(dir).toFile();
     } catch (IOException e) {
       throw new IllegalStateException(e);
     }

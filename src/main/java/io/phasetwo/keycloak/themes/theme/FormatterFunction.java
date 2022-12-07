@@ -24,7 +24,7 @@ public abstract class FormatterFunction implements Function<String, String> {
   @Override
   public String apply(String input) {
     try {
-      format(input);
+      return format(input);
     } catch (Exception e) {
       log.warn("error formatting for " + input, e);
     }

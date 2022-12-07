@@ -7,7 +7,7 @@
       ]
     },
     {
-      "name": "mustache-test",
+      "name": "mustache",
       "types": [
         "email"
       ]

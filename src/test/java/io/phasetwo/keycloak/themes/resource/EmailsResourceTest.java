@@ -18,6 +18,9 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.models.RealmModel;
 
 @JBossLog
 public class EmailsResourceTest {
@@ -38,6 +41,7 @@ public class EmailsResourceTest {
     return String.format("%s%s", baseUrl(realm), o.toString());
   }
 
+  
   @Test
   public void testGetTemplates() throws Exception {
     Keycloak keycloak = server.client();
@@ -58,6 +62,12 @@ public class EmailsResourceTest {
     // GET /templates/text/email-verification
     
     // PUT /templates/text/email-verification
+
+    // GET /templates/text/email-verification
+
+    // update with a realm attribute
+    String emailVerificationTemplate = "";
+    updateRealmAttribute(server.getKeycloak(), "master", String.format("%s.%s/%s", EmailsResource.EMAIL_TEMPLATE_ATTRIBUTE_PREFIX, "html", "email-verification", emailVerificationTemplate);
 
     // GET /templates/text/email-verification
   }

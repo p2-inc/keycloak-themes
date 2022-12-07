@@ -15,7 +15,6 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakUriInfo;
 import org.keycloak.theme.FreeMarkerException;
 import org.keycloak.theme.Theme;
-import org.keycloak.theme.beans.MessageFormatterMethod;
 import org.keycloak.utils.StringUtil;
 
 @JBossLog
@@ -64,7 +63,11 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
       }
       rb.putAll(theme.getMessages(locale));
       rb.putAll(realm.getRealmLocalizationTextsByLocale(locale.toLanguageTag()));
-      attributes.put("msg", new MessageFormatterMethod(locale, rb));
+      // attributes.put("msg", new MessageFormatterMethod(locale, rb));
+      attributes.put(
+          "linkExpirationFormatter", new LinkExpirationFormatterFunction(rb, locale, attributes));
+      attributes.put(
+          "requiredActionFormatter", new RequiredActionFormatterFunction(rb, locale, attributes));
       attributes.put("properties", theme.getProperties());
       attributes.put("realmName", getRealmName());
       attributes.put("user", new ProfileBean(user));

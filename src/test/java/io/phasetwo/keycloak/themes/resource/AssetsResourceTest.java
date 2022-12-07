@@ -1,5 +1,6 @@
 package io.phasetwo.keycloak.themes.resource;
 
+import static io.phasetwo.keycloak.Helpers.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.junit.Assert.assertNotNull;
@@ -24,12 +25,35 @@ public class AssetsResourceTest {
 
   CloseableHttpClient httpClient = HttpClients.createDefault();
 
-  //  @Path("css/login.css")
   @Test
   public void testCss() throws Exception {
     String url = String.format("%s/realms/master/assets/css/login.css", server.getAuthUrl());
-    String response = SimpleHttp.doGet(url, httpClient).asString();
-    assertNotNull(response);
+    String css = SimpleHttp.doGet(url, httpClient).asString();
+    assertNotNull(css);
+
+    updateRealmAttribute(server.getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_PRIMARY_COLOR, "#000000");
+    css = SimpleHttp.doGet(url, httpClient).asString();
+    assertNotNull(css);
+    assertThat(css, containsString("--pf-global--primary-color--100: #000000;"));
+
+    updateRealmAttribute(server.getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_SECONDARY_COLOR, "#0AF0AF");
+    css = SimpleHttp.doGet(url, httpClient).asString();
+    assertNotNull(css);
+    assertThat(css, containsString("--pf-global--primary-color--100: #000000;"));
+    assertThat(css, containsString("--pf-global--secondary-color--100: #0AF0AF;"));
+
+    updateRealmAttribute(server.getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_BACKGROUND_COLOR, "#FAAFAA");
+    css = SimpleHttp.doGet(url, httpClient).asString();
+    assertNotNull(css);
+    assertThat(css, containsString("--pf-global--primary-color--100: #000000;"));
+    assertThat(css, containsString("--pf-global--secondary-color--100: #0AF0AF;"));
+    assertThat(css, containsString("--pf-global--BackgroundColor--100: #FAAFAA;"));
+    
+    String newCss = "/* foobar */";
+    updateRealmAttribute(server.getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_CSS_PREFIX, newCss);
+    css = SimpleHttp.doGet(url, httpClient).asString();
+    assertNotNull(css);
+    assertThat(css, is(newCss));
   }
 
   //images?

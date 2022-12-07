@@ -16,8 +16,24 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.representations.idm.RealmEventsConfigRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.models.RealmModel;
+import org.keycloak.testsuite.KeycloakServer;
 
 public class Helpers {
+
+  public static void updateRealmAttribute(KeycloakServer keycloak, String realm, String key, String value) {
+    KeycloakSessionFactory factory = keycloak.getSessionFactory();
+    KeycloakSession session = factory.create();
+    session.getTransactionManager().begin();
+    try {
+      session.realms().getRealmByName(realm).setAttribute(key, value);
+      session.getTransactionManager().commit();
+    } finally {
+      session.close();
+    }
+  }
 
   public static UserRepresentation createUser(Keycloak keycloak, String realm, String username) {
     UserRepresentation user = new UserRepresentation();

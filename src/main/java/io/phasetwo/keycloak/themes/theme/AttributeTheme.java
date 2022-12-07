@@ -58,7 +58,7 @@ public class AttributeTheme implements Theme {
 
   @Override
   public String getParentName() {
-    return getAttribute("_providerConfig.theme.email.parent", "base");
+    return getAttribute("_providerConfig.theme.email.parent", "mustache");
   }
 
   @Override
@@ -79,32 +79,38 @@ public class AttributeTheme implements Theme {
     return String.format("_providerConfig.messages.email.%s", messageName);
   }
 
-  private void copyAttributeToFile(String name) {
-    getAttribute(templateKey(name))
-        .ifPresent(
-            a -> {
-              try {
-                Path p = realmdir.toPath().resolve(name);
-                if (Files.exists(p)) {
-                  Files.deleteIfExists(p);
-                }
-                Files.write(p, a.getBytes(StandardCharsets.UTF_8));
-              } catch (IOException e) {
-                log.warn("Error copying attribute to file", e);
-              }
-            });
+  private boolean copyAttributeToFile(String name) {
+    Optional<String> attr = getAttribute(templateKey(name));
+    if (!attr.isPresent()) return false;
+    attr.ifPresent(
+        a -> {
+          try {
+            Path p = realmdir.toPath().resolve(name);
+            if (Files.exists(p)) {
+              Files.deleteIfExists(p);
+            }
+            Files.write(p, a.getBytes(StandardCharsets.UTF_8));
+          } catch (IOException e) {
+            log.warn("Error copying attribute to file", e);
+          }
+        });
+    return true;
   }
 
   @Override
   public URL getTemplate(String name) throws IOException {
-    copyAttributeToFile(name);
+    log.infof("getTemplate %s", name);
+    if (!copyAttributeToFile(name)) return null;
     File file = new File(realmdir, name);
     return file.isFile() ? file.toURI().toURL() : null;
   }
 
   @Override
   public InputStream getResourceAsStream(String path) throws IOException {
-    return null;
+    log.infof("getResourceAsStream %s", path);
+    URL u = getTemplate(path);
+    if (u == null) return null;
+    return u.openConnection().getInputStream();
   }
 
   @Override

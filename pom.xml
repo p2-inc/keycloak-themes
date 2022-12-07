@@ -29,11 +29,13 @@
     <java.version>1.8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <main.java.package>io.phasetwo.keycloak.themes</main.java.package>
+    <freemarker.version>2.3.31</freemarker.version>
     <junit.version>4.13.2</junit.version>
-    <keycloak.version>18.0.0</keycloak.version>
+    <keycloak.version>20.0.1</keycloak.version>
     <lombok.version>1.18.22</lombok.version>
     <auto-service.version>1.0.1</auto-service.version>
     <ossrh.url>https://s01.oss.sonatype.org</ossrh.url>
+    <maven.test.skip>true</maven.test.skip>
   </properties>
 
   <scm>
@@ -180,6 +182,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+      <version>${freemarker.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>30.1-jre</version>
@@ -198,6 +206,13 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- 3rd party deps -->
+    <dependency>
+      <groupId>com.github.spullara.mustache.java</groupId>
+      <artifactId>compiler</artifactId>
+      <version>0.9.10</version>
+    </dependency>
+    
     <!-- testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -205,5 +220,37 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-admin-client</artifactId>
+      <version>${keycloak.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>test</id>
+      <properties>
+	<maven.test.skip>false</maven.test.skip>
+      </properties>
+      <dependencies>
+	<dependency> <!-- if you're getting a missing dependency error here, you need to install keycloak from source locally, as this never hits maven central -->
+	  <groupId>org.keycloak</groupId>
+	  <artifactId>keycloak-testsuite-utils</artifactId>
+	  <version>${keycloak.version}</version>
+	  <scope>test</scope>
+	</dependency>
+      </dependencies>
+      <build>
+        <plugins>
+	  <plugin>
+	    <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-surefire-plugin</artifactId>
+	    <version>3.0.0-M7</version>
+	  </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

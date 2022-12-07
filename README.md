@@ -6,6 +6,7 @@ Themes and theme utilities meant for simple theme customization without deployin
 
 - A modified login theme that allows colors, logo, CSS to be loaded from Realm attributes. 
 - An implementation of `ThemeProvider` that loads named Freemarker templates and messages from Realm attributes. Currently only for email.
+- An implementation of `EmailTemplateProvider` that allows the use of mustache.js templates.
 
 This extension is used in the [Phase Two](https://phasetwo.io) cloud offering, and is released here as part of its commitment to making its [core extensions](https://phasetwo.io/docs/introduction/open-source) open source. Please consult the [license](COPYING) for information regarding use.
 
@@ -23,6 +24,8 @@ mvn clean install
 ```
 
 2. Copy the jar produced in `target/` to your `providers` directory (for Quarkus) or `standalone/deployments` directory (for legacy) and rebuild/restart keycloak.
+
+After #1, you can also run `docker-compose up` if you want to take a quick look.
 
 ## Overview
 
@@ -49,11 +52,27 @@ Messages can be overridden with the following key format:
 _providerConfig.theme.email.messages.<message-key>
 ```
 
-There is an experimental feature that allows you to select a different base theme, but it doesn't work reliably yet. To use that, set the following variable with the theme you want to override:
+You can also select a different base theme. To use that, set the following variable with the theme you want to override:
 ```
 _providerConfig.theme.email.parent
 ```
+Note that the current base theme is `mustache` which requires the use of the custom `EmailTemplateProvider` below. If you switch it back to `base` by setting the realm attribute, you can override the .ftl templates.
+
+### Mustache templates
+
+The implementation of `EmailTemplateProvider` that allows the use of mustache.js templates will need to override the default implementation in Keycloak. This has to be specified as an SPI override at startup. If you want to use it, you will need to set the following command line flags for `start` or `start-dev`:
+```
+--spi-email-template-provider=freemarker-plus-mustache --spi-email-template-freemarker-plus-mustache-enabled=true
+```
+
+#### Notes
+- For the underlying implementation, we use Sam Pullara's [mustache.java](https://github.com/spullara/mustache.java).
+
+#### Issues
+- In the future, there will be admin UI that will make this easier to use.
+- We get equivalent funcationlity to the methods like `linkExpirationFormatter(linkExpiration)` by using the library's lambda functionality, and using the mustache-y syntax `{{#linkExpirationFormatter}}{{linkExpiration}}{{/linkExpirationFormatter}}`, but there isn't complete coverage yet.
+- There is essentially no i18n at this point, so only the english templates work.
 
 ---
 
-All documentation, source code and other files in this repository are Copyright 2022 Phase Two, Inc.
+All documentation, source code and other files in this repository are Copyright 2023 Phase Two, Inc.

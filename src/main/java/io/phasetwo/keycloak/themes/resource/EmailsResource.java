@@ -30,7 +30,7 @@ public class EmailsResource extends AbstractAdminResource {
     this.session = session;
   }
 
-  private static final Map<String, Object> EMAIL_TEMPLATES =
+  public static final Map<String, Object> EMAIL_TEMPLATES =
       new ImmutableMap.Builder<String, Object>()
           .put("email-verification", "Verification")
           .put("event-login_error", "Login error")

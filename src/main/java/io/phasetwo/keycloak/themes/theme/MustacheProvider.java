@@ -73,6 +73,9 @@ public class MustacheProvider {
   }
 
   public static String templateToString(String templateName, Theme theme) throws IOException {
+    log.infof(
+        "templateName %s themeName %s url %s",
+        templateName, theme.getName(), theme.getTemplate(templateName));
     return Resources.toString(theme.getTemplate(templateName), StandardCharsets.UTF_8);
   }
 }

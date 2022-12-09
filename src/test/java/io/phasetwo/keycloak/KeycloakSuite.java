@@ -67,7 +67,8 @@ public class KeycloakSuite implements TestRule {
     "keycloak.profile=preview",
     "keycloak.profile.feature.account_api=enabled",
     "keycloak.profile.feature.account2=enabled",
-    "keycloak.profile.feature.scripts=enabled"
+    "keycloak.profile.feature.scripts=enabled",
+    "keycloak.emailTemplate.provider=freemarker-plus-mustache"
   };
   //    "product.version=${keycloak.version}",
 
@@ -116,4 +117,5 @@ public class KeycloakSuite implements TestRule {
             .build();
     return keycloak;
   }
+
 }

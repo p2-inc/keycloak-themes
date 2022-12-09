@@ -1,5 +1,7 @@
 package io.phasetwo.keycloak.themes.resource;
 
+import static io.phasetwo.keycloak.themes.theme.AttributeTheme.*;
+
 import com.google.common.collect.ImmutableMap;
 import io.phasetwo.keycloak.themes.theme.MustacheProvider;
 import java.io.IOException;
@@ -28,8 +30,6 @@ public class EmailsResource extends AbstractAdminResource {
     this.session = session;
   }
 
-  public static final String EMAIL_TEMPLATE_ATTRIBUTE_PREFIX = "_providerConfig.templates.email";
-
   public static final Map<String, Object> EMAIL_TEMPLATES =
       new ImmutableMap.Builder<String, Object>()
           .put("email-verification", "Verification")
@@ -42,6 +42,8 @@ public class EmailsResource extends AbstractAdminResource {
           .put("event-remove_totp", "Remove OTP")
           .put("event-update_totp", "Update OTP")
           .put("identity-provider-link", "Link to Identity Provider")
+          .put("magic-link-email", "Magic link")
+          .put("invitation.email", "Organization invitation")
           .build();
 
   @GET
@@ -59,6 +61,10 @@ public class EmailsResource extends AbstractAdminResource {
     return String.format("%s/%s.mustache", templateType, templateName);
   }
 
+  private boolean templateExists(String templateName) {
+    return (EMAIL_TEMPLATES.get(templateName) != null);
+  }
+
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("templates/{templateType}/{templateName}")
@@ -68,8 +74,12 @@ public class EmailsResource extends AbstractAdminResource {
     if (!permissions.realm().canViewRealm()) {
       throw new ForbiddenException("Get email template requires view-realm");
     }
+    if (!templateExists(templateName)) {
+      throw new NotFoundException(templateName + " not found");
+    }
     String templatePath = getTemplatePath(templateType, templateName);
-    log.infof("getEmailTempate for %s", templatePath);
+    log.debugf("getEmailTempate for %s", templatePath);
+    String key = templateKey(templatePath);
     try {
       return MustacheProvider.templateToString(
           templatePath, session.theme().getTheme(Theme.Type.EMAIL));
@@ -88,18 +98,25 @@ public class EmailsResource extends AbstractAdminResource {
     if (!permissions.realm().canManageRealm()) {
       throw new ForbiddenException("Update email template requires manage-realm");
     }
+    if (!templateExists(templateName)) {
+      throw new NotFoundException(templateName + " not found");
+    }
     Map<String, List<InputPart>> formDataMap = input.getFormDataMap();
     if (!formDataMap.containsKey("template")) {
       throw new BadRequestException("No template part present");
     }
+    /*
     String key =
         String.format(
             "%s.%s", EMAIL_TEMPLATE_ATTRIBUTE_PREFIX, getTemplatePath(templateType, templateName));
+    */
+    String key = templateKey(getTemplatePath(templateType, templateName));
+
     try {
       String template = formDataMap.get("template").get(0).getBodyAsString();
+      log.debugf("setting realm attribute %s to %s", key, template);
       realm.setAttribute(key, template);
-      return Response.created(session.getContext().getUri().getAbsolutePathBuilder().build())
-          .build();
+      return Response.noContent().build();
     } catch (IOException e) {
       throw new InternalServerErrorException("Error updating attribute for template " + key, e);
     }

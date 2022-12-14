@@ -1,5 +1,5 @@
 .login-pf body {
-  background: #FFFFFF;
+  background: var(--pf-global--BackgroundColor--100);
 }
 
 div.kc-logo-text {

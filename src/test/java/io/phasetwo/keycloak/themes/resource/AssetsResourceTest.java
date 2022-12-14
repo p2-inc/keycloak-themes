@@ -48,20 +48,12 @@ public class AssetsResourceTest {
     assertThat(css, containsString("--pf-global--primary-color--100: #000000;"));
     assertThat(css, containsString("--pf-global--secondary-color--100: #0AF0AF;"));
     assertThat(css, containsString("--pf-global--BackgroundColor--100: #FAAFAA;"));
-    
+
+    log.infof(css);
     String newCss = "/* foobar */";
-    updateRealmAttribute(server.getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_CSS_PREFIX, newCss);
+    updateRealmAttribute(server.getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_CSS, newCss);
     css = SimpleHttp.doGet(url, httpClient).asString();
     assertNotNull(css);
     assertThat(css, is(newCss));
   }
-
-  //images?
-  /*
-  try {
-    BufferedImage originalImage = ImageIO.read(inputStream);
-  } finally {
-    inputStream.close();
-  }
-  */    
 }

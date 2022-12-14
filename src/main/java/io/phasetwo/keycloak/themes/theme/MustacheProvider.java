@@ -38,15 +38,15 @@ public class MustacheProvider {
   }
 
   public static boolean isMustacheTheme(Theme theme) {
-    // true for now
-    // check in properties? templateType=mustache
     try {
-      if (theme.getProperties() != null)
-        log.infof("templateType=%s", theme.getProperties().getProperty("templateType"));
+      if (theme.getProperties() != null) {
+        String type = theme.getProperties().getProperty("templateType");
+        log.infof("templateType=%s", type);
+        if ("mustache".equals(type)) return true;
+      }
     } catch (Exception ignore) {
     }
-    // instanceof MustacheTheme?
-    return true;
+    return false;
   }
 
   public static boolean hasMustacheTemplates(Theme theme, String template) {

@@ -1,5 +1,6 @@
 package io.phasetwo.keycloak.themes.resource;
 
+import com.google.common.base.Strings;
 import com.google.common.io.CharSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,13 +26,12 @@ public class AssetsResourceProvider implements RealmResourceProvider {
     this.session = session;
   }
 
-  public static final String ASSETS_LOGIN_CSS_PREFIX = "_providerConfig.assets.login.css";
-  public static final String ASSETS_LOGIN_PRIMARY_COLOR =
-      "_providerConfig.assets.login.primaryColor";
-  public static final String ASSETS_LOGIN_SECONDARY_COLOR =
-      "_providerConfig.assets.login.secondaryColor";
+  public static final String ASSETS_LOGIN_PREFIX = "_providerConfig.assets.login";
+  public static final String ASSETS_LOGIN_PRIMARY_COLOR = ASSETS_LOGIN_PREFIX + ".primaryColor";
+  public static final String ASSETS_LOGIN_SECONDARY_COLOR = ASSETS_LOGIN_PREFIX + ".secondaryColor";
   public static final String ASSETS_LOGIN_BACKGROUND_COLOR =
-      "_providerConfig.assets.login.backgroundColor";
+      ASSETS_LOGIN_PREFIX + ".backgroundColor";
+  public static final String ASSETS_LOGIN_CSS = "_providerConfig.assets.login.css";
 
   @Override
   public Object getResource() {
@@ -97,22 +97,11 @@ public class AssetsResourceProvider implements RealmResourceProvider {
   @Produces("text/css")
   public Response cssLogin(@Context HttpHeaders headers, @Context UriInfo uriInfo)
       throws IOException {
-    String css = session.getContext().getRealm().getAttribute(ASSETS_LOGIN_CSS_PREFIX);
-    if (css == null) {
+    String css = session.getContext().getRealm().getAttribute(ASSETS_LOGIN_CSS);
+    if (Strings.isNullOrEmpty(css)) {
       StringBuilder o = new StringBuilder("/* login css */\n");
       o.append(":root {\n");
       setColors(o);
-      session
-          .getContext()
-          .getRealm()
-          .getAttributes()
-          .forEach(
-              (k, v) -> {
-                if (k.startsWith(ASSETS_LOGIN_CSS_PREFIX)) {
-                  String name = k.substring(ASSETS_LOGIN_CSS_PREFIX.length() + 1);
-                  o.append("  --").append(name).append(": ").append(v).append(";\n");
-                }
-              });
       o.append("}\n");
       css = o.toString();
     }

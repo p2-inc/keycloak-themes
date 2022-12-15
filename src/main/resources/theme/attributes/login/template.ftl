@@ -13,7 +13,7 @@
         </#list>
     </#if>
     <title>${msg("loginTitle",(realm.displayName!''))}</title>
-            <link rel="icon" href="/auth/realms/${realm.name}/assets/img/favicon" />
+            <link rel="icon" href="${url.resourcesPath?keep_before("/resources")}/realms/${realm.name}/assets/img/favicon" />
     <#if properties.stylesCommon?has_content>
         <#list properties.stylesCommon?split(' ') as style>
             <link href="${url.resourcesCommonPath}/${style}" rel="stylesheet" />
@@ -24,7 +24,7 @@
             <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
         </#list>
     </#if>
-            <link href="/auth/realms/${realm.name}/assets/css/login.css" rel="stylesheet" />
+            <link href="${url.resourcesPath?keep_before("/resources")}/realms/${realm.name}/assets/css/login.css" rel="stylesheet" />
     <#if properties.scripts?has_content>
         <#list properties.scripts?split(' ') as script>
             <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
@@ -44,7 +44,7 @@
 	<#if realm.displayNameHtml?contains("<") && realm.displayNameHtml?contains(">")>
 	    ${kcSanitize(msg("loginTitleHtml",(realm.displayNameHtml!'')))?no_esc}
         <#else>
-	    <div class="kc-logo-text" style="background-image: url(/auth/realms/${realm.name}/assets/img/logo);"><span>${realm.displayName}</span></div>
+	    <div class="kc-logo-text" style="background-image: url(${url.resourcesPath?keep_before("/resources")}/realms/${realm.name}/assets/img/logo);"><span>${realm.displayName}</span></div>
 	</#if>
 	</div>
     </div>

@@ -6,6 +6,8 @@ import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.common.ClientConnection;
 import org.keycloak.events.EventBuilder;
@@ -15,6 +17,7 @@ import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.representations.AccessToken;
+import org.keycloak.services.resources.Cors;
 import org.keycloak.services.managers.AppAuthManager;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.managers.RealmManager;
@@ -43,11 +46,16 @@ public abstract class AbstractAdminResource {
     setupAuth();
     setupEvents();
     setupPermissions();
+    setupCors();
     init();
   }
 
   void init() {
     // override if your extending class needs additional setup;
+  }
+
+  private void setupCors() {
+    CorsResource.setupCors(session, auth);
   }
 
   private void setupAuth() {

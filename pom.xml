@@ -3,7 +3,7 @@
   <groupId>io.phasetwo.keycloak</groupId>
   <artifactId>keycloak-themes</artifactId>
   <packaging>jar</packaging>
-  <version>0.8-SNAPSHOT</version>
+  <version>0.8</version>
 
   <parent>
     <groupId>com.github.xgp</groupId>
@@ -41,7 +41,7 @@
   <scm>
     <url>https://github.com/p2-inc/keycloak-themes</url>
     <connection>scm:git:git@github.com:p2-inc/keycloak-themes.git</connection>
-    <tag>HEAD</tag>
+    <tag>v0.8</tag>
   </scm>
 
   <build>

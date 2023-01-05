@@ -65,6 +65,12 @@ public class EmailsResource extends AbstractAdminResource {
     return (EMAIL_TEMPLATES.get(templateName) != null);
   }
 
+  // fixes the problem of calling from master
+  private Theme getEmailThemeForRealm(KeycloakSession session) throws IOException {
+    log.infof("get email theme for realm %s", realm.getName());
+    return session.theme().getTheme(realm.getEmailTheme(), Theme.Type.EMAIL);
+  }
+
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("templates/{templateType}/{templateName}")
@@ -81,8 +87,7 @@ public class EmailsResource extends AbstractAdminResource {
     log.debugf("getEmailTempate for %s", templatePath);
     String key = templateKey(templatePath);
     try {
-      return MustacheProvider.templateToString(
-          templatePath, session.theme().getTheme(Theme.Type.EMAIL));
+      return MustacheProvider.templateToString(templatePath, getEmailThemeForRealm(session));
     } catch (IOException e) {
       throw new NotFoundException("Unable to get template " + templateName, e);
     }

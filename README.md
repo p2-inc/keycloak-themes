@@ -40,6 +40,14 @@ The login theme is named `attributes`. It assumes you will store the values as R
 - `_providerConfig.assets.logo.url`: URL of logo file that will be served as the `div.kc-logo-text.background-image`. Constrained to 150x150.
 - `_providerConfig.assets.favicon.url`: URL of the favicon
 
+#### Example CSS overrides
+
+There are 3 examples of CSS themes that can be loaded using the property above. They are in the `examples/` directory. You can either set these as the `_providerConfig.assets.login.css` Realm attribute, or, if you are using the Phase Two admin console theme, set them in the **Styles** -> **Login** section.
+
+* Consumer
+* Enterprise
+* SaaS
+
 ### Email theme
 
 The custom `ThemeProvider` installs one email theme called `attributes` which allows you to override any .ftl template (from base) using Realm attributes with the following key format:
@@ -69,7 +77,6 @@ The implementation of `EmailTemplateProvider` that allows the use of mustache.js
 - For the underlying implementation, we use Sam Pullara's [mustache.java](https://github.com/spullara/mustache.java).
 
 #### Issues
-- In the future, there will be admin UI that will make this easier to use.
 - We get equivalent funcationlity to the methods like `linkExpirationFormatter(linkExpiration)` by using the library's lambda functionality, and using the mustache-y syntax `{{#linkExpirationFormatter}}{{linkExpiration}}{{/linkExpirationFormatter}}`, but there isn't complete coverage yet.
 - There is essentially no i18n at this point, so only the english templates work.
 

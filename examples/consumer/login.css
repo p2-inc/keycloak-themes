@@ -1,0 +1,600 @@
+/* General Overrides */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend+Deca:wght@300;400;500;600;700&family=Lexend:wght@300;400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap");
+
+.login-pf body {
+  background-color: #f1f1f1;
+}
+
+.login-pf-header {
+  margin-top: 1em;
+}
+
+.login-pf-page {
+  min-height: 100vh;
+}
+
+#login-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+#kc-page-title {
+  font-family: "Lexend Deca", sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 34.9911px;
+  line-height: 44px;
+}
+
+#kc-content {
+  max-width: 462px;
+}
+
+.pf-c-form__label {
+  font-family: "Lexend Deca", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: #333333;
+}
+
+.pf-c-form-control:not(textarea) {
+  font-family: "Lexend Deca", sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  color: #888888;
+  background: #ffffff;
+  border: 1px solid rgba(51, 51, 51, 0.2);
+  border-radius: 4px;
+  height: 57px;
+}
+
+.card-pf {
+  max-width: 667px;
+  min-height: 423px;
+  border-top: 0;
+  border-bottom: 24px solid #0066cc;
+  border-radius: 24px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+}
+
+.checkbox label {
+  font-family: "Lexend";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 20px;
+  color: #888888;
+}
+
+a {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  text-decoration-line: underline;
+  color: #0066cc;
+}
+
+.pf-c-button.pf-m-primary {
+  height: 56px;
+  border-radius: 4px;
+  font-family: "Lexend";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 16px;
+  letter-spacing: 0.25px;
+}
+
+hr {
+  opacity: 0;
+}
+
+.alert-warning {
+  border-top: transparent;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1.5em;
+}
+
+.pf-c-alert__title {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 25px;
+  color: #795600;
+}
+
+#kc-info {
+  text-align: -webkit-center;
+  margin: unset;
+}
+
+.required {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: #c30808;
+}
+
+#kc-form-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+#kc-form-buttons button {
+  font-family: "Lexend";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 16px;
+  letter-spacing: 0.25px;
+  color: #888888;
+}
+
+#kc-form-buttons button,
+#kc-form-buttons input {
+  min-width: 43%;
+}
+
+#kc-form-buttons input[value="Delete"] {
+  background-color: #ce3838;
+}
+
+/* End General Overrides */
+
+/* Login-with-social */
+
+#rememberMe {
+  accent-color: #333333;
+  opacity: 0.45;
+  align-self: center;
+  margin-top: 0;
+}
+
+#kc-social-providers h4 {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 16px;
+  color: #0066cc;
+}
+
+#social-google {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  height: 58px;
+  border: 2px solid rgba(136, 136, 136, 0.5);
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.fa-google {
+  background-image: url("../assets/google.svg");
+}
+
+.fa-google:before {
+  content: none;
+}
+
+#social-github {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  height: 58px;
+  border: 2px solid rgba(136, 136, 136, 0.5);
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.fa-github {
+  background-image: url("../assets/github.svg");
+}
+
+.fa-github:before {
+  content: none;
+}
+
+.pf-c-button.pf-m-control {
+  --pf-c-button--after--BorderColor: transparent;
+}
+
+.kc-social-provider-logo {
+  width: 18px;
+  height: 18px;
+}
+
+.kc-social-icon-text {
+  left: unset;
+  right: -15px;
+}
+
+.kc-social-provider-name {
+  font-family: "Lexend";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 16px;
+  letter-spacing: 0.25px;
+  color: #888888;
+  top: unset;
+}
+
+#kc-info-wrapper {
+  background: transparent;
+}
+
+#kc-registration {
+  font-family: "Lexend";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 20px;
+  text-decoration-line: underline;
+  color: rgba(51, 51, 51, 0.5);
+}
+
+/* End login-with-social */
+
+/* Register */
+
+.subtitle {
+  padding-left: 0;
+  text-align: left;
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  margin: 0 0 30px;
+}
+
+#kc-form-options {
+  text-align: center;
+  margin-top: 1em;
+}
+
+/* END Register */
+
+/* Delete-account-verify */
+
+.login-pf-page .card-pf p {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 25px;
+  color: #333333;
+}
+
+#kc-content-wrapper {
+  margin-top: 0px;
+}
+
+#kc-content-wrapper form ul {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: #333333;
+}
+
+.login-pf-page .card-pf .delete-account-text {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: #333333;
+  margin-bottom: 2em;
+}
+
+#kc-content-wrapper form ul li {
+  margin: 1em;
+}
+
+#kc-content-wrapper form ul li:nth-child(2) {
+  margin-bottom: 1.5em;
+}
+
+/* END Delete-account-verify */
+
+/* Email-verify */
+
+#customer-address {
+  color: #000000;
+  font-weight: 500;
+}
+
+#kc-info-wrapper p {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 154.5%;
+  text-align: center;
+  color: #444444;
+}
+
+/* END Email-verify */
+
+/* Forgot-password */
+
+#kc-info-wrapper {
+  max-width: 500px;
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 20px;
+  color: #444444;
+}
+
+/* END Forgot-password */
+
+/* Info */
+
+#kc-info-message .instruction {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 34.9911px;
+  line-height: 44px;
+  text-align: center;
+  color: #000000;
+}
+
+.login-pf-page .card-pf p {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 34.9911px;
+  line-height: 44px;
+  color: #000000;
+}
+
+/* END Info */
+
+/* OTP-entry */
+
+#kc-attempted-username {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 34.9911px;
+  line-height: 44px;
+  color: #000000;
+}
+
+/* END OTP-entry */
+
+/* Recovery-codes */
+
+.pf-c-alert {
+  border-top: transparent;
+  margin-bottom: 1em;
+}
+
+ul {
+  list-style: unset;
+  margin-left: 1em;
+}
+
+li {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 20px;
+  color: #444444;
+}
+
+#kc-recovery-codes-list {
+  background-color: #fafafa;
+  border-radius: 4px;
+  padding-left: 46px;
+}
+
+#kc-recovery-codes-list li {
+  margin-bottom: 24px;
+}
+
+.kc-recovery-codes-list li span,
+#kc-recovery-codes-list li {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: #000000;
+}
+
+#kcRecoveryCodesConfirmationCheck {
+  height: 18px;
+  width: 18px;
+}
+
+#kc-content-wrapper div.pf-c-check.kc-recovery-codes-confirmation label {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 25px;
+  color: #888888;
+}
+
+#kc-content-wrapper div.pf-c-check.kc-recovery-codes-confirmation {
+  align-items: unset;
+}
+
+.kc-recovery-codes-actions {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 25px;
+  color: #0066cc;
+  margin-bottom: 1em;
+}
+
+#saveRecoveryAuthnCodesBtn:disabled {
+  background-color: #ececec;
+  color: #444444;
+}
+
+/* END Recovery-codes */
+
+/* Setup-otp */
+
+.login-pf-page .card-pf p {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: #333333;
+}
+
+li::marker {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: #333333;
+}
+
+#kc-totp-secret-qr-code {
+  position: relative;
+  left: -11px;
+}
+
+#kc-totp-supported-apps {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: #333333;
+}
+
+#kc-totp-supported-apps li::marker {
+  color: transparent;
+}
+
+#kc-content {
+  max-width: 473px;
+}
+
+ol#kc-totp-settings {
+  padding-left: 0px;
+}
+
+ol {
+  list-style-position: inside;
+  padding-left: 0;
+}
+
+li {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: #333333;
+}
+
+.form-group label {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  color: #333333;
+}
+
+/* END Setup-otp */
+
+/* Step-up-challenge */
+
+.alert-info {
+  border-top: transparent;
+  display: flex;
+  flex-direction: row;
+  margin: 3em 0;
+}
+
+.alert-info .kc-feedback-text {
+  color: #888888;
+}
+
+.fa-info-circle {
+  color: #0066cc;
+}
+
+#kc-attempted-username {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 34.9911px;
+  line-height: 44px;
+  color: #000000;
+}
+
+/* END Step-up-challenge */
+
+/* Update-email */
+
+/* END Update-email */
+
+/* Update-password */
+
+.checkbox label {
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 25px;
+  color: #888888;
+  display: flex;
+}
+
+#logout-sessions {
+  width: 18px;
+  height: 18px;
+  position: relative;
+  margin-right: 0.5em;
+}
+
+/* END Update-password */
+
+/* Update-password-ra */
+
+/* END Update-password-ra */
+
+/* Update-profile-ra */
+
+/* END Update-profile-ra */

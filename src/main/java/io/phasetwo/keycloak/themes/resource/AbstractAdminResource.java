@@ -29,17 +29,21 @@ import org.keycloak.services.resources.admin.permissions.AdminPermissions;
 @JBossLog
 public abstract class AbstractAdminResource {
 
-  @Context protected ClientConnection clientConnection;
-  @Context protected HttpHeaders headers;
-  @Context protected KeycloakSession session;
+  protected final ClientConnection connection;
+  protected final HttpHeaders headers;
+  protected final KeycloakSession session;
+  protected final RealmModel realm;
+
   protected AdminAuth auth;
   protected AdminEventBuilder adminEvent;
   protected AdminPermissionEvaluator permissions;
   protected EventBuilder event;
-  protected final RealmModel realm;
 
-  protected AbstractAdminResource(RealmModel realm) {
-    this.realm = realm;
+  protected AbstractAdminResource(KeycloakSession session) {
+    this.session = session;
+    this.realm = session.getContext().getRealm();
+    this.headers = session.getContext().getRequestHeaders();
+    this.connection = session.getContext().getConnection();
   }
 
   public void setup() {
@@ -47,11 +51,6 @@ public abstract class AbstractAdminResource {
     setupEvents();
     setupPermissions();
     setupCors();
-    init();
-  }
-
-  void init() {
-    // override if your extending class needs additional setup;
   }
 
   private void setupCors() {
@@ -67,7 +66,7 @@ public abstract class AbstractAdminResource {
         new AdminEventBuilder(this.realm, auth, session, session.getContext().getConnection())
             .realm(realm);
     event =
-        new EventBuilder​(this.realm, session, clientConnection).realm(realm);
+        new EventBuilder​(this.realm, session, connection).realm(realm);
   }
 
   private void setupPermissions() {
@@ -95,7 +94,7 @@ public abstract class AbstractAdminResource {
     AuthenticationManager.AuthResult authResult =
         new AppAuthManager.BearerTokenAuthenticator(session)
             .setRealm(realm)
-            .setConnection(clientConnection)
+            .setConnection(connection)
             .setHeaders(headers)
             .authenticate();
 

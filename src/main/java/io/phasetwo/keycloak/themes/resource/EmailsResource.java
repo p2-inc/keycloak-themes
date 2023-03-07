@@ -17,17 +17,13 @@ import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
 import org.keycloak.theme.Theme;
 
 @JBossLog
 public class EmailsResource extends AbstractAdminResource {
 
-  private final KeycloakSession session;
-
-  public EmailsResource(RealmModel realm, KeycloakSession session) {
-    super(realm);
-    this.session = session;
+  public EmailsResource(KeycloakSession session) {
+    super(session);
   }
 
   public static final Map<String, Object> EMAIL_TEMPLATES =

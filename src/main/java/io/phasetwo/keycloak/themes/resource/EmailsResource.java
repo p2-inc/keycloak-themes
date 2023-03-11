@@ -39,7 +39,7 @@ public class EmailsResource extends AbstractAdminResource {
           .put("event-update_totp", "Update OTP")
           .put("identity-provider-link", "Link to Identity Provider")
           .put("magic-link-email", "Magic link")
-          .put("invitation.email", "Organization invitation")
+          .put("invitation-email", "Organization invitation")
           .build();
 
   @GET

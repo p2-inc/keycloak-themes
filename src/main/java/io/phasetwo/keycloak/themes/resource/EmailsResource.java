@@ -40,6 +40,7 @@ public class EmailsResource extends AbstractAdminResource {
           .put("identity-provider-link", "Link to Identity Provider")
           .put("magic-link-email", "Magic link")
           .put("invitation-email", "Organization invitation")
+          .put("otp-email", "OTP Code")
           .build();
 
   @GET

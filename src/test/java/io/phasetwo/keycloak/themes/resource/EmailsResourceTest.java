@@ -77,14 +77,29 @@ public class EmailsResourceTest {
   }
 
   @Test
-  public void testGetUpdateTemplate() throws Exception {
+  public void testGetUpdateTemplateMaster() throws Exception {
+    testGetUpdateTemplate("master");
+  }
+
+  @Test
+  public void testGetUpdateTemplateNonMaster() throws Exception {
+    String realmName = "test";
     Keycloak keycloak = server.client();
-    RealmRepresentation r = keycloak.realm("master").toRepresentation();
+    RealmRepresentation r = new RealmRepresentation();
+    r.setRealm(realmName);
+    r.setEnabled(true);
+    keycloak.realms().create(r);
+    testGetUpdateTemplate(realmName);
+  }
+
+  void testGetUpdateTemplate(String realmName) throws Exception {
+    Keycloak keycloak = server.client();
+    RealmRepresentation r = keycloak.realm(realmName).toRepresentation();
     r.setEmailTheme("attributes");
-    keycloak.realm("master").update(r);
+    keycloak.realm(realmName).update(r);
 
     // GET /templates/text/email-verification
-    SimpleHttp.Response response = SimpleHttp.doGet(url("master", "templates", "text", "email-verification"), httpClient)
+    SimpleHttp.Response response = SimpleHttp.doGet(url(realmName, "templates", "text", "email-verification"), httpClient)
                                    .auth(keycloak.tokenManager().getAccessTokenString())
                                    .asResponse();
     assertThat(response.getStatus(), is(200));
@@ -93,7 +108,7 @@ public class EmailsResourceTest {
     
     // PUT /templates/text/email-verification
     String templatePlus = template + "\n\nfoo bar";
-    HttpPut put = new HttpPut(url("master", "templates", "text", "email-verification"));
+    HttpPut put = new HttpPut(url(realmName, "templates", "text", "email-verification"));
     StringBody templateBody = new StringBody(templatePlus, ContentType.MULTIPART_FORM_DATA);
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
     builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
@@ -104,7 +119,7 @@ public class EmailsResourceTest {
     assertThat(resp.getStatusLine().getStatusCode(), is(204));
 
     // GET /templates/text/email-verification
-    response = SimpleHttp.doGet(url("master", "templates", "text", "email-verification"), httpClient)
+    response = SimpleHttp.doGet(url(realmName, "templates", "text", "email-verification"), httpClient)
                .auth(keycloak.tokenManager().getAccessTokenString())
                .asResponse();
     assertThat(response.getStatus(), is(200));
@@ -114,10 +129,10 @@ public class EmailsResourceTest {
     
     // update with a realm attribute
     templatePlus = templatePlus + "\n\ndog cat";
-    updateRealmAttribute(server.getKeycloak(), "master", String.format("%s.%s/%s", EMAIL_TEMPLATE_ATTRIBUTE_PREFIX, "text", "email-verification.mustache"), templatePlus);
+    updateRealmAttribute(server.getKeycloak(), realmName, String.format("%s.%s/%s", EMAIL_TEMPLATE_ATTRIBUTE_PREFIX, "text", "email-verification.mustache"), templatePlus);
 
     // GET /templates/text/email-verification
-    response = SimpleHttp.doGet(url("master", "templates", "text", "email-verification"), httpClient)
+    response = SimpleHttp.doGet(url(realmName, "templates", "text", "email-verification"), httpClient)
                .auth(keycloak.tokenManager().getAccessTokenString())
                .asResponse();
     assertThat(response.getStatus(), is(200));

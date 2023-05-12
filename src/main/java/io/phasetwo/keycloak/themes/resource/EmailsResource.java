@@ -3,6 +3,7 @@ package io.phasetwo.keycloak.themes.resource;
 import static io.phasetwo.keycloak.themes.theme.AttributeTheme.*;
 
 import com.google.common.collect.ImmutableMap;
+import io.phasetwo.keycloak.themes.theme.AttributeTheme;
 import io.phasetwo.keycloak.themes.theme.MustacheProvider;
 import java.io.IOException;
 import java.util.List;
@@ -62,9 +63,9 @@ public class EmailsResource extends AbstractAdminResource {
     return (EMAIL_TEMPLATES.get(templateName) != null);
   }
 
-  // fixes the problem of calling from master
   private Theme getEmailThemeForRealm(KeycloakSession session) throws IOException {
     log.infof("get email theme for realm %s", realm.getName());
+    session.setAttribute(AttributeTheme.REALM_ATTRIBUTE_KEY, realm.getName());
     return session.theme().getTheme(realm.getEmailTheme(), Theme.Type.EMAIL);
   }
 
@@ -107,11 +108,6 @@ public class EmailsResource extends AbstractAdminResource {
     if (!formDataMap.containsKey("template")) {
       throw new BadRequestException("No template part present");
     }
-    /*
-    String key =
-        String.format(
-            "%s.%s", EMAIL_TEMPLATE_ATTRIBUTE_PREFIX, getTemplatePath(templateType, templateName));
-    */
     String key = templateKey(getTemplatePath(templateType, templateName));
 
     try {

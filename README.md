@@ -66,6 +66,11 @@ _providerConfig.theme.email.parent
 ```
 Note that the current base theme is `mustache` which requires the use of the custom `EmailTemplateProvider` below. If you switch it back to `base` by setting the realm attribute, you can override the .ftl templates.
 
+In order to run the email theme, you must turn theme caching off. This is because themes are cached in Keycloak with a common `KeycloakSession`, which will contain the incorrect Realm in the context for lookup of attributes. In practice, we have not noticed a significant performance impact of this. This requires setting the following command line flag for `start` or `start-dev`:
+```
+--spi-theme-cache-themes=false
+```
+
 ### Mustache templates
 
 The implementation of `EmailTemplateProvider` that allows the use of mustache.js templates will need to override the default implementation in Keycloak. This has to be specified as an SPI override at startup. If you want to use it, you will need to set the following command line flags for `start` or `start-dev`:

@@ -17,24 +17,20 @@ public class AttributeThemeProviderFactory implements ThemeProviderFactory {
 
   public static final String PROVIDER_ID = "ext-theme-provider-attribute";
 
-  private KeycloakSessionFactory factory;
-  private AttributeThemeProvider themeProvider;
   private File tmpdir;
 
   @Override
   public ThemeProvider create(KeycloakSession session) {
     log.debugf("Creating AttributeThemeProvider");
     this.tmpdir = Files.createTempDir();
-    return new AttributeThemeProvider(factory, session, tmpdir);
+    return new AttributeThemeProvider(session, tmpdir);
   }
 
   @Override
   public void init(Config.Scope config) {}
 
   @Override
-  public void postInit(KeycloakSessionFactory factory) {
-    this.factory = factory;
-  }
+  public void postInit(KeycloakSessionFactory factory) {}
 
   @Override
   public void close() {}

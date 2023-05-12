@@ -14,50 +14,54 @@ import java.util.Optional;
 import java.util.Properties;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.theme.Theme;
 
 /** */
 @JBossLog
 public class AttributeTheme implements Theme {
 
-  private final KeycloakSessionFactory factory;
+  public static final String REALM_ATTRIBUTE_KEY = "attribute-theme-realm";
+
+  private final KeycloakSession session;
   private final File tmpdir;
-  private final File realmdir;
   private final String name;
   private final Theme.Type type;
 
   private String realm;
+  private File realmdir;
 
-  public AttributeTheme(
-      KeycloakSessionFactory factory,
-      KeycloakSession session,
-      File tmpdir,
-      String name,
-      Theme.Type type) {
-    this.factory = factory;
+  public AttributeTheme(KeycloakSession session, File tmpdir, String name, Theme.Type type) {
     this.tmpdir = tmpdir;
     this.name = name;
     this.type = type;
+    this.session = session;
     this.realm = session.getContext().getRealm().getName();
-    this.realmdir = createRealmDir();
   }
 
   private Map<String, String> getAttributes() {
-    KeycloakSession session = factory.create();
-    Map<String, String> attrs = session.realms().getRealmByName(realm).getAttributes();
-    session.close();
+    Map<String, String> attrs = session.realms().getRealmByName(useRealm()).getAttributes();
     return attrs;
   }
 
-  private File createRealmDir() {
-    try {
-      Path dir = Paths.get(tmpdir.getAbsolutePath(), realm);
-      if (Files.exists(dir)) return dir.toFile();
-      else return Files.createDirectory(dir).toFile();
-    } catch (IOException e) {
-      throw new IllegalStateException(e);
+  private String useRealm() {
+    Object attr = session.getAttribute(REALM_ATTRIBUTE_KEY);
+    String useRealm = realm;
+    if (attr != null) {
+      useRealm = attr.toString();
     }
+    return useRealm;
+  }
+
+  private synchronized File getRealmDir() {
+    if (this.realmdir == null) {
+      try {
+        Path dir = Paths.get(tmpdir.getAbsolutePath(), useRealm());
+        this.realmdir = Files.exists(dir) ? dir.toFile() : Files.createDirectory(dir).toFile();
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
+    }
+    return this.realmdir;
   }
 
   private String getAttribute(String key, String defaultValue) {
@@ -108,7 +112,7 @@ public class AttributeTheme implements Theme {
     attr.ifPresent(
         a -> {
           try {
-            Path p = realmdir.toPath().resolve(name);
+            Path p = getRealmDir().toPath().resolve(name);
             if (Files.exists(p)) {
               Files.deleteIfExists(p);
             }
@@ -125,7 +129,7 @@ public class AttributeTheme implements Theme {
   public URL getTemplate(String name) throws IOException {
     log.debugf("getTemplate %s", name);
     if (!copyAttributeToFile(name)) return null;
-    File file = new File(realmdir, name);
+    File file = new File(getRealmDir(), name);
     return file.isFile() ? file.toURI().toURL() : null;
   }
 
@@ -140,7 +144,6 @@ public class AttributeTheme implements Theme {
   @Override
   public Properties getMessages(Locale locale) throws IOException {
     Properties p = new Properties();
-    // session.getContext().getRealm().getAttributes().entrySet().stream()
     getAttributes().entrySet().stream()
         .filter(e -> e.getKey().startsWith("_providerConfig.messages.email."))
         .forEach(

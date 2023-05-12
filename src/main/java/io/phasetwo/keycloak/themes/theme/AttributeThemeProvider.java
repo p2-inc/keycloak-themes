@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Set;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.theme.Theme;
 import org.keycloak.theme.ThemeProvider;
 
@@ -14,15 +13,16 @@ import org.keycloak.theme.ThemeProvider;
 @JBossLog
 public class AttributeThemeProvider implements ThemeProvider {
 
-  private final KeycloakSessionFactory factory;
   private final KeycloakSession session;
   private final File tmpdir;
 
-  public AttributeThemeProvider(
-      KeycloakSessionFactory factory, KeycloakSession session, File tmpdir) {
-    this.factory = factory;
+  public AttributeThemeProvider(KeycloakSession session, File tmpdir) {
     this.session = session;
     this.tmpdir = tmpdir;
+  }
+
+  public File getTmpDir() {
+    return this.tmpdir;
   }
 
   @Override
@@ -33,8 +33,8 @@ public class AttributeThemeProvider implements ThemeProvider {
   @Override
   public Theme getTheme(String name, Theme.Type type) throws IOException {
     if (!hasTheme(name, type)) return null;
-    log.debugf("Creating AttributeTheme");
-    return new AttributeTheme(factory, session, tmpdir, name, type);
+    log.infof("Creating AttributeTheme for %s", session.getContext().getRealm().getName());
+    return new AttributeTheme(session, tmpdir, name, type);
   }
 
   public static final String ATTRIBUTE_THEME_NAME = "attributes";

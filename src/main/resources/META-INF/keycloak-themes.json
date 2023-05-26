@@ -11,6 +11,12 @@
       "types": [
         "email"
       ]
+    },
+    {
+      "name": "attributes-keywind",
+      "types": [
+        "login"
+      ]
     }
   ]
 }

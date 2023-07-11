@@ -30,12 +30,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <main.java.package>io.phasetwo.keycloak.themes</main.java.package>
     <freemarker.version>2.3.31</freemarker.version>
-    <junit.version>4.13.2</junit.version>
-    <keycloak.version>21.1.1</keycloak.version>
-    <lombok.version>1.18.22</lombok.version>
-    <auto-service.version>1.0.1</auto-service.version>
+    <junit.version>5.8.2</junit.version>
+    <keycloak.version>22.0.0</keycloak.version>
+    <lombok.version>1.18.28</lombok.version>
+    <auto-service.version>1.1.1</auto-service.version>
     <ossrh.url>https://s01.oss.sonatype.org</ossrh.url>
-    <maven.test.skip>true</maven.test.skip>
   </properties>
 
   <scm>
@@ -80,10 +79,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.11.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
 	  <compilerArgument>-Xlint:unchecked</compilerArgument>
 	  <compilerArgument>-Xlint:deprecation</compilerArgument>
           <useIncrementalCompilation>false</useIncrementalCompilation>
@@ -142,7 +141,17 @@
       <plugin> <!-- pretty up the code using google java standards `mvn fmt:format` -->
         <groupId>com.spotify.fmt</groupId>
         <artifactId>fmt-maven-plugin</artifactId>
-        <version>2.19</version>
+        <version>2.20</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.0</version>
+        <configuration>
+          <argLine>
+            --illegal-access=permit
+          </argLine>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -190,19 +199,19 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>30.1-jre</version>
+      <version>32.0.0-jre</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-      <version>2.1.1</version>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+      <version>3.1.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-      <version>1.1.0.Final</version>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <version>3.0.2</version>
       <scope>provided</scope>
     </dependency>
 
@@ -215,15 +224,45 @@
     
     <!-- testing -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.keycloak</groupId>
-      <artifactId>keycloak-admin-client</artifactId>
-      <version>${keycloak.version}</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>1.18.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.dasniko</groupId>
+      <artifactId>testcontainers-keycloak</artifactId>
+      <version>3.0.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-impl-maven-archive</artifactId>
+      <version>3.2.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.4.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <version>2.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -234,29 +273,4 @@
     </dependency>
   </dependencies>
 
-  <profiles>
-    <profile>
-      <id>test</id>
-      <properties>
-	<maven.test.skip>false</maven.test.skip>
-      </properties>
-      <dependencies>
-	<dependency> <!-- if you're getting a missing dependency error here, you need to install keycloak from source locally, as this never hits maven central -->
-	  <groupId>org.keycloak</groupId>
-	  <artifactId>keycloak-testsuite-utils</artifactId>
-	  <version>${keycloak.version}</version>
-	  <scope>test</scope>
-	</dependency>
-      </dependencies>
-      <build>
-        <plugins>
-	  <plugin>
-	    <groupId>org.apache.maven.plugins</groupId>
-	    <artifactId>maven-surefire-plugin</artifactId>
-	    <version>3.0.0-M7</version>
-	  </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

@@ -1,6 +1,6 @@
 package io.phasetwo.keycloak.themes.resource;
 
-import javax.ws.rs.*;
+import jakarta.ws.rs.*;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.models.KeycloakSession;
 

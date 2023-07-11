@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Properties;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
 import org.keycloak.theme.Theme;
 
 /** */
@@ -157,6 +158,11 @@ public class AttributeTheme implements Theme {
 
   @Override
   public Properties getMessages(String baseBundlename, Locale locale) throws IOException {
+    return null;
+  }
+
+  @Override
+  public Properties getEnhancedMessages(RealmModel realm, Locale locale) throws IOException {
     return null;
   }
 

@@ -1,16 +1,48 @@
 package io.phasetwo.keycloak;
 
+import com.google.common.collect.Lists;
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
 public class Helpers {
+
+  public static String getKeycloakVersion() {
+    String version = System.getProperty("keycloakVersion");
+    if (version == null) throw new IllegalStateException("keycloakVersion not set");
+    return version;
+  }
+
+  public static String getDockerImage() {
+    return String.format("quay.io/phasetwo/keycloak-crdb:%s", getKeycloakVersion());
+  }
+
+  public static List<File> getDeps(String... paths) {
+    List<File> dependencies = Lists.newArrayList();
+    for (String path : paths) {
+      dependencies.addAll(getDeps(path));
+    }
+    return dependencies;
+  }
+
+  private static List<File> getDeps(String path) {
+    List<File> dependencies =
+        Maven.resolver()
+            .loadPomFromFile("./pom.xml")
+            .resolve(path)
+            .withoutTransitivity()
+            .asList(File.class);
+    return dependencies;
+  }
 
   public static void updateRealmAttribute(
       Keycloak keycloak, String realm, String key, String value) {

@@ -23,10 +23,17 @@ public class AssetsResourceTest {
 
   @Container
   public static final KeycloakContainer container =
-      new KeycloakContainer("quay.io/phasetwo/keycloak-crdb:22.0.0")
+      new KeycloakContainer(getDockerImage())
           .withContextPath("/auth")
           .withReuse(true)
-          .withProviderClassesFrom("target/classes");
+          .withProviderClassesFrom("target/classes")
+          .withEnv("KC_SPI_EMAIL_TEMPLATE_PROVIDER", "freemarker-plus-mustache")
+          .withEnv("KC_SPI_EMAIL_TEMPLATE_FREEMARKER_PLUS_MUSTACHE_ENABLED", "true")
+          .withDisabledCaching()
+          .withProviderLibsFrom(
+              getDeps(
+                  "com.github.spullara.mustache.java:compiler",
+                  "io.phasetwo.keycloak:keycloak-extensions"));
 
   @BeforeAll
   public static void beforeAll() {

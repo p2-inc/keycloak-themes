@@ -1,6 +1,8 @@
 package io.phasetwo.keycloak.themes.resource;
 
 import com.google.auto.service.AutoService;
+import io.phasetwo.keycloak.ext.util.Stats;
+import io.phasetwo.keycloak.themes.Version;
 import org.keycloak.Config.Scope;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
@@ -23,7 +25,9 @@ public class EmailsResourceProviderFactory implements RealmResourceProviderFacto
   }
 
   @Override
-  public void init(Scope config) {}
+  public void init(Scope config) {
+    Stats.collect(Version.getName(), Version.getVersion(), Version.getCommit());
+  }
 
   @Override
   public void postInit(KeycloakSessionFactory factory) {}

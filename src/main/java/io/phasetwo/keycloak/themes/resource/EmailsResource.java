@@ -3,6 +3,7 @@ package io.phasetwo.keycloak.themes.resource;
 import static io.phasetwo.keycloak.themes.theme.AttributeTheme.*;
 
 import com.google.common.collect.ImmutableMap;
+import io.phasetwo.keycloak.ext.resource.AbstractAdminResource;
 import io.phasetwo.keycloak.themes.theme.AttributeTheme;
 import io.phasetwo.keycloak.themes.theme.MustacheProvider;
 import jakarta.ws.rs.*;
@@ -18,10 +19,11 @@ import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.services.resources.admin.AdminAuth;
 import org.keycloak.theme.Theme;
 
 @JBossLog
-public class EmailsResource extends AbstractAdminResource {
+public class EmailsResource extends AbstractAdminResource<AdminAuth> {
 
   public EmailsResource(KeycloakSession session) {
     super(session);

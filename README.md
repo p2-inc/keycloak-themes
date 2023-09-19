@@ -14,18 +14,20 @@ This extension is used in the [Phase Two](https://phasetwo.io) cloud offering, a
 
 The easiest way to get started is our [Docker image](https://quay.io/repository/phasetwo/phasetwo-keycloak?tab=tags). Documentation and examples for using it are in the [phasetwo-containers](https://github.com/p2-inc/phasetwo-containers) repo. The most recent version of this extension is included.
 
-## Installation
+## Building
 
-If you wish to build this yourself, you can do so with a few simple steps:
+If you wish to build this yourself, you can do so with one step:
 
-1. Build the jar:
 ```
 mvn clean install
 ```
 
-2. Copy the jar produced in `target/` to your `providers` directory (for Quarkus) or `standalone/deployments` directory (for legacy) and rebuild/restart keycloak.
+After this, you can run `docker-compose up` if you want to take a quick look.
 
-After #1, you can also run `docker-compose up` if you want to take a quick look.
+## Installation
+
+The jars that are distributed with the `bundle` classifier have the 3rd party dependencies bundled (via the Maven shade plugin). Put the `keycloak-magic-link-{version}-bundle` jar in the `providers/` directory of your Keycloak distribution and restart Keycloak. If you are installing several extensions that may have overlapping dependencies, it is recommended that you use the standalone jar, and manually install the dependencies, as you may run into version conflicts with the class files in the shaded jar.
+
 
 ## Overview
 

@@ -10,8 +10,6 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
-import java.io.File;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.jbosslog.JBossLog;
 import org.apache.http.HttpResponse;
@@ -22,7 +20,6 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -34,26 +31,19 @@ import org.testcontainers.junit.jupiter.Container;
 @JBossLog
 public class EmailsResourceTest {
 
-  static List<File> getDeps() {
-    List<File> dependencies =
-        Maven.resolver()
-            .loadPomFromFile("./pom.xml")
-            .resolve("com.github.spullara.mustache.java:compiler")
-            .withoutTransitivity()
-            .asList(File.class);
-    return dependencies;
-  }
-
   @Container
   public static final KeycloakContainer container =
-      new KeycloakContainer("quay.io/phasetwo/keycloak-crdb:22.0.0")
+      new KeycloakContainer(getDockerImage())
           .withContextPath("/auth")
           .withReuse(true)
           .withProviderClassesFrom("target/classes")
           .withEnv("KC_SPI_EMAIL_TEMPLATE_PROVIDER", "freemarker-plus-mustache")
           .withEnv("KC_SPI_EMAIL_TEMPLATE_FREEMARKER_PLUS_MUSTACHE_ENABLED", "true")
           .withDisabledCaching()
-          .withProviderLibsFrom(getDeps());
+          .withProviderLibsFrom(
+              getDeps(
+                  "com.github.spullara.mustache.java:compiler",
+                  "io.phasetwo.keycloak:keycloak-extensions"));
 
   @BeforeAll
   public static void beforeAll() {

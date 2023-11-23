@@ -9,40 +9,15 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import lombok.extern.jbosslog.JBossLog;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.keycloak.admin.client.Keycloak;
 import org.keycloak.broker.provider.util.SimpleHttp;
-import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 @JBossLog
-public class AssetsResourceTest {
-
-  @Container
-  public static final KeycloakContainer container =
-      new KeycloakContainer("quay.io/phasetwo/keycloak-crdb:22.0.0")
-          .withContextPath("/auth")
-          .withReuse(true)
-          .withProviderClassesFrom("target/classes");
-
-  @BeforeAll
-  public static void beforeAll() {
-    container.start();
-  }
-
-  @AfterAll
-  public static void afterAll() {
-    container.stop();
-  }
-
-  CloseableHttpClient httpClient = HttpClients.createDefault();
-
-  static Keycloak getKeycloak() {
-    return container.getKeycloakAdminClient();
-  }
+@Testcontainers
+public class AssetsResourceTest extends AbstractResourceTest {
 
   @Test
   public void testCss() throws Exception {

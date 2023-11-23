@@ -31,8 +31,8 @@
     <main.java.package>io.phasetwo.keycloak.themes</main.java.package>
     <freemarker.version>2.3.31</freemarker.version>
     <junit.version>5.8.2</junit.version>
-    <keycloak.version>22.0.2</keycloak.version>
-    <lombok.version>1.18.28</lombok.version>
+    <keycloak.version>23.0.0</keycloak.version>
+    <lombok.version>1.18.30</lombok.version>
     <auto-service.version>1.1.1</auto-service.version>
     <ossrh.url>https://s01.oss.sonatype.org</ossrh.url>
   </properties>
@@ -141,16 +141,20 @@
       <plugin> <!-- pretty up the code using google java standards `mvn fmt:format` -->
         <groupId>com.spotify.fmt</groupId>
         <artifactId>fmt-maven-plugin</artifactId>
-        <version>2.20</version>
+        <version>2.21.1</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.0</version>
-        <configuration>
+        <version>3.2.2</version>
+	<configuration>
           <argLine>
             --illegal-access=permit
           </argLine>
+          <systemPropertyVariables>
+            <propertyName>keycloak-version</propertyName>
+            <buildDirectory>${keycloak.version}</buildDirectory>
+          </systemPropertyVariables>
         </configuration>
       </plugin>
     </plugins>

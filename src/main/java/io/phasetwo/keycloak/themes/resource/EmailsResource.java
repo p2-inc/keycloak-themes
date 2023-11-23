@@ -1,6 +1,7 @@
 package io.phasetwo.keycloak.themes.resource;
 
 import static io.phasetwo.keycloak.themes.theme.AttributeTheme.*;
+import static jakarta.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
 
 import com.google.common.collect.ImmutableMap;
 import io.phasetwo.keycloak.themes.theme.AttributeTheme;
@@ -19,6 +20,9 @@ import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.theme.Theme;
+import jakarta.ws.rs.core.MultivaluedMap;
+import org.keycloak.http.FormPartValue;
+import org.keycloak.http.HttpRequest;
 
 @JBossLog
 public class EmailsResource extends AbstractAdminResource {
@@ -96,26 +100,44 @@ public class EmailsResource extends AbstractAdminResource {
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   public Response updateEmailTemplate(
       @PathParam("templateType") String templateType,
-      @PathParam("templateName") String templateName,
-      MultipartFormDataInput input) {
+      @PathParam("templateName") String templateName) {
     if (!permissions.realm().canManageRealm()) {
       throw new ForbiddenException("Update email template requires manage-realm");
     }
     if (!templateExists(templateName)) {
       throw new NotFoundException(templateName + " not found");
     }
-    Map<String, List<InputPart>> formDataMap = input.getFormDataMap();
+
+    HttpRequest req = session.getContext().getHttpRequest();
+    log.infof("mediaType %s", req.getHttpHeaders().getMediaType());
+    log.infof("contentType %s", req.getHttpHeaders().getHeaderString("content-type"));
+
+    MediaType mediaType = req.getHttpHeaders().getMediaType();
+    log.infof("isCompatible %b", MULTIPART_FORM_DATA_TYPE.isCompatible(mediaType));
+    log.infof("hasBoundary %b", mediaType.getParameters().containsKey("boundary"));
+
+    //log.infof("body %s", template);
+
+    MultivaluedMap<String, FormPartValue> formDataMap = session.getContext().getHttpRequest().getMultiPartFormParameters();
+    if (formDataMap != null) {
+      log.infof("formDataMap %s", formDataMap);
+      for (String k : formDataMap.keySet()) {
+        log.infof("key %s", k);
+      }
+    }
+
     if (!formDataMap.containsKey("template")) {
       throw new BadRequestException("No template part present");
     }
+
     String key = templateKey(getTemplatePath(templateType, templateName));
 
     try {
-      String template = formDataMap.get("template").get(0).getBodyAsString();
+      String template = formDataMap.getFirst("template").asString();
       log.debugf("setting realm attribute %s to %s", key, template);
       realm.setAttribute(key, template);
       return Response.noContent().build();
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new InternalServerErrorException("Error updating attribute for template " + key, e);
     }
   }

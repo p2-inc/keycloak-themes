@@ -10,19 +10,16 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.jbosslog.JBossLog;
-import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.theme.Theme;
-import jakarta.ws.rs.core.MultivaluedMap;
 import org.keycloak.http.FormPartValue;
 import org.keycloak.http.HttpRequest;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.theme.Theme;
 
 @JBossLog
 public class EmailsResource extends AbstractAdminResource {
@@ -100,7 +97,8 @@ public class EmailsResource extends AbstractAdminResource {
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   public Response updateEmailTemplate(
       @PathParam("templateType") String templateType,
-      @PathParam("templateName") String templateName) {
+      @PathParam("templateName") String templateName,
+      @FormParam("noop") String noop) {
     if (!permissions.realm().canManageRealm()) {
       throw new ForbiddenException("Update email template requires manage-realm");
     }
@@ -108,21 +106,20 @@ public class EmailsResource extends AbstractAdminResource {
       throw new NotFoundException(templateName + " not found");
     }
 
-    HttpRequest req = session.getContext().getHttpRequest();
-    log.infof("mediaType %s", req.getHttpHeaders().getMediaType());
-    log.infof("contentType %s", req.getHttpHeaders().getHeaderString("content-type"));
-
-    MediaType mediaType = req.getHttpHeaders().getMediaType();
-    log.infof("isCompatible %b", MULTIPART_FORM_DATA_TYPE.isCompatible(mediaType));
-    log.infof("hasBoundary %b", mediaType.getParameters().containsKey("boundary"));
-
-    //log.infof("body %s", template);
-
-    MultivaluedMap<String, FormPartValue> formDataMap = session.getContext().getHttpRequest().getMultiPartFormParameters();
-    if (formDataMap != null) {
-      log.infof("formDataMap %s", formDataMap);
-      for (String k : formDataMap.keySet()) {
-        log.infof("key %s", k);
+    MultivaluedMap<String, FormPartValue> formDataMap =
+        session.getContext().getHttpRequest().getMultiPartFormParameters();
+    if (log.isTraceEnabled()) {
+      HttpRequest req = session.getContext().getHttpRequest();
+      log.tracef("mediaType %s", req.getHttpHeaders().getMediaType());
+      log.tracef("contentType %s", req.getHttpHeaders().getHeaderString("content-type"));
+      MediaType mediaType = req.getHttpHeaders().getMediaType();
+      log.tracef("isCompatible %b", MULTIPART_FORM_DATA_TYPE.isCompatible(mediaType));
+      log.tracef("hasBoundary %b", mediaType.getParameters().containsKey("boundary"));
+      if (formDataMap != null) {
+        log.tracef("formDataMap %s", formDataMap);
+        for (String k : formDataMap.keySet()) {
+          log.tracef("key %s", k);
+        }
       }
     }
 

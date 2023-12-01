@@ -31,7 +31,7 @@
     <main.java.package>io.phasetwo.keycloak.themes</main.java.package>
     <freemarker.version>2.3.31</freemarker.version>
     <junit.version>5.8.2</junit.version>
-    <keycloak.version>23.0.0</keycloak.version>
+    <keycloak.version>23.0.1</keycloak.version>
     <lombok.version>1.18.30</lombok.version>
     <auto-service.version>1.1.1</auto-service.version>
     <ossrh.url>https://s01.oss.sonatype.org</ossrh.url>
@@ -49,7 +49,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-	<version>3.2.4</version>
+	<version>3.5.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -242,19 +242,19 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>1.18.3</version>
+      <version>1.19.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.github.dasniko</groupId>
       <artifactId>testcontainers-keycloak</artifactId>
-      <version>3.0.0</version>
+      <version>3.2.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-impl-maven-archive</artifactId>
-      <version>3.2.0</version>
+      <version>3.2.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>

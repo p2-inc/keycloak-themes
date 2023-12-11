@@ -56,6 +56,14 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
       Theme theme = getTheme();
       Locale locale = session.getContext().resolveLocale(user);
       attributes.put("locale", locale);
+
+      // Expose locale_xy flags
+      realm.getSupportedLocalesStream().forEach(loc -> {
+              String key = String.format("locale_%s", loc);
+              Boolean ok = locale.getLanguage().equals(new Locale(loc).getLanguage());
+              attributes.put(key, ok);
+          });
+
       KeycloakUriInfo uriInfo = session.getContext().getUri();
       Properties rb = new Properties();
       if (!StringUtil.isNotBlank(realm.getDefaultLocale())) {

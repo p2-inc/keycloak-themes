@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Stream;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.freemarker.FreeMarkerEmailTemplateProvider;
@@ -58,11 +59,14 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
       attributes.put("locale", locale);
 
       // Expose locale_xy flags
-      realm.getSupportedLocalesStream().forEach(loc -> {
-              String key = String.format("locale_%s", loc);
-              Boolean ok = locale.getLanguage().equals(new Locale(loc).getLanguage());
-              attributes.put(key, ok);
-          });
+      Stream stream = realm.getSupportedLocalesStream();
+      if (stream != null) {
+          stream.forEach(loc -> {
+                  String key = String.format("locale_%s", loc);
+                  Boolean ok = locale.getLanguage().equals(loc);
+                  attributes.put(key, ok);
+              });
+      }
 
       KeycloakUriInfo uriInfo = session.getContext().getUri();
       Properties rb = new Properties();

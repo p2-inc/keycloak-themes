@@ -21,7 +21,7 @@ public class AttributeThemeProviderFactory implements ThemeProviderFactory {
 
   @Override
   public ThemeProvider create(KeycloakSession session) {
-    log.debugf("Creating AttributeThemeProvider");
+    log.trace("Creating AttributeThemeProvider");
     this.tmpdir = Files.createTempDir();
     return new AttributeThemeProvider(session, tmpdir);
   }

@@ -24,15 +24,13 @@ public class AttributeTheme implements Theme {
   public static final String REALM_ATTRIBUTE_KEY = "attribute-theme-realm";
 
   private final KeycloakSession session;
-  private final File tmpdir;
   private final String name;
   private final Theme.Type type;
 
   private String realm;
   private File realmdir;
 
-  public AttributeTheme(KeycloakSession session, File tmpdir, String name, Theme.Type type) {
-    this.tmpdir = tmpdir;
+  public AttributeTheme(KeycloakSession session, String name, Theme.Type type) {
     this.name = name;
     this.type = type;
     this.session = session;
@@ -56,7 +54,7 @@ public class AttributeTheme implements Theme {
   private synchronized File getRealmDir() {
     if (this.realmdir == null) {
       try {
-        Path dir = Paths.get(tmpdir.getAbsolutePath(), useRealm());
+        Path dir = Files.createTempDirectory(useRealm());
         this.realmdir = Files.exists(dir) ? dir.toFile() : Files.createDirectory(dir).toFile();
       } catch (IOException e) {
         throw new IllegalStateException(e);

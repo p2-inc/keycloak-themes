@@ -14,15 +14,9 @@ import org.keycloak.theme.ThemeProvider;
 public class AttributeThemeProvider implements ThemeProvider {
 
   private final KeycloakSession session;
-  private final File tmpdir;
 
-  public AttributeThemeProvider(KeycloakSession session, File tmpdir) {
+  public AttributeThemeProvider(KeycloakSession session) {
     this.session = session;
-    this.tmpdir = tmpdir;
-  }
-
-  public File getTmpDir() {
-    return this.tmpdir;
   }
 
   @Override
@@ -34,7 +28,7 @@ public class AttributeThemeProvider implements ThemeProvider {
   public Theme getTheme(String name, Theme.Type type) throws IOException {
     if (!hasTheme(name, type)) return null;
     log.infof("Creating AttributeTheme for %s", session.getContext().getRealm().getName());
-    return new AttributeTheme(session, tmpdir, name, type);
+    return new AttributeTheme(session, name, type);
   }
 
   public static final String ATTRIBUTE_THEME_NAME = "attributes";

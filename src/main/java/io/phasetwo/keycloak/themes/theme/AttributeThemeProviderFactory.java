@@ -1,8 +1,6 @@
 package io.phasetwo.keycloak.themes.theme;
 
 import com.google.auto.service.AutoService;
-import com.google.common.io.Files;
-import java.io.File;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
@@ -17,13 +15,10 @@ public class AttributeThemeProviderFactory implements ThemeProviderFactory {
 
   public static final String PROVIDER_ID = "ext-theme-provider-attribute";
 
-  private File tmpdir;
-
   @Override
   public ThemeProvider create(KeycloakSession session) {
     log.trace("Creating AttributeThemeProvider");
-    this.tmpdir = Files.createTempDir();
-    return new AttributeThemeProvider(session, tmpdir);
+    return new AttributeThemeProvider(session);
   }
 
   @Override
@@ -33,15 +28,7 @@ public class AttributeThemeProviderFactory implements ThemeProviderFactory {
   public void postInit(KeycloakSessionFactory factory) {}
 
   @Override
-  public void close() {
-    try {
-      this.tmpdir.delete();
-    } catch (Exception e) {
-      log.error("Failed to delete tmpdir", e);
-    } finally {
-        this.tmpdir.deleteOnExit();
-    }
-  }
+  public void close() { }
 
   @Override
   public String getId() {

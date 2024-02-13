@@ -33,7 +33,15 @@ public class AttributeThemeProviderFactory implements ThemeProviderFactory {
   public void postInit(KeycloakSessionFactory factory) {}
 
   @Override
-  public void close() {}
+  public void close() {
+    try {
+      this.tmpdir.delete();
+    } catch (Exception e) {
+      log.error("Failed to delete tmpdir", e);
+    } finally {
+        this.tmpdir.deleteOnExit();
+    }
+  }
 
   @Override
   public String getId() {

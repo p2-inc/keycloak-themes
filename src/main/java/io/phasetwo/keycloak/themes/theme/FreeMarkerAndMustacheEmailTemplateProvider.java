@@ -61,11 +61,12 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
       // Expose locale_xy flags
       Stream stream = realm.getSupportedLocalesStream();
       if (stream != null) {
-          stream.forEach(loc -> {
-                  String key = String.format("locale_%s", loc);
-                  Boolean ok = locale.getLanguage().equals(loc);
-                  attributes.put(key, ok);
-              });
+        stream.forEach(
+            loc -> {
+              String key = String.format("locale_%s", loc);
+              Boolean ok = locale.getLanguage().equals(loc);
+              attributes.put(key, ok);
+            });
       }
 
       KeycloakUriInfo uriInfo = session.getContext().getUri();

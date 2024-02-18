@@ -41,6 +41,7 @@ public class EmailsResource extends AbstractAdminResource {
           .put("event-update_totp", "Update OTP")
           .put("identity-provider-link", "Link to Identity Provider")
           .put("magic-link-email", "Magic link")
+          .put("magic-link-continuation-email", "Magic link continuation")
           .put("invitation-email", "Organization invitation")
           .put("otp-email", "OTP Code")
           .build();

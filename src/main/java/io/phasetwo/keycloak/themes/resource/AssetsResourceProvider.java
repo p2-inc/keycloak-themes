@@ -11,6 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.Urls;
@@ -79,9 +84,15 @@ public class AssetsResourceProvider implements RealmResourceProvider {
     }
   }
 
-  private void setColors(StringBuilder o) {
+ private void setColors(StringBuilder o) {
     setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--primary-color--100");
-    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--secondary-color--100");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--active-color--100");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--primary-color--dark-100");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--link--Color");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--link--Color--dark");
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--primary-color--200");
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--link--Color--hover");
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--link--Color--dark--hover");
     setColor(o, ASSETS_LOGIN_BACKGROUND_COLOR, "--pf-global--BackgroundColor--100");
   }
 

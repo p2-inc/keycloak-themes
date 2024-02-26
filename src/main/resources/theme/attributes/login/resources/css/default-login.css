@@ -12,3 +12,20 @@ div.kc-logo-text {
 #kc-header-wrapper {
   color: #363636;
 }
+
+a {
+  color: var(--pf-global--link--Color);
+}
+
+.login-pf a:hover {
+  color: var(--pf-global--link--Color--hover);
+}
+
+input[type="text"]:focus,
+input[type="text"]:focus-within,
+input[type="text"]:focus-visible,
+input[type="password"]:focus,
+input[type="password"]:focus-within,
+input[type="password"]:focus-visible {
+  outline: var(--pf-global--active-color--100) auto 1px;
+}

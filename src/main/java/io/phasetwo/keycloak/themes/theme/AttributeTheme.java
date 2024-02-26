@@ -95,15 +95,15 @@ public class AttributeTheme implements Theme {
     return type;
   }
 
-  private static final String LEGACY_EMAIL_TEMPLATE_ATTRIBUTE_PREFIX =
+  public static final String LEGACY_EMAIL_TEMPLATE_ATTRIBUTE_PREFIX =
       "_providerConfig.templates.email";
-  private static final String LEGACY_EMAIL_MESSAGE_ATTRIBUTE_PREFIX =
+  public static final String LEGACY_EMAIL_MESSAGE_ATTRIBUTE_PREFIX =
       "_providerConfig.messages.email";
-  private static final String EMAIL_TEMPLATE_ATTRIBUTE_PREFIX =
+  public static final String EMAIL_TEMPLATE_ATTRIBUTE_PREFIX =
       "_providerConfig.theme.email.templates";
-  private static final String EMAIL_MESSAGE_ATTRIBUTE_PREFIX =
+  public static final String EMAIL_MESSAGE_ATTRIBUTE_PREFIX =
       "_providerConfig.theme.email.messages";
-  private static final String EMAIL_PARENT_ATTRIBUTE_PREFIX = "_providerConfig.theme.email.parent";
+  public static final String EMAIL_PARENT_ATTRIBUTE_PREFIX = "_providerConfig.theme.email.parent";
 
   public static String templateKey(String templateName) {
     return String.format("%s.%s", EMAIL_TEMPLATE_ATTRIBUTE_PREFIX, templateName);

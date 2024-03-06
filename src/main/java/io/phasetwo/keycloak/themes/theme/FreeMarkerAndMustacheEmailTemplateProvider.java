@@ -83,7 +83,7 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
           "requiredActionFormatter", new RequiredActionFormatterFunction(rb, locale, attributes));
       attributes.put("properties", theme.getProperties());
       attributes.put("realmName", getRealmName());
-      attributes.put("user", new ProfileBean(user));
+      attributes.put("user", new ProfileBean(user, session));
       attributes.put("url", new UrlBean(realm, theme, uriInfo.getBaseUri(), null));
       String subject =
           new MessageFormat(rb.getProperty(subjectKey, subjectKey), locale)

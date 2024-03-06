@@ -4,10 +4,7 @@ import jakarta.validation.constraints.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.common.ClientConnection;
 import org.keycloak.events.EventBuilder;
@@ -17,7 +14,6 @@ import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.representations.AccessToken;
-import org.keycloak.services.resources.Cors;
 import org.keycloak.services.managers.AppAuthManager;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.managers.RealmManager;
@@ -65,8 +61,7 @@ public abstract class AbstractAdminResource {
     adminEvent =
         new AdminEventBuilder(this.realm, auth, session, session.getContext().getConnection())
             .realm(realm);
-    event =
-        new EventBuilder​(this.realm, session, connection).realm(realm);
+    event = new EventBuilder(this.realm, session, connection).realm(realm);
   }
 
   private void setupPermissions() {

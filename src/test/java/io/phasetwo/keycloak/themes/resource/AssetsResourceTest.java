@@ -7,10 +7,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import dasniko.testcontainers.keycloak.KeycloakContainer;
 import lombok.extern.jbosslog.JBossLog;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.keycloak.broker.provider.util.SimpleHttp;
 import org.testcontainers.junit.jupiter.Testcontainers;

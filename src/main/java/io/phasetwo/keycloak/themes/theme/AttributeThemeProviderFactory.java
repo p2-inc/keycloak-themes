@@ -1,7 +1,6 @@
 package io.phasetwo.keycloak.themes.theme;
 
 import com.google.auto.service.AutoService;
-import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,13 +19,10 @@ public class AttributeThemeProviderFactory implements ThemeProviderFactory {
 
   public static final String PROVIDER_ID = "ext-theme-provider-attribute";
 
-  private File tmpdir;
-
   @Override
   public ThemeProvider create(KeycloakSession session) {
     log.trace("Creating AttributeThemeProvider");
-    this.tmpdir = Files.createTempDir();
-    return new AttributeThemeProvider(session, tmpdir);
+    return new AttributeThemeProvider(session);
   }
 
   @Override
@@ -36,15 +32,9 @@ public class AttributeThemeProviderFactory implements ThemeProviderFactory {
   public void postInit(KeycloakSessionFactory factory) {}
 
   @Override
-  public void close() {
-    try {
-      deleteRecursively(tmpdir);
-    } catch (Exception e) {
-      log.warnf(e, "Error removing tmpdir", tmpdir);
-    }
-  }
+  public void close() {}
 
-  private static void deleteRecursively(File dir) throws IOException {
+  static void deleteRecursively(File dir) throws IOException {
     Path toDelete = dir.toPath();
 
     java.nio.file.Files.walk(toDelete)

@@ -1,6 +1,7 @@
 package io.phasetwo.keycloak.themes.theme;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
@@ -16,9 +17,9 @@ public class AttributeThemeProvider implements ThemeProvider {
   private final KeycloakSession session;
   private final File tmpdir;
 
-  public AttributeThemeProvider(KeycloakSession session, File tmpdir) {
+  public AttributeThemeProvider(KeycloakSession session) {
     this.session = session;
-    this.tmpdir = tmpdir;
+    this.tmpdir = Files.createTempDir();
   }
 
   public File getTmpDir() {
@@ -52,5 +53,12 @@ public class AttributeThemeProvider implements ThemeProvider {
   }
 
   @Override
-  public void close() {}
+  public void close() {
+    log.trace("Attempting to recursively delete tmpdir");
+    try {
+      AttributeThemeProviderFactory.deleteRecursively(tmpdir);
+    } catch (Exception e) {
+      log.warnf(e, "Error removing tmpdir", tmpdir);
+    }
+  }
 }

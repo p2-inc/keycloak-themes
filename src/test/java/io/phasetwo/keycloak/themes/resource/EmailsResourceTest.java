@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.phasetwo.keycloak.LegacySimpleHttp;
 import java.util.Map;
 import lombok.extern.jbosslog.JBossLog;
 import org.apache.http.HttpResponse;
@@ -19,7 +20,6 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.StringBody;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.representations.idm.RealmRepresentation;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -43,8 +43,8 @@ public class EmailsResourceTest extends AbstractResourceTest {
   public void testGetTemplates() throws Exception {
     Keycloak keycloak = getKeycloak();
     // GET /templates
-    SimpleHttp.Response response =
-        SimpleHttp.doGet(url("master", "templates"), httpClient)
+    LegacySimpleHttp.Response response =
+        LegacySimpleHttp.doGet(url("master", "templates"), httpClient)
             .auth(keycloak.tokenManager().getAccessTokenString())
             .asResponse();
     assertThat(response.getStatus(), is(200));
@@ -58,8 +58,8 @@ public class EmailsResourceTest extends AbstractResourceTest {
   @Test
   public void testGetNonexistentTemplate() throws Exception {
     Keycloak keycloak = getKeycloak();
-    SimpleHttp.Response response =
-        SimpleHttp.doGet(url("master", "templates", "text", "foo-bar"), httpClient)
+    LegacySimpleHttp.Response response =
+        LegacySimpleHttp.doGet(url("master", "templates", "text", "foo-bar"), httpClient)
             .auth(keycloak.tokenManager().getAccessTokenString())
             .asResponse();
     assertThat(response.getStatus(), is(404));
@@ -88,8 +88,9 @@ public class EmailsResourceTest extends AbstractResourceTest {
     keycloak.realm(realmName).update(r);
 
     // GET /templates/text/email-verification
-    SimpleHttp.Response response =
-        SimpleHttp.doGet(url(realmName, "templates", "text", "email-verification"), httpClient)
+    LegacySimpleHttp.Response response =
+        LegacySimpleHttp.doGet(
+                url(realmName, "templates", "text", "email-verification"), httpClient)
             .auth(keycloak.tokenManager().getAccessTokenString())
             .asResponse();
     assertThat(response.getStatus(), is(200));
@@ -110,7 +111,8 @@ public class EmailsResourceTest extends AbstractResourceTest {
 
     // GET /templates/text/email-verification
     response =
-        SimpleHttp.doGet(url(realmName, "templates", "text", "email-verification"), httpClient)
+        LegacySimpleHttp.doGet(
+                url(realmName, "templates", "text", "email-verification"), httpClient)
             .auth(keycloak.tokenManager().getAccessTokenString())
             .asResponse();
     assertThat(response.getStatus(), is(200));
@@ -129,7 +131,8 @@ public class EmailsResourceTest extends AbstractResourceTest {
 
     // GET /templates/text/email-verification
     response =
-        SimpleHttp.doGet(url(realmName, "templates", "text", "email-verification"), httpClient)
+        LegacySimpleHttp.doGet(
+                url(realmName, "templates", "text", "email-verification"), httpClient)
             .auth(keycloak.tokenManager().getAccessTokenString())
             .asResponse();
     assertThat(response.getStatus(), is(200));

@@ -7,9 +7,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import io.phasetwo.keycloak.LegacySimpleHttp;
 import lombok.extern.jbosslog.JBossLog;
 import org.junit.jupiter.api.Test;
-import org.keycloak.broker.provider.util.SimpleHttp;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @JBossLog
@@ -20,12 +20,12 @@ public class AssetsResourceTest extends AbstractResourceTest {
   public void testCss() throws Exception {
     String url =
         String.format("%s/realms/master/assets/css/login.css", container.getAuthServerUrl());
-    String css = SimpleHttp.doGet(url, httpClient).asString();
+    String css = LegacySimpleHttp.doGet(url, httpClient).asString();
     assertThat(css, notNullValue());
 
     updateRealmAttribute(
         getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_PRIMARY_COLOR, "#000000");
-    css = SimpleHttp.doGet(url, httpClient).asString();
+    css = LegacySimpleHttp.doGet(url, httpClient).asString();
     assertThat(css, notNullValue());
     assertThat(css, containsString("--pf-global--primary-color--100: #000000;"));
     assertThat(css, containsString("--pf-global--active-color--100: #000000"));
@@ -35,7 +35,7 @@ public class AssetsResourceTest extends AbstractResourceTest {
 
     updateRealmAttribute(
         getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_SECONDARY_COLOR, "#0AF0AF");
-    css = SimpleHttp.doGet(url, httpClient).asString();
+    css = LegacySimpleHttp.doGet(url, httpClient).asString();
     assertThat(css, notNullValue());
     assertThat(css, containsString("--pf-global--primary-color--100: #000000;"));
     assertThat(css, containsString("--pf-global--active-color--100: #000000"));
@@ -48,7 +48,7 @@ public class AssetsResourceTest extends AbstractResourceTest {
 
     updateRealmAttribute(
         getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_BACKGROUND_COLOR, "#FAAFAA");
-    css = SimpleHttp.doGet(url, httpClient).asString();
+    css = LegacySimpleHttp.doGet(url, httpClient).asString();
     assertThat(css, notNullValue());
     assertThat(css, containsString("--pf-global--primary-color--100: #000000;"));
     assertThat(css, containsString("--pf-global--active-color--100: #000000"));
@@ -63,7 +63,7 @@ public class AssetsResourceTest extends AbstractResourceTest {
     log.infof(css);
     String newCss = "/* foobar */";
     updateRealmAttribute(getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_CSS, newCss);
-    css = SimpleHttp.doGet(url, httpClient).asString();
+    css = LegacySimpleHttp.doGet(url, httpClient).asString();
     assertThat(css, notNullValue());
     assertThat(css, is(newCss));
   }

@@ -96,4 +96,4 @@ The implementation of `EmailTemplateProvider` that allows the use of mustache.js
 
 ---
 
-All documentation, source code and other files in this repository are Copyright 2023 Phase Two, Inc.
+All documentation, source code and other files in this repository are Copyright 2024 Phase Two, Inc.

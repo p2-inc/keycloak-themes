@@ -1,5 +1,5 @@
 .login-pf body {
-  background: var(--pf-global--BackgroundColor--100);
+  background: var(--pf-v5-global--BackgroundColor--100);
 }
 
 div.kc-logo-text {
@@ -14,11 +14,11 @@ div.kc-logo-text {
 }
 
 a {
-  color: var(--pf-global--link--Color);
+  color: var(--pf-v5-global--link--Color);
 }
 
 .login-pf a:hover {
-  color: var(--pf-global--link--Color--hover);
+  color: var(--pf-v5-global--link--Color--hover);
 }
 
 input[type="text"]:focus,
@@ -27,5 +27,5 @@ input[type="text"]:focus-visible,
 input[type="password"]:focus,
 input[type="password"]:focus-within,
 input[type="password"]:focus-visible {
-  outline: var(--pf-global--active-color--100) auto 1px;
+  outline: var(--pf-v5-global--active-color--100) auto 1px;
 }

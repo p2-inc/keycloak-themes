@@ -80,15 +80,15 @@ public class AssetsResourceProvider implements RealmResourceProvider {
   }
 
   private void setColors(StringBuilder o) {
-    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--primary-color--100");
-    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--active-color--100");
-    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--primary-color--dark-100");
-    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--link--Color");
-    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--link--Color--dark");
-    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--primary-color--200");
-    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--link--Color--hover");
-    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--link--Color--dark--hover");
-    setColor(o, ASSETS_LOGIN_BACKGROUND_COLOR, "--pf-global--BackgroundColor--100");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--primary-color--100");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--active-color--100");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--primary-color--dark-100");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--link--Color");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--link--Color--dark");
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-v5-global--primary-color--200");
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-v5-global--link--Color--hover");
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-v5-global--link--Color--dark--hover");
+    setColor(o, ASSETS_LOGIN_BACKGROUND_COLOR, "--pf-v5-global--BackgroundColor--100");
   }
 
   private void setColor(StringBuilder o, String key, String name) {

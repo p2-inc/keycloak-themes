@@ -19,7 +19,7 @@ public class LinkExpirationFormatterFunction extends FormatterFunction {
   String format(String input) throws Exception {
     LinkExpirationFormatterMethod freemarkerMethod = new LinkExpirationFormatterMethod(rb, locale);
     Object result = freemarkerMethod.exec(ImmutableList.of(input));
-    log.infof("format link expiration from %s to %s", input, result);
+    log.debugf("format link expiration from %s to %s", input, result);
     return result.toString();
   }
 }

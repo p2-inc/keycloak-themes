@@ -66,7 +66,7 @@ public class EmailsResource extends AbstractAdminResource {
   }
 
   private Theme getEmailThemeForRealm(KeycloakSession session) throws IOException {
-    log.infof("get email theme for realm %s", realm.getName());
+    log.debugf("get email theme for realm %s", realm.getName());
     session.setAttribute(AttributeTheme.REALM_ATTRIBUTE_KEY, realm.getName());
     return session.theme().getTheme(realm.getEmailTheme(), Theme.Type.EMAIL);
   }

@@ -34,10 +34,10 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
       throws EmailException {
     try {
       Theme theme = getTheme();
-      log.infof("processTemplate for %s in theme %s", template, theme.getName());
+      log.debugf("processTemplate for %s in theme %s", template, theme.getName());
       if (MustacheProvider.isMustacheTheme(theme)
           && MustacheProvider.hasMustacheTemplates(theme, template)) {
-        log.infof("Using mustache template for %s in theme %s", template, theme.getName());
+        log.debugf("Using mustache template for %s in theme %s", template, theme.getName());
         return processMustacheTemplate(subjectKey, subjectAttributes, template, attributes);
       } else {
         return super.processTemplate(subjectKey, subjectAttributes, template, attributes);

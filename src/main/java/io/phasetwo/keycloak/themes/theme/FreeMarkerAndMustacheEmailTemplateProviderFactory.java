@@ -13,7 +13,7 @@ public class FreeMarkerAndMustacheEmailTemplateProviderFactory
     extends FreeMarkerEmailTemplateProviderFactory {
   @Override
   public EmailTemplateProvider create(KeycloakSession session) {
-    log.infof("creating new FreeMarkerAndMustacheEmailTemplateProviderFactory");
+    log.debugf("creating new FreeMarkerAndMustacheEmailTemplateProviderFactory");
     return new FreeMarkerAndMustacheEmailTemplateProvider(session);
   }
 

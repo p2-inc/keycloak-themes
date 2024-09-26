@@ -72,7 +72,7 @@ public class AssetsResourceProvider implements RealmResourceProvider {
       } else {
         redir = new URI(imgUrl);
       }
-      log.infof("redirecting to %s", redir);
+      log.debugf("redirecting to %s", redir);
       return Response.seeOther(redir).build();
     } catch (Exception e) {
       throw new NotFoundException(e);

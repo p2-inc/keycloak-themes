@@ -41,7 +41,7 @@ public class MustacheProvider {
     try {
       if (theme.getProperties() != null) {
         String type = theme.getProperties().getProperty("templateType");
-        log.infof("templateType=%s", type);
+        log.debugf("templateType=%s", type);
         if ("mustache".equals(type)) return true;
       }
     } catch (Exception ignore) {
@@ -55,7 +55,7 @@ public class MustacheProvider {
       String[] dirs = {"text", "html"};
       for (String dir : dirs) {
         String path = String.format("%s/%s", dir, nameAsMustache);
-        log.infof("Trying mustache template at %s", path);
+        log.debugf("Trying mustache template at %s", path);
         URL u = theme.getTemplate(path);
         if (u == null) return false;
       }
@@ -73,7 +73,7 @@ public class MustacheProvider {
   }
 
   public static String templateToString(String templateName, Theme theme) throws IOException {
-    log.infof(
+    log.debugf(
         "templateName: %s, themeName: %s, url: %s",
         templateName, theme.getName(), theme.getTemplate(templateName));
     return Resources.toString(theme.getTemplate(templateName), StandardCharsets.UTF_8);

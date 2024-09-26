@@ -18,7 +18,7 @@ public class RequiredActionFormatterFunction extends FormatterFunction {
   String format(String input) throws Exception {
     String key = String.format("%s.%s", "requiredAction", input);
     String result = new MessageFormat(rb.getProperty(key, input), locale).format(null);
-    log.infof("format required action from %s to %s", input, result);
+    log.debugf("format required action from %s to %s", input, result);
     return result.toString();
   }
 }

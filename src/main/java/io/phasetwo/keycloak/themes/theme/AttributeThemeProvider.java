@@ -34,7 +34,7 @@ public class AttributeThemeProvider implements ThemeProvider {
   @Override
   public Theme getTheme(String name, Theme.Type type) throws IOException {
     if (!hasTheme(name, type)) return null;
-    log.infof("Creating AttributeTheme for %s", session.getContext().getRealm().getName());
+    log.debugf("Creating AttributeTheme for %s", session.getContext().getRealm().getName());
     return new AttributeTheme(session, tmpdir, name, type);
   }
 

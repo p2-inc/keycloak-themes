@@ -2,7 +2,7 @@ version: '3'
 
 services:
   keycloak:
-      image: quay.io/keycloak/keycloak:20.0.1
+      image: quay.io/keycloak/keycloak:26.0.0
       environment:
         KEYCLOAK_ADMIN: admin
         KEYCLOAK_ADMIN_PASSWORD: admin
@@ -10,5 +10,5 @@ services:
       ports:
         - 8080:8080
       volumes: 
-        - ./target/keycloak-themes-0.3-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-themes.jar
-      command: [ "start-dev --spi-email-template-provider=freemarker-plus-mustache --spi-email-template-freemarker-plus-mustache-enabled=true" ] 
+        - ./target/keycloak-themes-0.32-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-themes.jar
+      entrypoint: /opt/keycloak/bin/kc.sh --verbose start-dev --spi-email-template-provider=freemarker-plus-mustache --spi-email-template-freemarker-plus-mustache-enabled=true --spi-email-sender-provider=ext-email-override --spi-email-sender-ext-email-override-enabled=true --spi-email-sender-ext-email-override-host=smtp.somehost.biz --spi-email-sender-ext-email-override-auth=true --spi-email-sender-ext-email-override-from=support@phasetwo.io --spi-email-sender-ext-email-override-port=587 --spi-email-sender-ext-email-override-starttls=true --spi-email-sender-ext-email-override-user=someuser --spi-email-sender-ext-email-override-password=somepass 

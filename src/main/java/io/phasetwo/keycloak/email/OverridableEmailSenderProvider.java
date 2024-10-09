@@ -1,11 +1,13 @@
 package io.phasetwo.keycloak.email;
 
 import java.util.Map;
+import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.email.DefaultEmailSenderProvider;
 import org.keycloak.email.EmailException;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 
+@JBossLog
 public class OverridableEmailSenderProvider extends DefaultEmailSenderProvider {
 
   private final KeycloakSession session;
@@ -26,6 +28,7 @@ public class OverridableEmailSenderProvider extends DefaultEmailSenderProvider {
       Map<String, String> config, UserModel user, String subject, String textBody, String htmlBody)
       throws EmailException {
     if (useOverride(config)) {
+      log.debug("Using customer override email sender");
       super.send(config, user, subject, textBody, htmlBody);
     } else {
       super.send(conf, user, subject, textBody, htmlBody);
@@ -37,6 +40,7 @@ public class OverridableEmailSenderProvider extends DefaultEmailSenderProvider {
       Map<String, String> config, String address, String subject, String textBody, String htmlBody)
       throws EmailException {
     if (useOverride(config)) {
+      log.debug("Using customer override email sender");
       super.send(config, address, subject, textBody, htmlBody);
     } else {
       super.send(conf, address, subject, textBody, htmlBody);

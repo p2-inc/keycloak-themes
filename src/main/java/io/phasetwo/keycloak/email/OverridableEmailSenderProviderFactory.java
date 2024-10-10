@@ -3,30 +3,18 @@ package io.phasetwo.keycloak.email;
 import com.google.auto.service.AutoService;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import java.util.Map;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
 import org.keycloak.email.EmailSenderProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
-import org.keycloak.provider.ServerInfoAwareProviderFactory;
 
 @JBossLog
 @AutoService(EmailSenderProviderFactory.class)
-public class OverridableEmailSenderProviderFactory
-    implements EmailSenderProviderFactory, ServerInfoAwareProviderFactory {
+public class OverridableEmailSenderProviderFactory implements EmailSenderProviderFactory {
 
   private Map<String, String> conf;
-
-  @Override
-  public Map<String, String> getOperationalInfo() {
-    Map<String, String> info = Maps.newHashMap(conf);
-    if (info.get("password") != null) {
-      info.put("password", "********");
-    }
-    return info;
-  }
 
   @Override
   public OverridableEmailSenderProvider create(KeycloakSession session) {

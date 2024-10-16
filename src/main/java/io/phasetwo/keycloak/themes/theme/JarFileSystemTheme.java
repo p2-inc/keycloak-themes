@@ -88,15 +88,16 @@ public class JarFileSystemTheme implements Theme {
 
   @Override
   public URL getTemplate(String name) throws IOException {
-    log.debugf("getTemplate %s", name);
     Path file = themeDir.resolve(name);
+    log.debugf("getTemplate %s from %s", name, file);
     return Files.isRegularFile(file) ? file.toUri().toURL() : null;
   }
 
   @Override
   public InputStream getResourceAsStream(String path) throws IOException {
-    log.debugf("getResourceAsStream %s", path);
+    log.infof("getResourceAsStream %s", path);
     Path resource = resourcesDir.resolve(path);
+    log.infof("getResourceAsStream %s from %s", resource, path);
     return Files.isRegularFile(resource) ? Files.newInputStream(resource) : null;
   }
 

@@ -1,9 +1,11 @@
 package io.phasetwo.keycloak.themes.theme;
 
+import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -25,10 +27,11 @@ import org.keycloak.theme.ThemeProviderFactory;
 import org.keycloak.util.JsonSerialization;
 
 @JBossLog
+@AutoService(ThemeProviderFactory.class)
 public class JarFolderThemeProviderFactory
     implements ThemeProviderFactory, DirectoryWatcher.FileEventListener {
 
-  public static final String PROVIDER_ID = "ext-theme-provider-jar";
+  public static final String PROVIDER_ID = "ext-theme-jar-folder";
   public static final String KEYCLOAK_THEMES_JSON = "/META-INF/keycloak-themes.json";
 
   protected static Map<String, Map<Theme.Type, Map<String, JarFileSystemTheme>>> realmThemes =
@@ -41,9 +44,18 @@ public class JarFolderThemeProviderFactory
 
   @Override
   public void onFileModified(Optional<String> dir, Path file) {
+    log.infof("onFileModified %s %s", file, dir.orElse("[root]"));
+    // TODO is the dir a real realm?
     try {
-      FileSystem fs = FileSystems.newFileSystem(file.toUri(), ImmutableMap.of(), null);
+      String uriString = String.format("jar:file:%s", file.toAbsolutePath());
+      log.infof("attempting FileSystem from %s", uriString);
+      URI uri = URI.create(uriString);
+      FileSystem fs = FileSystems.newFileSystem(uri, ImmutableMap.of());
+      // FileSystem fs = FileSystems.newFileSystem(file.toUri(), ImmutableMap.of(), null);
       Path themeManifest = fs.getPath(KEYCLOAK_THEMES_JSON);
+      log.infof(
+          "theme manifest %s %b %b",
+          themeManifest, Files.isReadable(themeManifest), Files.isRegularFile(themeManifest));
       try (InputStream inputStream = Files.newInputStream(themeManifest)) {
         loadThemes(
             file, fs, dir, JsonSerialization.readValue(inputStream, ThemesRepresentation.class));
@@ -67,8 +79,11 @@ public class JarFolderThemeProviderFactory
 
     try {
       for (ThemeRepresentation themeRep : themesRep.getThemes()) {
+        log.infof(
+            "%d types for theme %s in %s", themeRep.getTypes().length, themeRep.getName(), jarFile);
         for (String t : themeRep.getTypes()) {
           Theme.Type type = Theme.Type.valueOf(t.toUpperCase());
+          log.infof("loading theme %s %s", themeRep.getName(), type);
           if (!themes.containsKey(type)) {
             themes.put(type, new HashMap<>());
           }
@@ -86,7 +101,8 @@ public class JarFolderThemeProviderFactory
 
   @Override
   public void onFileRemoved(Optional<String> dir, Path file) {
-    // walk the tree and remove
+    log.infof("onFileModified %s %s", file, dir.orElse("[root]"));
+    // TODO walk the tree and remove
 
   }
 
@@ -103,6 +119,7 @@ public class JarFolderThemeProviderFactory
     }
     try {
       this.watcher = new DirectoryWatcher(this.rootDir.toPath(), this, ".jar");
+      new Thread(this.watcher).start();
     } catch (IOException e) {
       log.error("Error starting directory watcher", e);
       throw new IllegalStateException(e);

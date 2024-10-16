@@ -5,8 +5,10 @@ import static java.nio.file.StandardWatchEventKinds.*;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Optional;
+import lombok.extern.jbosslog.JBossLog;
 
-public class DirectoryWatcher {
+@JBossLog
+public class DirectoryWatcher implements Runnable {
 
   private final Path directory;
   private final WatchService watchService;
@@ -25,12 +27,12 @@ public class DirectoryWatcher {
 
   // Register the directory to listen for file creation, modification, and directory creation
   private void registerDirectory(Path dir) throws IOException {
-    dir.register(watchService, ENTRY_CREATE, ENTRY_MODIFY);
-    System.out.println("Registered directory: " + dir);
+    dir.register(watchService, ENTRY_DELETE, ENTRY_MODIFY);
+    log.infof("Registered directory: %s", dir);
   }
 
-  public void watch() {
-    System.out.println("Watching directory: " + directory);
+  public void run() {
+    log.infof("Watching directory: %s", directory);
 
     try {
       while (running) {
@@ -38,7 +40,7 @@ public class DirectoryWatcher {
         try {
           key = watchService.take(); // Wait for an event
         } catch (InterruptedException ex) {
-          System.out.println("Watcher interrupted");
+          log.info("Watcher interrupted");
           return;
         }
 
@@ -54,14 +56,14 @@ public class DirectoryWatcher {
           Path eventPath = (Path) event.context();
           Path fullPath = directory.resolve(eventPath);
 
+          log.infof("File event [%s] %s %s", kind, eventPath, fullPath);
           // If the event concerns a directory
           if (Files.isDirectory(fullPath) && kind == ENTRY_CREATE) {
             try {
               // Register the new directory to watch for file creation/modification within it
               registerDirectory(fullPath);
             } catch (IOException e) {
-              System.err.println("Failed to register new directory: " + fullPath);
-              e.printStackTrace();
+              log.warnf(e, "Failed to register new directory: %s", fullPath);
             }
           } else {
             // If the event concerns a file of the given type (created or modified)
@@ -74,9 +76,9 @@ public class DirectoryWatcher {
 
               if (kind == ENTRY_CREATE) {
                 listener.onFileModified(subDirName, fullPath);
-              } else if (kind == ENTRY_DELETE) {
-                listener.onFileModified(subDirName, fullPath);
               } else if (kind == ENTRY_MODIFY) {
+                listener.onFileModified(subDirName, fullPath);
+              } else if (kind == ENTRY_DELETE) {
                 listener.onFileRemoved(subDirName, fullPath);
               }
             }
@@ -99,9 +101,9 @@ public class DirectoryWatcher {
     running = false;
     try {
       watchService.close(); // Closes the watch service and releases resources
-      System.out.println("WatchService closed.");
+      log.info("WatchService closed.");
     } catch (IOException e) {
-      e.printStackTrace();
+      log.warn("Error closing directory watcher.", e);
     }
   }
 

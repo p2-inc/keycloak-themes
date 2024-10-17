@@ -96,6 +96,10 @@ public class DirectoryWatcher implements Runnable {
     }
   }
 
+  public boolean isRunning() {
+    return running;
+  }
+
   // Method to stop the watcher and close the WatchService
   public void stopWatching() {
     running = false;

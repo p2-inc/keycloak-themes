@@ -8,13 +8,17 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
@@ -37,21 +41,21 @@ public class JarFolderThemeProviderFactory
   protected static Map<String, Map<Theme.Type, Map<String, JarFileSystemTheme>>> realmThemes =
       new HashMap<>();
   protected static Map<Theme.Type, Map<String, JarFileSystemTheme>> globalThemes = new HashMap<>();
-  protected static Set<Path> jars = new HashSet<>();
+  protected static Map<Path, FileSystem> jars = new HashMap<>();
 
   private File rootDir;
   private DirectoryWatcher watcher;
 
   @Override
   public void onFileModified(Optional<String> dir, Path file) {
-    log.infof("onFileModified %s %s", file, dir.orElse("[root]"));
     // TODO is the dir a real realm?
     try {
+      if (!Files.exists(file) || Files.size(file) == 0) return;
+      log.infof("onFileModified %s %s", file, dir.orElse("[root]"));
       String uriString = String.format("jar:file:%s", file.toAbsolutePath());
       log.infof("attempting FileSystem from %s", uriString);
       URI uri = URI.create(uriString);
       FileSystem fs = FileSystems.newFileSystem(uri, ImmutableMap.of());
-      // FileSystem fs = FileSystems.newFileSystem(file.toUri(), ImmutableMap.of(), null);
       Path themeManifest = fs.getPath(KEYCLOAK_THEMES_JSON);
       log.infof(
           "theme manifest %s %b %b",
@@ -60,13 +64,13 @@ public class JarFolderThemeProviderFactory
         loadThemes(
             file, fs, dir, JsonSerialization.readValue(inputStream, ThemesRepresentation.class));
       }
-      jars.add(file);
+      jars.put(file, fs);
     } catch (Exception e) {
-      log.warnf(e, "Error getting FileSystem from %s", file);
+      log.errorf(e, "Error getting FileSystem from %s", file);
     }
   }
 
-  protected void loadThemes(
+  void loadThemes(
       Path jarFile, FileSystem fs, Optional<String> realm, ThemesRepresentation themesRep) {
     Map<Theme.Type, Map<String, JarFileSystemTheme>> themes =
         realm.isPresent() ? realmThemes.get(realm.get()) : globalThemes;
@@ -101,9 +105,43 @@ public class JarFolderThemeProviderFactory
 
   @Override
   public void onFileRemoved(Optional<String> dir, Path file) {
-    log.infof("onFileModified %s %s", file, dir.orElse("[root]"));
-    // TODO walk the tree and remove
+    FileSystem fs = jars.remove(file);
+    if (fs == null) return;
+    log.infof("onFileRemoved %s %s", file, dir.orElse("[root]"));
 
+    // remove from globalThemes
+    removeThemesForFile(globalThemes, file);
+
+    // remove from realmThemes
+    for (Map<Theme.Type, Map<String, JarFileSystemTheme>> themes : realmThemes.values()) {
+      removeThemesForFile(themes, file);
+    }
+
+    // close the FileSystem
+    try {
+      if (!Files.exists(file) || !Files.isRegularFile(file)) {
+        Files.createFile(file);
+        if (fs.isOpen()) {
+          fs.close();
+        }
+      }
+    } catch (IOException e) {
+      log.errorf(e, "Error closing FileSystem for %s", file);
+    }
+  }
+
+  void removeThemesForFile(Map<Theme.Type, Map<String, JarFileSystemTheme>> themes, Path file) {
+    for (Map<String, JarFileSystemTheme> themesOfType : themes.values()) {
+      Iterator<Map.Entry<String, JarFileSystemTheme>> iterator = themesOfType.entrySet().iterator();
+      while (iterator.hasNext()) {
+        Map.Entry<String, JarFileSystemTheme> entry = iterator.next();
+        int comp = entry.getValue().getJarFile().compareTo(file);
+        if (comp == 0) {
+          log.infof("Found %s theme with jarFile %s, removing", entry.getKey(), file);
+          iterator.remove();
+        }
+      }
+    }
   }
 
   @Override
@@ -115,11 +153,11 @@ public class JarFolderThemeProviderFactory
   public void init(Config.Scope config) {
     String d = config.get("dir");
     if (d != null) {
-      this.rootDir = new File(d);
+      rootDir = new File(d);
     }
     try {
-      this.watcher = new DirectoryWatcher(this.rootDir.toPath(), this, ".jar");
-      new Thread(this.watcher).start();
+      watcher = new DirectoryWatcher(rootDir.toPath(), this, ".jar");
+      new Thread(watcher).start();
     } catch (IOException e) {
       log.error("Error starting directory watcher", e);
       throw new IllegalStateException(e);
@@ -128,20 +166,52 @@ public class JarFolderThemeProviderFactory
 
   @Override
   public void postInit(KeycloakSessionFactory factory) {
+    // shutdown hook so watcher doesn't hang
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
                 () -> {
-                  if (watcher != null) {
+                  if (watcher != null && watcher.isRunning()) {
                     watcher.stopWatching();
                   }
                 }));
+    // bootstrap anything that's already there
+    try {
+      findFilesAndNotify(rootDir.toPath(), ".jar");
+    } catch (IOException e) {
+      throw new IllegalStateException("Error finding existing theme jars", e);
+    }
+  }
+
+  void findFilesAndNotify(Path directory, String fileType) throws IOException {
+    Files.walkFileTree(
+        directory,
+        EnumSet.noneOf(FileVisitOption.class),
+        2,
+        new SimpleFileVisitor<>() {
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+            if (file.toString().endsWith(fileType)) {
+              Optional<String> subDir = Optional.empty();
+              if (!file.getParent().equals(directory)) {
+                subDir = Optional.of(directory.relativize(file.getParent()).toString());
+              }
+              onFileModified(subDir, file);
+            }
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult visitFileFailed(Path file, IOException exc) {
+            return FileVisitResult.CONTINUE;
+          }
+        });
   }
 
   @Override
   public void close() {
-    if (watcher != null) {
-      watcher.stopWatching(); // Ensure the watcher is stopped if any error occurs
+    if (watcher != null && watcher.isRunning()) {
+      watcher.stopWatching();
     }
   }
 

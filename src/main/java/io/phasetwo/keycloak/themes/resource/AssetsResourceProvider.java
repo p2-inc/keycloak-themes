@@ -70,7 +70,8 @@ public class AssetsResourceProvider implements RealmResourceProvider {
                     "%s/%s/%s",
                     theme.getType().toString().toLowerCase(), theme.getName(), defaultPath));
       } else {
-        redir = new URI(imgUrl);
+        // ensure no leading or following spaces
+        redir = new URI(imgUrl.trim());
       }
       log.debugf("redirecting to %s", redir);
       return Response.seeOther(redir).build();

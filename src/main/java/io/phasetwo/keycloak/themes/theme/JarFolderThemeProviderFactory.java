@@ -50,7 +50,10 @@ public class JarFolderThemeProviderFactory
   public void onFileModified(Optional<String> dir, Path file) {
     // TODO is the dir a real realm?
     try {
-      if (!Files.exists(file) || Files.size(file) == 0) return;
+      if (!Files.exists(file) || Files.size(file) == 0) {
+        log.info("File doesn't exist or is zero size");
+        return;
+      }
       log.infof("onFileModified %s %s", file, dir.orElse("[root]"));
       String uriString = String.format("jar:file:%s", file.toAbsolutePath());
       log.infof("attempting FileSystem from %s", uriString);
@@ -106,7 +109,10 @@ public class JarFolderThemeProviderFactory
   @Override
   public void onFileRemoved(Optional<String> dir, Path file) {
     FileSystem fs = jars.remove(file);
-    if (fs == null) return;
+    if (fs == null) {
+      log.infof("No FileSystem for %s", file);
+      return;
+    }
     log.infof("onFileRemoved %s %s", file, dir.orElse("[root]"));
 
     // remove from globalThemes
@@ -120,11 +126,14 @@ public class JarFolderThemeProviderFactory
     // close the FileSystem
     try {
       if (!Files.exists(file) || !Files.isRegularFile(file)) {
+        // We have to create a temp/empty file because of this bug
+        // https://bugs.openjdk.org/browse/JDK-8291712
         Files.createFile(file);
-        if (fs.isOpen()) {
-          fs.close();
-        }
       }
+      if (fs.isOpen()) {
+        fs.close();
+      }
+      Files.deleteIfExists(file);
     } catch (IOException e) {
       log.errorf(e, "Error closing FileSystem for %s", file);
     }

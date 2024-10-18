@@ -95,9 +95,9 @@ public class JarFileSystemTheme implements Theme {
 
   @Override
   public InputStream getResourceAsStream(String path) throws IOException {
-    log.infof("getResourceAsStream %s", path);
+    log.debugf("getResourceAsStream %s", path);
     Path resource = resourcesDir.resolve(path);
-    log.infof("getResourceAsStream %s from %s", resource, path);
+    log.debugf("getResourceAsStream %s from %s", resource, path);
     return Files.isRegularFile(resource) ? Files.newInputStream(resource) : null;
   }
 

@@ -22,18 +22,31 @@ public class DirectoryWatcher implements Runnable {
     this.listener = listener;
     this.fileType = fileType;
     this.watchService = FileSystems.getDefault().newWatchService();
+    registerDirectories(directory);
+  }
+
+  private void registerDirectories(Path directory) throws IOException {
     registerDirectory(directory);
+    Files.list(directory)
+        .forEach(
+            file -> {
+              log.debugf("Visited %s", file);
+              try {
+                if (Files.isDirectory(file)) {
+                  registerDirectory(file);
+                }
+              } catch (Exception ignore) {
+              }
+            });
   }
 
   // Register the directory to listen for file creation, modification, and directory creation
   private void registerDirectory(Path dir) throws IOException {
-    dir.register(watchService, ENTRY_DELETE, ENTRY_MODIFY);
+    dir.register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
     log.infof("Registered directory: %s", dir);
   }
 
   public void run() {
-    log.infof("Watching directory: %s", directory);
-
     try {
       while (running) {
         WatchKey key;
@@ -53,8 +66,9 @@ public class DirectoryWatcher implements Runnable {
           }
 
           // Retrieve the file/directory name that caused the event
+          Path dir = (Path) key.watchable();
           Path eventPath = (Path) event.context();
-          Path fullPath = directory.resolve(eventPath);
+          Path fullPath = dir.resolve(eventPath);
 
           log.infof("File event [%s] %s %s", kind, eventPath, fullPath);
           // If the event concerns a directory
@@ -75,7 +89,6 @@ public class DirectoryWatcher implements Runnable {
               }
 
               if (kind == ENTRY_CREATE) {
-                listener.onFileModified(subDirName, fullPath);
               } else if (kind == ENTRY_MODIFY) {
                 listener.onFileModified(subDirName, fullPath);
               } else if (kind == ENTRY_DELETE) {

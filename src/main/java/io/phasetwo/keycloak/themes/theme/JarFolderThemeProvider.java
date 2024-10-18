@@ -1,5 +1,6 @@
 package io.phasetwo.keycloak.themes.theme;
 
+import com.google.common.base.Joiner;
 import java.io.IOException;
 import java.lang.StackWalker.StackFrame;
 import java.util.HashSet;
@@ -30,7 +31,7 @@ public class JarFolderThemeProvider implements ThemeProvider {
     if (realm == null) {
       this.resourceSession =
           isClassAndMethodInStack("org.keycloak.services.resources.ThemeResource", "getResource");
-      log.infof("No realm in context, but is resource session? [%b]", this.resourceSession);
+      log.debugf("No realm in context, but is resource session? [%b]", this.resourceSession);
     } else {
       this.resourceSession = false;
     }
@@ -79,14 +80,12 @@ public class JarFolderThemeProvider implements ThemeProvider {
     if (themes != null && themes.containsKey(type) && themes.get(type).containsKey(name)) {
       return themes.get(type).get(name);
     }
-    if (resourceSession) {
+    if (resourceSession || realm != null) {
       int idx = name.indexOf("--");
       if (idx < 1) return null;
       String k = name.substring(0, idx);
       log.infof("resource session for %s %s", name, k);
       themes = realmThemes.get(k);
-    } else if (realm != null) {
-      themes = realmThemes.get(realm.getName());
     } else {
       themes = null;
     }
@@ -98,24 +97,27 @@ public class JarFolderThemeProvider implements ThemeProvider {
 
   @Override
   public Set<String> nameSet(Theme.Type type) {
-    log.infof("nameSet %s %s", type);
+    log.debugf("nameSet %s %s", type);
     Set<String> names = new HashSet<>();
     if (globalThemes.containsKey(type)) {
       names.addAll(globalThemes.get(type).keySet());
     }
-    if (realm == null) return names;
-    Map<Theme.Type, Map<String, JarFileSystemTheme>> themes = realmThemes.get(realm.getName());
-    if (themes != null && themes.containsKey(type)) {
-      for (String name : themes.get(type).keySet()) {
-        names.add(String.format("%s--%s", realm.getName(), name));
+    if (realm != null) {
+      log.infof("names for %s", realm.getName());
+      Map<Theme.Type, Map<String, JarFileSystemTheme>> themes = realmThemes.get(realm.getName());
+      if (themes != null && themes.containsKey(type)) {
+        for (String name : themes.get(type).keySet()) {
+          names.add(String.format("%s--%s", realm.getName(), name));
+        }
       }
     }
+    log.infof("[%s] nameSet: %s", type, Joiner.on(",").join(names));
     return names;
   }
 
   @Override
   public boolean hasTheme(String name, Theme.Type type) {
-    log.infof("hasTheme %s %s", name, type);
+    log.debugf("hasTheme %s %s", name, type);
     try {
       return (getTheme(name, type) != null);
     } catch (IOException e) {

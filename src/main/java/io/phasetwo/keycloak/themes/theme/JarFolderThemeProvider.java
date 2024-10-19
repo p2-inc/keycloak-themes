@@ -75,7 +75,7 @@ public class JarFolderThemeProvider implements ThemeProvider {
   @Override
   public Theme getTheme(String name, Theme.Type type) throws IOException {
     if (!isAllowedType(type)) return null;
-    log.infof("getTheme %s %s", name, type);
+    log.debugf("getTheme %s %s", name, type);
     Map<Theme.Type, Map<String, JarFileSystemTheme>> themes = globalThemes;
     if (themes != null && themes.containsKey(type) && themes.get(type).containsKey(name)) {
       return themes.get(type).get(name);
@@ -84,7 +84,7 @@ public class JarFolderThemeProvider implements ThemeProvider {
       int idx = name.indexOf("--");
       if (idx < 1) return null;
       String k = name.substring(0, idx);
-      log.infof("resource session for %s %s", name, k);
+      log.debugf("resource session for %s %s", name, k);
       themes = realmThemes.get(k);
     } else {
       themes = null;
@@ -103,7 +103,7 @@ public class JarFolderThemeProvider implements ThemeProvider {
       names.addAll(globalThemes.get(type).keySet());
     }
     if (realm != null) {
-      log.infof("names for %s", realm.getName());
+      log.debugf("names for %s", realm.getName());
       Map<Theme.Type, Map<String, JarFileSystemTheme>> themes = realmThemes.get(realm.getName());
       if (themes != null && themes.containsKey(type)) {
         for (String name : themes.get(type).keySet()) {
@@ -111,7 +111,7 @@ public class JarFolderThemeProvider implements ThemeProvider {
         }
       }
     }
-    log.infof("[%s] nameSet: %s", type, Joiner.on(",").join(names));
+    log.debugf("[%s] nameSet: %s", type, Joiner.on(",").join(names));
     return names;
   }
 

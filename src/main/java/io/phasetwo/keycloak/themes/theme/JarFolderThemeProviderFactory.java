@@ -20,6 +20,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.jbosslog.JBossLog;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.HiddenFileFilter;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
+import org.apache.commons.io.monitor.FileAlterationMonitor;
+import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
@@ -32,8 +38,8 @@ import org.keycloak.util.JsonSerialization;
 
 @JBossLog
 @AutoService(ThemeProviderFactory.class)
-public class JarFolderThemeProviderFactory
-    implements ThemeProviderFactory, DirectoryWatcher.FileEventListener {
+public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
+    implements ThemeProviderFactory {
 
   public static final String PROVIDER_ID = "ext-theme-jar-folder";
   public static final String KEYCLOAK_THEMES_JSON = "/META-INF/keycloak-themes.json";
@@ -44,9 +50,26 @@ public class JarFolderThemeProviderFactory
   protected static Map<Path, FileSystem> jars = new HashMap<>();
 
   private File rootDir;
-  private DirectoryWatcher watcher;
+  private FileAlterationMonitor monitor;
 
   @Override
+  public void onFileChange(File file) {
+    log.infof("onFileChange %s", file);
+    onFileModified(isSubDir(file), file.toPath());
+  }
+
+  @Override
+  public void onFileCreate(File file) {
+    log.infof("onFileCreate %s", file);
+    onFileModified(isSubDir(file), file.toPath());
+  }
+
+  @Override
+  public void onFileDelete(File file) {
+    log.infof("onFileDelete %s", file);
+    onFileRemoved(isSubDir(file), file.toPath());
+  }
+
   public void onFileModified(Optional<String> dir, Path file) {
     // TODO is the dir a real realm?
     try {
@@ -106,7 +129,6 @@ public class JarFolderThemeProviderFactory
     }
   }
 
-  @Override
   public void onFileRemoved(Optional<String> dir, Path file) {
     FileSystem fs = jars.remove(file);
     if (fs == null) {
@@ -164,13 +186,37 @@ public class JarFolderThemeProviderFactory
     if (d != null) {
       rootDir = new File(d);
     }
+
     try {
-      watcher = new DirectoryWatcher(rootDir.toPath(), this, ".jar");
-      new Thread(watcher).start();
-    } catch (IOException e) {
+      monitor = new FileAlterationMonitor(60000L); // 1 minute interval
+      FileAlterationObserver observer =
+          new FileAlterationObserver(rootDir, filterDirectoryAndJar());
+      observer.addListener(this);
+      monitor.addObserver(observer);
+      monitor.start();
+    } catch (Exception e) {
       log.error("Error starting directory watcher", e);
       throw new IllegalStateException(e);
     }
+  }
+
+  private static IOFileFilter filterDirectoryAndJar() {
+    IOFileFilter directories =
+        FileFilterUtils.and(FileFilterUtils.directoryFileFilter(), HiddenFileFilter.VISIBLE);
+    IOFileFilter files =
+        FileFilterUtils.and(
+            FileFilterUtils.fileFileFilter(), FileFilterUtils.suffixFileFilter(".jar"));
+    return FileFilterUtils.or(directories, files);
+  }
+
+  private Optional<String> isSubDir(File file) {
+    Path directory = rootDir.toPath();
+    Path fullPath = file.toPath();
+    Optional<String> subDirName = Optional.empty();
+    if (!fullPath.getParent().equals(directory)) {
+      subDirName = Optional.of(directory.relativize(fullPath.getParent()).toString());
+    }
+    return subDirName;
   }
 
   @Override
@@ -180,8 +226,11 @@ public class JarFolderThemeProviderFactory
         .addShutdownHook(
             new Thread(
                 () -> {
-                  if (watcher != null && watcher.isRunning()) {
-                    watcher.stopWatching();
+                  if (monitor != null) {
+                    try {
+                      monitor.stop();
+                    } catch (Exception ignore) {
+                    }
                   }
                 }));
     // bootstrap anything that's already there
@@ -219,8 +268,11 @@ public class JarFolderThemeProviderFactory
 
   @Override
   public void close() {
-    if (watcher != null && watcher.isRunning()) {
-      watcher.stopWatching();
+    if (monitor != null) {
+      try {
+        monitor.stop();
+      } catch (Exception ignore) {
+      }
     }
   }
 

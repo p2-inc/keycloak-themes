@@ -7,6 +7,7 @@ Themes and theme utilities meant for simple theme customization without deployin
 - A modified login theme that allows colors, logo, CSS to be loaded from Realm attributes.
 - An implementation of `ThemeProvider` that loads named Freemarker templates and messages from Realm attributes. Currently only for email.
 - An implementation of `EmailTemplateProvider` that allows the use of mustache.js templates.
+- An implementation of `EmailSenderProvider` that allows overriding SMTP server with defaults.
 
 This extension is used in the [Phase Two](https://phasetwo.io) cloud offering, and is released here as part of its commitment to making its [core extensions](https://phasetwo.io/docs/introduction/open-source) open source. Please consult the [license](COPYING) for information regarding use.
 
@@ -108,7 +109,7 @@ If you wish to set the global overrides, you can set the following variables:
 |`--spi-email-sender-ext-email-override-max-emails`|no|100|Maximum number of emails that can be sent in a day for a realm using the override. Fails silently after this maximum. Set to `-1` for no limit.|
 |`--spi-email-sender-ext-email-override-host`|yes||SMTP hostname. Must be set in order to use this provider.|
 |`--spi-email-sender-ext-email-override-from`|yes||From email address. Must be set in order to use this provider.|
-|`--spi-email-sender-ext-email-override-auth`|no||`true` for auth enabled.|
+|`--spi-email-sender-ext-email-override-auth`|no|`false`|`true` for auth enabled.|
 |`--spi-email-sender-ext-email-override-user`|no||From email address.|
 |`--spi-email-sender-ext-email-override-password`|no||From email address.|
 |`--spi-email-sender-ext-email-override-ssl`|no|`false`|`true` for SSL enabled.|

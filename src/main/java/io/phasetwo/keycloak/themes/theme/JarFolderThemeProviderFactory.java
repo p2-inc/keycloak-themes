@@ -1,6 +1,7 @@
 package io.phasetwo.keycloak.themes.theme;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +71,7 @@ public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
     onFileRemoved(isSubDir(file), file.toPath());
   }
 
-  public void onFileModified(Optional<String> dir, Path file) {
+  private void onFileModified(Optional<String> dir, Path file) {
     // TODO is the dir a real realm?
     try {
       if (!Files.exists(file) || Files.size(file) == 0) {
@@ -89,6 +90,8 @@ public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
       try (InputStream inputStream = Files.newInputStream(themeManifest)) {
         loadThemes(
             file, fs, dir, JsonSerialization.readValue(inputStream, ThemesRepresentation.class));
+        log.debugf("globalThemes %s", Joiner.on(",").withKeyValueSeparator("=").join(globalThemes));
+        log.debugf("realmThemes %s", Joiner.on(",").withKeyValueSeparator("=").join(realmThemes));
       }
       jars.put(file, fs);
     } catch (Exception e) {
@@ -96,7 +99,7 @@ public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
     }
   }
 
-  void loadThemes(
+  private void loadThemes(
       Path jarFile, FileSystem fs, Optional<String> realm, ThemesRepresentation themesRep) {
     Map<Theme.Type, Map<String, JarFileSystemTheme>> themes =
         realm.isPresent() ? realmThemes.get(realm.get()) : globalThemes;
@@ -121,7 +124,7 @@ public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
               .get(type)
               .put(
                   themeRep.getName(),
-                  new JarFileSystemTheme(jarFile, fs, themeRep.getName(), type));
+                  new JarFileSystemTheme(jarFile, fs, realm, themeRep.getName(), type));
         }
       }
     } catch (Exception e) {
@@ -129,7 +132,7 @@ public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
     }
   }
 
-  public void onFileRemoved(Optional<String> dir, Path file) {
+  private void onFileRemoved(Optional<String> dir, Path file) {
     FileSystem fs = jars.remove(file);
     if (fs == null) {
       log.infof("No FileSystem for %s", file);
@@ -161,7 +164,8 @@ public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
     }
   }
 
-  void removeThemesForFile(Map<Theme.Type, Map<String, JarFileSystemTheme>> themes, Path file) {
+  private void removeThemesForFile(
+      Map<Theme.Type, Map<String, JarFileSystemTheme>> themes, Path file) {
     for (Map<String, JarFileSystemTheme> themesOfType : themes.values()) {
       Iterator<Map.Entry<String, JarFileSystemTheme>> iterator = themesOfType.entrySet().iterator();
       while (iterator.hasNext()) {
@@ -241,7 +245,7 @@ public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
     }
   }
 
-  void findFilesAndNotify(Path directory, String fileType) throws IOException {
+  private void findFilesAndNotify(Path directory, String fileType) throws IOException {
     Files.walkFileTree(
         directory,
         EnumSet.noneOf(FileVisitOption.class),

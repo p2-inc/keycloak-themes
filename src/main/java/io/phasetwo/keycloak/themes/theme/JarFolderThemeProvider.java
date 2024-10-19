@@ -39,19 +39,18 @@ public class JarFolderThemeProvider implements ThemeProvider {
     this.realmThemes = realmThemes;
   }
 
-  static final Theme.Type[] ALLOWED_TYPES = {
+  private static final Theme.Type[] ALLOWED_TYPES = {
     Theme.Type.LOGIN, Theme.Type.EMAIL, Theme.Type.COMMON, Theme.Type.ACCOUNT
   };
 
-  static boolean isAllowedType(Theme.Type type) {
+  private static boolean isAllowedType(Theme.Type type) {
     for (Theme.Type allowed : ALLOWED_TYPES) {
       if (type == allowed) return true;
     }
     return false;
   }
 
-  static boolean isClassAndMethodInStack(String className, String methodName) {
-    // Use StackWalker to get the stack frames
+  private static boolean isClassAndMethodInStack(String className, String methodName) {
     Optional<StackFrame> foundFrame =
         StackWalker.getInstance()
             .walk(
@@ -62,8 +61,6 @@ public class JarFolderThemeProvider implements ThemeProvider {
                                 frame.getClassName().equals(className)
                                     && frame.getMethodName().equals(methodName))
                         .findFirst());
-
-    // If the frame was found, return true
     return foundFrame.isPresent();
   }
 
@@ -82,22 +79,25 @@ public class JarFolderThemeProvider implements ThemeProvider {
     }
     if (resourceSession || realm != null) {
       int idx = name.indexOf("--");
-      if (idx < 1) return null;
-      String k = name.substring(0, idx);
-      log.debugf("resource session for %s %s", name, k);
-      themes = realmThemes.get(k);
-    } else {
-      themes = null;
+      if (idx < 1) return null; // there's no "--"
+      if (name.length() < idx + 3) return null; // there's nothing after the "--"
+      String realmKey = name.substring(0, idx);
+      String themeKey = name.substring(idx + 2);
+      log.debugf("resource session for %s %s %s", name, realmKey, themeKey);
+      themes = realmThemes.get(realmKey);
+      if (themes != null && themes.containsKey(type) && themes.get(type).containsKey(themeKey)) {
+        Theme theme = themes.get(type).get(themeKey);
+        log.debugf("theme %s for key %s is %s", type, themeKey, theme);
+        return theme;
+      }
     }
-    if (themes != null && themes.containsKey(type) && themes.get(type).containsKey(name)) {
-      return themes.get(type).get(name);
-    }
+    log.debugf("No theme for %s %s", name, type);
     return null;
   }
 
   @Override
   public Set<String> nameSet(Theme.Type type) {
-    log.debugf("nameSet %s %s", type);
+    log.debugf("nameSet %s", type);
     Set<String> names = new HashSet<>();
     if (globalThemes.containsKey(type)) {
       names.addAll(globalThemes.get(type).keySet());
@@ -111,15 +111,16 @@ public class JarFolderThemeProvider implements ThemeProvider {
         }
       }
     }
-    log.debugf("[%s] nameSet: %s", type, Joiner.on(",").join(names));
+    if (names.size() > 0) log.debugf("[%s] nameSet: %s", type, Joiner.on(",").join(names));
     return names;
   }
 
   @Override
   public boolean hasTheme(String name, Theme.Type type) {
-    log.debugf("hasTheme %s %s", name, type);
     try {
-      return (getTheme(name, type) != null);
+      Theme theme = getTheme(name, type);
+      log.debugf("hasTheme %s %s %b", name, type, theme != null);
+      return (theme != null);
     } catch (IOException e) {
       return false;
     }

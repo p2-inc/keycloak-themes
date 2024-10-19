@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import lombok.extern.jbosslog.JBossLog;
@@ -23,6 +24,7 @@ public class JarFileSystemTheme implements Theme {
 
   private final Path jarFile;
   private final FileSystem fileSystem;
+  private final Optional<String> realmName;
   private final String name;
   private final Type type;
   private final Path themeDir;
@@ -31,10 +33,12 @@ public class JarFileSystemTheme implements Theme {
   private String parentName;
   private String importName;
 
-  public JarFileSystemTheme(Path jarFile, FileSystem fileSystem, String name, Type type) {
+  public JarFileSystemTheme(
+      Path jarFile, FileSystem fileSystem, Optional<String> realmName, String name, Type type) {
     this.themeDir = themeDir(fileSystem, name, type);
     this.jarFile = jarFile;
     this.fileSystem = fileSystem;
+    this.realmName = realmName;
     this.name = name;
     this.type = type;
     this.properties = new Properties();
@@ -68,7 +72,12 @@ public class JarFileSystemTheme implements Theme {
 
   @Override
   public String getName() {
-    return name;
+    StringBuilder o = new StringBuilder();
+    if (realmName.isPresent()) {
+      o.append(realmName.get()).append("--");
+    }
+    o.append(name);
+    return o.toString();
   }
 
   @Override

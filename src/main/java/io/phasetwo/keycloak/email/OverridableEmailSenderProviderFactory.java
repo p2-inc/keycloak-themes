@@ -14,11 +14,12 @@ import org.keycloak.models.KeycloakSessionFactory;
 @AutoService(EmailSenderProviderFactory.class)
 public class OverridableEmailSenderProviderFactory implements EmailSenderProviderFactory {
 
+  private Integer maxEmails;
   private Map<String, String> conf;
 
   @Override
   public OverridableEmailSenderProvider create(KeycloakSession session) {
-    return new OverridableEmailSenderProvider(session, conf);
+    return new OverridableEmailSenderProvider(session, conf, maxEmails);
   }
 
   public static final String[] PROPERTY_NAMES = {
@@ -39,7 +40,8 @@ public class OverridableEmailSenderProviderFactory implements EmailSenderProvide
   @Override
   public void init(Config.Scope config) {
     log.info("Initializing config for email sender.");
-
+    this.maxEmails = config.getInt("maxEmails", 100);
+    log.infof("maxEmails set to %d", this.maxEmails);
     String host = config.get("host");
     if (!Strings.isNullOrEmpty(host)) { // TODO better test than this
       ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();

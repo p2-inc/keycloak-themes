@@ -7,6 +7,7 @@ Themes and theme utilities meant for simple theme customization without deployin
 - A modified login theme that allows colors, logo, CSS to be loaded from Realm attributes.
 - An implementation of `ThemeProvider` that loads named Freemarker templates and messages from Realm attributes. Currently only for email.
 - An implementation of `EmailTemplateProvider` that allows the use of mustache.js templates.
+- An implementation of `EmailSenderProvider` that allows overriding SMTP server with defaults.
 
 This extension is used in the [Phase Two](https://phasetwo.io) cloud offering, and is released here as part of its commitment to making its [core extensions](https://phasetwo.io/docs/introduction/open-source) open source. Please consult the [license](COPYING) for information regarding use.
 
@@ -93,6 +94,37 @@ The implementation of `EmailTemplateProvider` that allows the use of mustache.js
 
 - We get equivalent funcationlity to the methods like `linkExpirationFormatter(linkExpiration)` by using the library's lambda functionality, and using the mustache-y syntax `{{#linkExpirationFormatter}}{{linkExpiration}}{{/linkExpirationFormatter}}`, but there isn't complete coverage yet.
 - There is essentially no i18n at this point, so only the english templates work.
+
+### Email Sender
+
+This includes an implementation of `EmailSenderProvider` which behaves as the default, unless you specify variables to configure provider defaults. In this case, any realm that does not have an SMTP server set up will default to use the values set in the variables. This is useful in environments where a single SMTP server is used by many realms, and the Keycloak administrator does not want to distribute credentials to every realm administrator.
+
+This can also be useful in environments where you want to allow realms to "test" Keycloak's email sending without having to configure an SMTP server. For this use case, we have also included a counter in the distributed cache that is used to limit the number of emails that are sent using the global configuration, in order to prevent spammers from exploiting the free email capability. This can be configured with the `max-emails` variable. To use the limiting functionality, you must have a distributed or replicated cache configuration for `counterCache` in your Infinispan XML cache configuration. E.g.:
+
+```xml
+    <replicated-cache name="counterCache">
+      <expiration lifespan="-1"/>
+    </replicated-cache>
+```
+
+If you wish to set the global overrides, you can set the following variables:
+|Variable|Required|Default|Description|
+|----|----|----|----|
+|`--spi-email-sender-provider`|yes|`ext-email-override`|Must be set in order to use this provider.|
+|`--spi-email-sender-ext-email-override-enabled`|yes|`true`|Must be set in order to use this provider.|
+|`--spi-email-sender-ext-email-override-max-emails`|no|100|Maximum number of emails that can be sent in a day for a realm using the override. Fails silently after this maximum. Set to `-1` for no limit.|
+|`--spi-email-sender-ext-email-override-host`|yes||SMTP hostname. Must be set in order to use this provider.|
+|`--spi-email-sender-ext-email-override-from`|yes||From email address. Must be set in order to use this provider.|
+|`--spi-email-sender-ext-email-override-auth`|no|`false`|`true` for auth enabled.|
+|`--spi-email-sender-ext-email-override-user`|no||From email address.|
+|`--spi-email-sender-ext-email-override-password`|no||From email address.|
+|`--spi-email-sender-ext-email-override-ssl`|no|`false`|`true` for SSL enabled.|
+|`--spi-email-sender-ext-email-override-starttls`|no|`false`|`true` for StartTLS enabled.|
+|`--spi-email-sender-ext-email-override-port`|no|`25`|SMTP port.|
+|`--spi-email-sender-ext-email-override-from-display-name`|no||From email address display name.|
+|`--spi-email-sender-ext-email-override-reply-to`|no||Reply-to email address.|
+|`--spi-email-sender-ext-email-override-reply-to-display-name`|no||Reply-to email address display name.|
+|`--spi-email-sender-ext-email-override-envelope-from`|no||Envelope-from email address.|
 
 ---
 

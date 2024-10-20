@@ -18,8 +18,8 @@ public class OverridableEmailSenderProvider extends DefaultEmailSenderProvider {
   private final KeycloakSession session;
   private final Map<String, String> conf;
   private final Integer maxEmails;
-  private final Cache<String, Integer> counterCache;
   private final String cacheKey;
+  private Cache<String, Integer> counterCache;
 
   public OverridableEmailSenderProvider(
       KeycloakSession session, Map<String, String> conf, Integer maxEmails) {
@@ -27,9 +27,13 @@ public class OverridableEmailSenderProvider extends DefaultEmailSenderProvider {
     this.session = session;
     this.conf = conf;
     this.maxEmails = maxEmails;
-    this.counterCache =
-        session.getProvider(InfinispanConnectionProvider.class).getCache("counterCache", true);
     this.cacheKey = getCacheKey();
+    try {
+      this.counterCache =
+          session.getProvider(InfinispanConnectionProvider.class).getCache("counterCache", true);
+    } catch (Exception e) {
+      log.warnf("Error loading counterCache %s", e);
+    }
   }
 
   private boolean useOverride(Map<String, String> config) {
@@ -50,6 +54,7 @@ public class OverridableEmailSenderProvider extends DefaultEmailSenderProvider {
   private boolean canSend() {
     if (cacheKey == null) return true;
     Integer count = counterCache.get(cacheKey);
+    log.infof("Count for %s is %d / %d", cacheKey, count, maxEmails);
     if (count == null || count <= maxEmails) return true;
     else return false;
   }

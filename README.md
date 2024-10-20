@@ -99,7 +99,13 @@ The implementation of `EmailTemplateProvider` that allows the use of mustache.js
 
 This includes an implementation of `EmailSenderProvider` which behaves as the default, unless you specify variables to configure provider defaults. In this case, any realm that does not have an SMTP server set up will default to use the values set in the variables. This is useful in environments where a single SMTP server is used by many realms, and the Keycloak administrator does not want to distribute credentials to every realm administrator.
 
-This can also be useful in environments where you want to allow realms to "test" Keycloak's email sending without having to configure an SMTP server. For this use case, we have also included a counter in the distributed cache that is used to limit the number of emails that are sent using the global configuration, in order to prevent spammers from exploiting the free email capability. This can be configured with the `max-emails` variable.
+This can also be useful in environments where you want to allow realms to "test" Keycloak's email sending without having to configure an SMTP server. For this use case, we have also included a counter in the distributed cache that is used to limit the number of emails that are sent using the global configuration, in order to prevent spammers from exploiting the free email capability. This can be configured with the `max-emails` variable. To use the limiting functionality, you must have a distributed or replicated cache configuration for `counterCache` in your Infinispan XML cache configuration. E.g.:
+
+```xml
+    <replicated-cache name="counterCache">
+      <expiration lifespan="-1"/>
+    </replicated-cache>
+```
 
 If you wish to set the global overrides, you can set the following variables:
 |Variable|Required|Default|Description|

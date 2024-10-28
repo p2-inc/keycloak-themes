@@ -16,7 +16,7 @@ public abstract class AbstractResourceTest {
 
   public static final String KEYCLOAK_IMAGE =
       String.format(
-          "quay.io/phasetwo/keycloak-crdb:%s", System.getProperty("keycloak-version", "23.0.0"));
+          "quay.io/phasetwo/keycloak-crdb:%s", System.getProperty("keycloak-version", "26.0.2"));
 
   static final String[] deps = {"com.github.spullara.mustache.java:compiler"};
 

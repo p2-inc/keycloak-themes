@@ -2,13 +2,13 @@ version: '3'
 
 services:
   keycloak:
-      image: quay.io/keycloak/keycloak:20.0.1
+      image: quay.io/phasetwo/keycloak-crdb:26.0.2
       environment:
-        KEYCLOAK_ADMIN: admin
-        KEYCLOAK_ADMIN_PASSWORD: admin
+        KC_BOOTSTRAP_ADMIN_USERNAME: admin
+        KC_BOOTSTRAP_ADMIN_PASSWORD: admin
         KC_HTTP_RELATIVE_PATH: /auth
       ports:
         - 8080:8080
       volumes: 
-        - ./target/keycloak-themes-0.3-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-themes.jar
+        - ./target/keycloak-themes-0.34-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-themes.jar
       command: [ "start-dev --spi-email-template-provider=freemarker-plus-mustache --spi-email-template-freemarker-plus-mustache-enabled=true" ] 

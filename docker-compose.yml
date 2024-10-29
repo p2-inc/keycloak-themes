@@ -2,15 +2,15 @@ version: '3'
 
 services:
   keycloak:
-      image: quay.io/keycloak/keycloak:26.0.0
+      image: quay.io/phasetwo/keycloak-crdb:26.0.2
       environment:
-        KEYCLOAK_ADMIN: admin
-        KEYCLOAK_ADMIN_PASSWORD: admin
+        KC_BOOTSTRAP_ADMIN_USERNAME: admin
+        KC_BOOTSTRAP_ADMIN_PASSWORD: admin
         KC_HTTP_RELATIVE_PATH: /auth
         #KC_LOG_LEVEL: DEBUG
       ports:
         - 8080:8080
       volumes: 
-        - ${PWD}/target/keycloak-themes-0.33-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-themes.jar
+        - ./target/keycloak-themes-0.34-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-themes.jar
         - ${PWD}/mnt_themes:/opt/keycloak/jarthemes
       entrypoint: /opt/keycloak/bin/kc.sh --verbose start-dev --spi-email-template-provider=freemarker-plus-mustache --spi-email-template-freemarker-plus-mustache-enabled=true --spi-theme-ext-theme-jar-folder-dir=/opt/keycloak/jarthemes --spi-theme-cache-themes=false

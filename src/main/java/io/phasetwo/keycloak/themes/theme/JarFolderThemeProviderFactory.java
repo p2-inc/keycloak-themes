@@ -57,7 +57,18 @@ public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
   @Override
   public void onFileChange(File file) {
     log.infof("onFileChange %s", file);
-    onFileModified(isSubDir(file), file.toPath());
+    Path newFile = file.toPath();
+    Optional<String> isSubDir = isSubDir(file);
+    try {
+      Path tmp = Files.createTempFile("theme", "jar");
+      Files.deleteIfExists(tmp);
+      Files.move(newFile, tmp);
+      onFileRemoved(isSubDir, newFile);
+      Files.move(tmp, newFile);
+      onFileModified(isSubDir, newFile);
+    } catch (Exception e) {
+      log.warnf("Error replacing file %s", newFile);
+    }
   }
 
   @Override

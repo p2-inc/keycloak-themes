@@ -36,7 +36,7 @@ public class OverridableEmailSenderProvider extends DefaultEmailSenderProvider {
     }
   }
 
-  private boolean useOverride(Map<String, String> config) {
+  private boolean useRealmConfig(Map<String, String> config) {
     return (!config.isEmpty() && config.containsKey("host"));
   }
 
@@ -70,7 +70,7 @@ public class OverridableEmailSenderProvider extends DefaultEmailSenderProvider {
   public void send(
       Map<String, String> config, UserModel user, String subject, String textBody, String htmlBody)
       throws EmailException {
-    if (useOverride(config)) {
+    if (useRealmConfig(config)) {
       log.debug("Using customer override email sender");
       super.send(config, user, subject, textBody, htmlBody);
     } else {
@@ -88,7 +88,7 @@ public class OverridableEmailSenderProvider extends DefaultEmailSenderProvider {
   public void send(
       Map<String, String> config, String address, String subject, String textBody, String htmlBody)
       throws EmailException {
-    if (useOverride(config)) {
+    if (useRealmConfig(config)) {
       log.debug("Using customer override email sender");
       super.send(config, address, subject, textBody, htmlBody);
     } else {

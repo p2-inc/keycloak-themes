@@ -108,23 +108,24 @@ This can also be useful in environments where you want to allow realms to "test"
 ```
 
 If you wish to set the global overrides, you can set the following variables:
-|Variable|Required|Default|Description|
-|----|----|----|----|
-|`--spi-email-sender-provider`|yes|`ext-email-override`|Must be set in order to use this provider.|
-|`--spi-email-sender-ext-email-override-enabled`|yes|`true`|Must be set in order to use this provider.|
-|`--spi-email-sender-ext-email-override-max-emails`|no|100|Maximum number of emails that can be sent in a day for a realm using the override. Fails silently after this maximum. Set to `-1` for no limit.|
-|`--spi-email-sender-ext-email-override-host`|yes||SMTP hostname. Must be set in order to use this provider.|
-|`--spi-email-sender-ext-email-override-from`|yes||From email address. Must be set in order to use this provider.|
-|`--spi-email-sender-ext-email-override-auth`|no|`false`|`true` for auth enabled.|
-|`--spi-email-sender-ext-email-override-user`|no||From email address.|
-|`--spi-email-sender-ext-email-override-password`|no||From email address.|
-|`--spi-email-sender-ext-email-override-ssl`|no|`false`|`true` for SSL enabled.|
-|`--spi-email-sender-ext-email-override-starttls`|no|`false`|`true` for StartTLS enabled.|
-|`--spi-email-sender-ext-email-override-port`|no|`25`|SMTP port.|
-|`--spi-email-sender-ext-email-override-from-display-name`|no||From email address display name.|
-|`--spi-email-sender-ext-email-override-reply-to`|no||Reply-to email address.|
-|`--spi-email-sender-ext-email-override-reply-to-display-name`|no||Reply-to email address display name.|
-|`--spi-email-sender-ext-email-override-envelope-from`|no||Envelope-from email address.|
+
+| Variable | Required | Default | Description |
+| ---- | ---- | ---- | ---- |
+| `--spi-email-sender-provider` | yes | `ext-email-override` | Must be set in order to use this provider. |
+| `--spi-email-sender-ext-email-override-enabled` | yes | `true` | Must be set in order to use this provider. |
+| `--spi-email-sender-ext-email-override-max-emails` | no | 100 | Maximum number of emails that can be sent in a day for a realm using the override. Fails silently after this maximum. Set to `-1` for no limit. |
+| `--spi-email-sender-ext-email-override-host` | yes |  | SMTP hostname. Must be set in order to use this provider. |
+| `--spi-email-sender-ext-email-override-from` | yes |  | From email address. Must be set in order to use this provider. |
+| `--spi-email-sender-ext-email-override-auth` | no | `false` | `true` for auth enabled. |
+| `--spi-email-sender-ext-email-override-user` | no |  | From email address. |
+| `--spi-email-sender-ext-email-override-password` | no |  | From email address. |
+| `--spi-email-sender-ext-email-override-ssl` | no | `false` | `true` for SSL enabled. |
+| `--spi-email-sender-ext-email-override-starttls` | no | `false` | `true` for StartTLS enabled. |
+| `--spi-email-sender-ext-email-override-port` | no | `25` | SMTP port. |
+| `--spi-email-sender-ext-email-override-from-display-name` | no |  | From email address display name. |
+| `--spi-email-sender-ext-email-override-reply-to` | no |  | Reply-to email address. |
+| `--spi-email-sender-ext-email-override-reply-to-display-name` | no |  | Reply-to email address display name. |
+| `--spi-email-sender-ext-email-override-envelope-from` | no |  | Envelope-from email address. |
 
 ---
 

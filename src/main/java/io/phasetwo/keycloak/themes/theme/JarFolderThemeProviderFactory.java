@@ -30,6 +30,7 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.provider.EnvironmentDependentProviderFactory;
 import org.keycloak.theme.ClasspathThemeProviderFactory.ThemeRepresentation;
 import org.keycloak.theme.ClasspathThemeProviderFactory.ThemesRepresentation;
 import org.keycloak.theme.Theme;
@@ -40,7 +41,7 @@ import org.keycloak.util.JsonSerialization;
 @JBossLog
 @AutoService(ThemeProviderFactory.class)
 public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
-    implements ThemeProviderFactory {
+    implements ThemeProviderFactory, EnvironmentDependentProviderFactory {
 
   public static final String PROVIDER_ID = "ext-theme-jar-folder";
   public static final String KEYCLOAK_THEMES_JSON = "/META-INF/keycloak-themes.json";
@@ -182,6 +183,15 @@ public class JarFolderThemeProviderFactory extends FileAlterationListenerAdaptor
   @Override
   public ThemeProvider create(KeycloakSession session) {
     return new JarFolderThemeProvider(session, globalThemes, realmThemes);
+  }
+
+  @Override
+  public boolean isSupported(Config.Scope config) {
+    try {
+      return Files.isDirectory(new File(config.get("dir")).toPath());
+    } catch (Exception ignore) {
+    }
+    return false;
   }
 
   @Override

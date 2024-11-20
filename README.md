@@ -7,6 +7,7 @@ Themes and theme utilities meant for simple theme customization without deployin
 - A modified login theme that allows colors, logo, CSS to be loaded from Realm attributes.
 - An implementation of `ThemeProvider` that loads named Freemarker templates and messages from Realm attributes. Currently only for email.
 - An implementation of `EmailTemplateProvider` that allows the use of mustache.js templates.
+- An implementation of `ThemeProvider` that allows runtime loading of themes from JAR files. Both globally and per-realm.
 
 This extension is used in the [Phase Two](https://phasetwo.io) cloud offering, and is released here as part of its commitment to making its [core extensions](https://phasetwo.io/docs/introduction/open-source) open source. Please consult the [license](COPYING) for information regarding use.
 
@@ -93,6 +94,19 @@ The implementation of `EmailTemplateProvider` that allows the use of mustache.js
 
 - We get equivalent funcationlity to the methods like `linkExpirationFormatter(linkExpiration)` by using the library's lambda functionality, and using the mustache-y syntax `{{#linkExpirationFormatter}}{{linkExpiration}}{{/linkExpirationFormatter}}`, but there isn't complete coverage yet.
 - There is essentially no i18n at this point, so only the english templates work.
+
+### JAR Folder Theme Provider
+
+This includes an implementation of `ThemeProvider` that dynamically loads theme JARs from a specified directory at runtime. This is useful for deploying packaged themes without requiring a restart of Keycloak. The specified directory is scanned every 1 minute for JAR files both at the top level, and 1 directory deep. The JAR files placed in the top level will expose the enclosed themes to all realms. The subdirectories are meant to be named with realm names that should be allowed to access the JAR files contained in those subdirectories.
+
+In order to workaround some issues with the `ThemeProvider` API, subdirectory themes are named as `<realmName>--<themeName>`. Also, subdirectory themes are **only** available in the Admin UI for selection when you are logged in to that realm's Admin UI, **not** the `master` Admin UI.
+
+The following variables can be set in order to configure this provider:
+
+| Variable | Required | Default | Description |
+| ---- | ---- | ---- | ---- |
+| `--spi-theme-cache-themes` | yes |  | Must be set to `true` in order to use this provider. |
+| `--spi-theme-ext-theme-jar-folder-dir` | yes |  | Directory to be watched by this provider for theme JARs. |
 
 ---
 

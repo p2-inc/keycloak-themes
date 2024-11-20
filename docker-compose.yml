@@ -7,8 +7,10 @@ services:
         KC_BOOTSTRAP_ADMIN_USERNAME: admin
         KC_BOOTSTRAP_ADMIN_PASSWORD: admin
         KC_HTTP_RELATIVE_PATH: /auth
+        #KC_LOG_LEVEL: DEBUG
       ports:
         - 8080:8080
       volumes: 
         - ./target/keycloak-themes-0.34-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-themes.jar
-      command: [ "start-dev --spi-email-template-provider=freemarker-plus-mustache --spi-email-template-freemarker-plus-mustache-enabled=true" ] 
+        - ${PWD}/mnt_themes:/opt/keycloak/jarthemes
+      entrypoint: /opt/keycloak/bin/kc.sh --verbose start-dev --spi-email-template-provider=freemarker-plus-mustache --spi-email-template-freemarker-plus-mustache-enabled=true --spi-theme-ext-theme-jar-folder-dir=/opt/keycloak/jarthemes --spi-theme-cache-themes=false

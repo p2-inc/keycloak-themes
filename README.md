@@ -26,15 +26,26 @@ If you wish to build this yourself, you can do so with a few simple steps:
 mvn clean install
 ```
 
-2. Copy the jar produced in `target/` to your `providers` directory (for Quarkus) or `standalone/deployments` directory (for legacy) and rebuild/restart keycloak.
+or without tests (quicker) 
 
-After #1, you can also run `docker-compose up` if you want to take a quick look.
+```
+mvn clean install -DskipTests
+```
+
+2. If you are using your own Keycloak, copy the jar produced in `target/` to your `providers` directory (for Quarkus) or `standalone/deployments` directory (for legacy) and rebuild/restart keycloak. 
+
+After #1, you can also run `docker-compose up` if you want to take a quick look against our image. 
 
 ## Overview
 
-### Login theme
+### Login theme(s)
 
-The login theme is named `attributes`. It assumes you will store the values as Realm attributes with the following keys:
+There are two login themes available. 
+
+- `attributes` for patternfly installations v4 and below
+- `attributes-v2` for patternfly installation v5
+
+Both themes assume you will store the values as Realm attributes with the following keys:
 
 - `_providerConfig.assets.login.css`: CSS you want to be loaded after the standard login.css
 - `_providerConfig.assets.login.backgroundColor`: override for `--pf-v5-global--primary-color--100`.
@@ -93,7 +104,7 @@ The implementation of `EmailTemplateProvider` that allows the use of mustache.js
 
 #### Issues
 
-- We get equivalent funcationlity to the methods like `linkExpirationFormatter(linkExpiration)` by using the library's lambda functionality, and using the mustache-y syntax `{{#linkExpirationFormatter}}{{linkExpiration}}{{/linkExpirationFormatter}}`, but there isn't complete coverage yet.
+- We get equivalent functionality to the methods like `linkExpirationFormatter(linkExpiration)` by using the library's lambda functionality, and using the mustache-y syntax `{{#linkExpirationFormatter}}{{linkExpiration}}{{/linkExpirationFormatter}}`, but there isn't complete coverage yet.
 - There is essentially no i18n at this point, so only the english templates work.
 
 ### Email Sender

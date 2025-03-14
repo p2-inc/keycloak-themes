@@ -7,6 +7,12 @@
       ]
     },
     {
+      "name": "attributes-v2",
+      "types": [
+        "login"
+      ]
+    },
+    {
       "name": "mustache",
       "types": [
         "email"

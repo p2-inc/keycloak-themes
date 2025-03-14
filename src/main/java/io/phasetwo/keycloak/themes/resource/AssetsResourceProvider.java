@@ -90,6 +90,16 @@ public class AssetsResourceProvider implements RealmResourceProvider {
     setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-v5-global--link--Color--hover");
     setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-v5-global--link--Color--dark--hover");
     setColor(o, ASSETS_LOGIN_BACKGROUND_COLOR, "--pf-v5-global--BackgroundColor--100");
+    // Handle p4 and less versions
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--primary-color--100");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--active-color--100");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--primary-color--dark-100");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--link--Color");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-global--link--Color--dark");
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--primary-color--200");
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--link--Color--hover");
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-global--link--Color--dark--hover");
+    setColor(o, ASSETS_LOGIN_BACKGROUND_COLOR, "--pf-global--BackgroundColor--100");
   }
 
   private void setColor(StringBuilder o, String key, String name) {
@@ -106,7 +116,7 @@ public class AssetsResourceProvider implements RealmResourceProvider {
       throws IOException {
     String css = session.getContext().getRealm().getAttribute(ASSETS_LOGIN_CSS);
     if (Strings.isNullOrEmpty(css)) {
-      StringBuilder o = new StringBuilder("/* login css */\n");
+      StringBuilder o = new StringBuilder("/* custom login css */\n");
       o.append(":root {\n");
       setColors(o);
       o.append("}\n");

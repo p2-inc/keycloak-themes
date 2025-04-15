@@ -73,7 +73,7 @@ public class AssetsResourceTest extends AbstractResourceTest {
     assertThat(css, containsString("--pf-v5-global--link--Color--hover: #0AF0AF;"));
     assertThat(css, containsString("--pf-v5-global--link--Color--dark--hover: #0AF0AF;"));
     assertThat(css, containsString("--pf-v5-global--BackgroundColor--100: #FAAFAA;"));
-    
+
     assertThat(css, containsString("--pf-global--primary-color--100: #000000;"));
     assertThat(css, containsString("--pf-global--active-color--100: #000000"));
     assertThat(css, containsString("--pf-global--primary-color--dark-100: #000000"));

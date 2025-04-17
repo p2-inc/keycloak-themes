@@ -6,20 +6,20 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
+import org.keycloak.email.DefaultEmailSenderProviderFactory;
 import org.keycloak.email.EmailSenderProviderFactory;
 import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.KeycloakSessionFactory;
 
 @JBossLog
 @AutoService(EmailSenderProviderFactory.class)
-public class OverridableEmailSenderProviderFactory implements EmailSenderProviderFactory {
+public class OverridableEmailSenderProviderFactory extends DefaultEmailSenderProviderFactory {
 
   private Integer maxEmails;
   private Map<String, String> conf;
 
   @Override
   public OverridableEmailSenderProvider create(KeycloakSession session) {
-    return new OverridableEmailSenderProvider(session, conf, maxEmails);
+    return new OverridableEmailSenderProvider(session, getEmailAuthenticators(), conf, maxEmails);
   }
 
   public static final String[] PROPERTY_NAMES = {
@@ -56,12 +56,6 @@ public class OverridableEmailSenderProviderFactory implements EmailSenderProvide
       this.conf = ImmutableMap.of();
     }
   }
-
-  @Override
-  public void postInit(KeycloakSessionFactory factory) {}
-
-  @Override
-  public void close() {}
 
   @Override
   public String getId() {

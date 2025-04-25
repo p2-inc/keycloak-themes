@@ -1,5 +1,8 @@
 package io.phasetwo.keycloak.themes.theme;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import io.phasetwo.keycloak.email.AttributesBuilderProvider;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
@@ -85,20 +88,27 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
       attributes.put("realmName", getRealmName());
       attributes.put("user", new ProfileBean(user, session));
       attributes.put("url", new UrlBean(realm, theme, uriInfo.getBaseUri(), null));
+
+      // runAttributesBuilder
+      //  clone in case it's immutable
+      List<Object> subjAttr = Lists.newArrayList(subjectAttributes);
+      Map<String, Object> attr = Maps.newHashMap(attributes);
+      runAttributesBuilder(subjAttr, attr);
+
       String subject =
           new MessageFormat(rb.getProperty(subjectKey, subjectKey), locale)
-              .format(subjectAttributes.toArray());
+              .format(subjAttr.toArray());
       String textTemplate = String.format("text/%s", template);
       String textBody;
       try {
-        textBody = MustacheProvider.processTemplate(attributes, textTemplate, theme);
+        textBody = MustacheProvider.processTemplate(attr, textTemplate, theme);
       } catch (final FreeMarkerException e) {
         throw new EmailException("Failed to template plain text email.", e);
       }
       String htmlTemplate = String.format("html/%s", template);
       String htmlBody;
       try {
-        htmlBody = MustacheProvider.processTemplate(attributes, htmlTemplate, theme);
+        htmlBody = MustacheProvider.processTemplate(attr, htmlTemplate, theme);
       } catch (final FreeMarkerException e) {
         throw new EmailException("Failed to template html email.", e);
       }
@@ -107,5 +117,17 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
     } catch (Exception e) {
       throw new EmailException("Failed to template email", e);
     }
+  }
+
+  private void runAttributesBuilder(
+      List<Object> subjectAttributes, Map<String, Object> bodyAttributes) throws Exception {
+    AttributesBuilderProvider ab = null;
+    try {
+      ab = session.getProvider(AttributesBuilderProvider.class);
+    } catch (Exception e) {
+      log.debug("Can't load AttributesBuilderProvider", e);
+      return;
+    }
+    ab.updateAttributes(subjectAttributes, bodyAttributes);
   }
 }

@@ -15,7 +15,7 @@ public class MessageBuilderSpi implements Spi {
 
   @Override
   public String getName() {
-    return "messageBuilderProvider";
+    return "messageBuilder";
   }
 
   @Override

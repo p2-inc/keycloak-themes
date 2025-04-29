@@ -15,7 +15,7 @@ public class AttributesBuilderSpi implements Spi {
 
   @Override
   public String getName() {
-    return "attributesBuilderProvider";
+    return "attributesBuilder";
   }
 
   @Override

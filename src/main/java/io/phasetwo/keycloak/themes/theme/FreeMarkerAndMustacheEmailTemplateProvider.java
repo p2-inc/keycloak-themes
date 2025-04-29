@@ -17,6 +17,7 @@ import org.keycloak.email.freemarker.beans.ProfileBean;
 import org.keycloak.forms.login.freemarker.model.UrlBean;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakUriInfo;
+import org.keycloak.models.RealmModel;
 import org.keycloak.theme.FreeMarkerException;
 import org.keycloak.theme.Theme;
 import org.keycloak.utils.StringUtil;
@@ -93,7 +94,7 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
       //  clone in case it's immutable
       List<Object> subjAttr = Lists.newArrayList(subjectAttributes);
       Map<String, Object> attr = Maps.newHashMap(attributes);
-      runAttributesBuilder(subjAttr, attr);
+      runAttributesBuilder(realm, subjAttr, attr);
 
       String subject =
           new MessageFormat(rb.getProperty(subjectKey, subjectKey), locale)
@@ -120,7 +121,8 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
   }
 
   private void runAttributesBuilder(
-      List<Object> subjectAttributes, Map<String, Object> bodyAttributes) throws Exception {
+      RealmModel realm, List<Object> subjectAttributes, Map<String, Object> bodyAttributes)
+      throws Exception {
     AttributesBuilderProvider ab = null;
     try {
       ab = session.getProvider(AttributesBuilderProvider.class);
@@ -128,6 +130,6 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
       log.debug("Can't load AttributesBuilderProvider", e);
       return;
     }
-    ab.updateAttributes(subjectAttributes, bodyAttributes);
+    ab.updateAttributes(realm, subjectAttributes, bodyAttributes);
   }
 }

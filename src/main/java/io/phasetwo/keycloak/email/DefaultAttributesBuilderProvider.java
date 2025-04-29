@@ -5,6 +5,7 @@ import java.util.Map;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.email.EmailException;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
 
 @JBossLog
 public class DefaultAttributesBuilderProvider implements AttributesBuilderProvider {
@@ -16,7 +17,8 @@ public class DefaultAttributesBuilderProvider implements AttributesBuilderProvid
   }
 
   @Override
-  public void updateAttributes(List<Object> subjectAttributes, Map<String, Object> bodyAttributes)
+  public void updateAttributes(
+      RealmModel realm, List<Object> subjectAttributes, Map<String, Object> bodyAttributes)
       throws EmailException {
     log.debugf("update attributes no-op");
   }

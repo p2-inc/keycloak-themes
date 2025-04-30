@@ -6,7 +6,7 @@ import org.keycloak.provider.ProviderFactory;
 import org.keycloak.provider.Spi;
 
 @AutoService(Spi.class)
-public class MessageBuilderSpi implements Spi {
+public class AttributesBuilderSpi implements Spi {
 
   @Override
   public boolean isInternal() {
@@ -15,17 +15,17 @@ public class MessageBuilderSpi implements Spi {
 
   @Override
   public String getName() {
-    return "messageBuilder";
+    return "attributesBuilder";
   }
 
   @Override
   public Class<? extends Provider> getProviderClass() {
-    return MessageBuilderProvider.class;
+    return AttributesBuilderProvider.class;
   }
 
   @Override
   @SuppressWarnings("rawtypes")
   public Class<? extends ProviderFactory> getProviderFactoryClass() {
-    return MessageBuilderProviderFactory.class;
+    return AttributesBuilderProviderFactory.class;
   }
 }

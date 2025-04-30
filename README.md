@@ -107,6 +107,10 @@ The implementation of `EmailTemplateProvider` that allows the use of mustache.js
 - We get equivalent functionality to the methods like `linkExpirationFormatter(linkExpiration)` by using the library's lambda functionality, and using the mustache-y syntax `{{#linkExpirationFormatter}}{{linkExpiration}}{{/linkExpirationFormatter}}`, but there isn't complete coverage yet.
 - There is essentially no i18n at this point, so only the english templates work.
 
+#### Attributes
+
+This implementation also includes an SPI `AttributesBuilderProvider` that allows adding attributes to the context objects that will be used in templating the email subject and body. This is done by implementing a single `updateAttributes` method that provides a mutable list of subject attributes and map of body attributes.
+
 ### Email Sender
 
 This includes an implementation of `EmailSenderProvider` which behaves as the default, unless you specify variables to configure provider defaults. In this case, any realm that does not have an SMTP server set up will default to use the values set in the variables. This is useful in environments where a single SMTP server is used by many realms, and the Keycloak administrator does not want to distribute credentials to every realm administrator.
@@ -138,6 +142,10 @@ If you wish to set the global overrides, you can set the following variables:
 | `--spi-email-sender-ext-email-override-reply-to` | no |  | Reply-to email address. |
 | `--spi-email-sender-ext-email-override-reply-to-display-name` | no |  | Reply-to email address display name. |
 | `--spi-email-sender-ext-email-override-envelope-from` | no |  | Envelope-from email address. |
+
+#### Attachments
+
+This implementation also includes an SPI `MessageBuilderProvider` that allows modifying the email message once it has been templated, but before it is sent. This is meant to allow adding headers and attachments. This is done by implementing a single `updateMessage` method that provides the [Message](https://jakarta.ee/specifications/platform/9/apidocs/jakarta/mail/message) and [Multipart](https://jakarta.ee/specifications/platform/9/apidocs/jakarta/mail/multipart) objects.
 
 ### JAR Folder Theme Provider
 

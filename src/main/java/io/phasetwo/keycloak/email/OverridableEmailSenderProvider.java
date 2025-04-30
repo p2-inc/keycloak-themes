@@ -365,7 +365,7 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
             "mail.smtp.ssl.checkserveridentity",
             Boolean.FALSE
                 .toString()); // this should be the default but seems to be impl specific, so set it
-                              // explicitly just to be sure
+        // explicitly just to be sure
       } else {
         props.put("mail.smtp.ssl.checkserveridentity", Boolean.TRUE.toString());
       }

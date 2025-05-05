@@ -39,12 +39,28 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
     try {
       Theme theme = getTheme();
       log.debugf("processTemplate for %s in theme %s", template, theme.getName());
+
+      // runAttributesBuilder
+      //  clone in case it's immutable
+      List<Object> subjAttr = Lists.newArrayList(subjectAttributes);
+      Map<String, Object> attr = Maps.newHashMap(attributes);
+      try {
+        int s = subjAttr.size();
+        int b = attr.size();
+        runAttributesBuilder(realm, subjAttr, attr);
+        log.debugf(
+            "Attributes builder (subject %d -> %d) (body %d -> %d)",
+            s, subjAttr.size(), b, attr.size());
+      } catch (Exception e) {
+        log.warn("Error running attributes builder", e);
+      }
+
       if (MustacheProvider.isMustacheTheme(theme)
           && MustacheProvider.hasMustacheTemplates(theme, template)) {
         log.debugf("Using mustache template for %s in theme %s", template, theme.getName());
-        return processMustacheTemplate(subjectKey, subjectAttributes, template, attributes);
+        return processMustacheTemplate(subjectKey, subjAttr, template, attr);
       } else {
-        return super.processTemplate(subjectKey, subjectAttributes, template, attributes);
+        return super.processTemplate(subjectKey, subjAttr, template, attr);
       }
     } catch (IOException e) {
       throw new EmailException("Failed to template email", e);
@@ -90,26 +106,20 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
       attributes.put("user", new ProfileBean(user, session));
       attributes.put("url", new UrlBean(realm, theme, uriInfo.getBaseUri(), null));
 
-      // runAttributesBuilder
-      //  clone in case it's immutable
-      List<Object> subjAttr = Lists.newArrayList(subjectAttributes);
-      Map<String, Object> attr = Maps.newHashMap(attributes);
-      runAttributesBuilder(realm, subjAttr, attr);
-
       String subject =
           new MessageFormat(rb.getProperty(subjectKey, subjectKey), locale)
-              .format(subjAttr.toArray());
+              .format(subjectAttributes.toArray());
       String textTemplate = String.format("text/%s", template);
       String textBody;
       try {
-        textBody = MustacheProvider.processTemplate(attr, textTemplate, theme);
+        textBody = MustacheProvider.processTemplate(attributes, textTemplate, theme);
       } catch (final FreeMarkerException e) {
         throw new EmailException("Failed to template plain text email.", e);
       }
       String htmlTemplate = String.format("html/%s", template);
       String htmlBody;
       try {
-        htmlBody = MustacheProvider.processTemplate(attr, htmlTemplate, theme);
+        htmlBody = MustacheProvider.processTemplate(attributes, htmlTemplate, theme);
       } catch (final FreeMarkerException e) {
         throw new EmailException("Failed to template html email.", e);
       }

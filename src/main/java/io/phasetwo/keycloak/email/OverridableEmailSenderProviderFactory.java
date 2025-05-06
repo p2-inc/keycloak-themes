@@ -39,6 +39,7 @@ public class OverridableEmailSenderProviderFactory extends DefaultEmailSenderPro
 
   @Override
   public void init(Config.Scope config) {
+    super.init(config);
     log.info("Initializing config for email sender.");
     this.maxEmails = config.getInt("maxEmails", 100);
     log.infof("maxEmails set to %d", this.maxEmails);

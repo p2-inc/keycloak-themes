@@ -149,6 +149,7 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
   public void doSend(
       Map<String, String> config, String address, String subject, String textBody, String htmlBody)
       throws EmailException {
+
     Session session = Session.getInstance(buildEmailProperties(config));
 
     Message message =
@@ -283,6 +284,7 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
       log.debug("Can't load MessageBuilderProvider", e);
       return;
     }
+    log.debugf("Running MessageBuilder with %s %s", msg, multipart);
     mb.updateMessage(msg, multipart);
   }
 

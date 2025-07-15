@@ -2,17 +2,18 @@ version: '3'
 
 services:
   keycloak:
-      image: quay.io/phasetwo/keycloak-crdb:26.0.2
+      image: quay.io/phasetwo/keycloak-crdb:26.3.1
       environment:
         KC_BOOTSTRAP_ADMIN_USERNAME: admin
         KC_BOOTSTRAP_ADMIN_PASSWORD: admin
         KC_HTTP_RELATIVE_PATH: /auth
         #KC_LOG_LEVEL: DEBUG
+        JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,address=*:8787,server=y,suspend=n -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true
       ports:
         - 8080:8080
+        - 8787:8787
       volumes: 
-        - ./target/keycloak-themes-0.34-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-themes.jar
+        - ./target/keycloak-themes-0.44-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-themes.jar
         - ${PWD}/jarthemes:/opt/keycloak/jarthemes
         - ./conf/cache-ispn-custom.xml:/opt/keycloak/conf/cache-ispn-custom.xml
       entrypoint: /opt/keycloak/bin/kc.sh --verbose start-dev --cache-config-file=cache-ispn-custom.xml --spi-email-template-provider=freemarker-plus-mustache --spi-email-template-freemarker-plus-mustache-enabled=true --spi-email-sender-provider=ext-email-override --spi-email-sender-ext-email-override-enabled=true --spi-email-sender-ext-email-override-host=smtp.someserver.com --spi-email-sender-ext-email-override-auth=true --spi-email-sender-ext-email-override-from=support@phasetwo.io --spi-email-sender-ext-email-override-port=587 --spi-email-sender-ext-email-override-starttls=true --spi-email-sender-ext-email-override-user=someuser --spi-email-sender-ext-email-override-password=somepass --spi-email-sender-ext-email-override-max-emails=200 --spi-theme-ext-theme-jar-folder-dir=/opt/keycloak/jarthemes --spi-theme-cache-themes=false
-      

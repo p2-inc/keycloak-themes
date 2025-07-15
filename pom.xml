@@ -5,6 +5,10 @@
   <packaging>jar</packaging>
   <version>0.44-SNAPSHOT</version>
 
+  <name>Phase Two Keycloak Themes</name>
+  <description>Themes and theme utilities meant for simple theme customization.</description>
+  <url>https://github.com/p2-inc/keycloak-themes</url>
+
   <parent>
     <groupId>com.github.xgp</groupId>
     <artifactId>oss-parent</artifactId>

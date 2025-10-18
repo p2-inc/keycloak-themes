@@ -2,8 +2,6 @@ package io.phasetwo.keycloak.email;
 
 import static org.keycloak.utils.StringUtil.isNotBlank;
 
-import org.keycloak.utils.EmailValidationUtil;
-import org.keycloak.utils.SMTPUtil;
 import jakarta.mail.Address;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -36,6 +34,8 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.truststore.JSSETruststoreConfigurator;
+import org.keycloak.utils.EmailValidationUtil;
+import org.keycloak.utils.SMTPUtil;
 
 @JBossLog
 public class OverridableEmailSenderProvider implements EmailSenderProvider {
@@ -66,14 +66,14 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
       log.warnf("Error loading counterCache %s", e);
     }
   }
-  
+
   @Override
   public void validate(Map<String, String> config) throws EmailException {
     log.debugf("validate %s", config);
     // just static configuration checking here, not really testing email
     checkFromAddress(config.get("from"), isAllowUTF8(config));
   }
-  
+
   @Override
   public void close() {}
 
@@ -161,11 +161,12 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
     final boolean allowutf8 = isAllowUTF8(config);
     final String convertedAddress = checkUserAddress(address, allowutf8);
     final String from = checkFromAddress(config.get("from"), allowutf8);
-    
+
     Session session = Session.getInstance(buildEmailProperties(config, from));
 
     Message message =
-        buildMessage(session, address, from, subject, config, buildMultipartBody(textBody, htmlBody));
+        buildMessage(
+            session, address, from, subject, config, buildMultipartBody(textBody, htmlBody));
 
     try (Transport transport = session.getTransport("smtp")) {
 
@@ -182,86 +183,96 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
     }
   }
 
-  private Properties buildEmailProperties(Map<String, String> config, String from) throws EmailException {
+  private Properties buildEmailProperties(Map<String, String> config, String from)
+      throws EmailException {
     Properties props = new Properties();
-    
+
     if (config.containsKey("host")) {
       props.setProperty("mail.smtp.host", config.get("host"));
     }
-    
+
     if (config.containsKey("port") && config.get("port") != null) {
       props.setProperty("mail.smtp.port", config.get("port"));
     }
-    
+
     if (isAuthConfigured(config)) {
       props.setProperty("mail.smtp.auth", "true");
     }
-    
+
     if (isAuthTypeTokenConfigured(config)) {
       props.put("mail.smtp.auth.mechanisms", "XOAUTH2");
     }
-    
+
     if (isDebugEnabled(config)) {
       props.put("mail.debug", "true");
     }
-    
+
     if (isSslConfigured(config)) {
       props.setProperty("mail.smtp.ssl.enable", "true");
     }
-    
+
     if (isStarttlsConfigured(config)) {
       props.setProperty("mail.smtp.starttls.enable", "true");
     }
-    
+
     if (isSslConfigured(config) || isStarttlsConfigured(config) || isAuthConfigured(config)) {
       props.put("mail.smtp.ssl.protocols", SUPPORTED_SSL_PROTOCOLS);
-      
+
       setupTruststore(props);
     }
-    
+
     props.setProperty("mail.smtp.timeout", "10000");
     props.setProperty("mail.smtp.connectiontimeout", "10000");
     props.setProperty("mail.smtp.writetimeout", "10000");
-    
+
     String envelopeFrom = config.get("envelopeFrom");
     if (isNotBlank(envelopeFrom)) {
       props.setProperty("mail.smtp.from", envelopeFrom);
     }
-    
+
     final boolean allowutf8 = isAllowUTF8(config);
     if (allowutf8) {
       props.setProperty("mail.mime.allowutf8", "true");
     }
-    
-    // Specify 'mail.from' as InternetAddress.getLocalAddress() would otherwise do a InetAddress.getCanonicalHostName
-    // and add this as a mail header. This would both be slow, and would reveal internal IP addresses that we don't want.
+
+    // Specify 'mail.from' as InternetAddress.getLocalAddress() would otherwise do a
+    // InetAddress.getCanonicalHostName
+    // and add this as a mail header. This would both be slow, and would reveal internal IP
+    // addresses that we don't want.
     // https://jakarta.ee/specifications/mail/2.0/jakarta-mail-spec-2.0#a823
     props.setProperty("mail.from", from);
-    
+
     return props;
   }
 
-  private Message buildMessage(Session session, String address, String from, String subject, Map<String, String> config, Multipart multipart) throws EmailException {
-    
+  private Message buildMessage(
+      Session session,
+      String address,
+      String from,
+      String subject,
+      Map<String, String> config,
+      Multipart multipart)
+      throws EmailException {
+
     String fromDisplayName = config.get("fromDisplayName");
     String replyTo = config.get("replyTo");
     String replyToDisplayName = config.get("replyToDisplayName");
-    
+
     try {
       Message msg = new MimeMessage(session);
       msg.setFrom(toInternetAddress(from, fromDisplayName));
-      msg.setReplyTo(new Address[]{toInternetAddress(from, fromDisplayName)});
-      
+      msg.setReplyTo(new Address[] {toInternetAddress(from, fromDisplayName)});
+
       if (isNotBlank(replyTo)) {
-        msg.setReplyTo(new Address[]{toInternetAddress(replyTo, replyToDisplayName)});
+        msg.setReplyTo(new Address[] {toInternetAddress(replyTo, replyToDisplayName)});
       }
-      
+
       msg.setHeader("To", address);
       msg.setSubject(MimeUtility.encodeText(subject, StandardCharsets.UTF_8.name(), null));
       msg.setContent(multipart);
       msg.saveChanges();
       msg.setSentDate(new Date());
-      
+
       return msg;
     } catch (UnsupportedEncodingException e) {
       throw new EmailException("Failed to encode email address", e);
@@ -343,7 +354,10 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
   private static String checkUserAddress(String address, boolean allowutf8) throws EmailException {
     final String convertedAddress = convertEmail(address, allowutf8);
     if (convertedAddress == null) {
-      throw new EmailException(String.format("Invalid address '%s'. If the address contains UTF-8 characters in the local part please ensure the SMTP server supports the SMTPUTF8 extension and enable 'Allow UTF-8' in the email realm configuration.", address));
+      throw new EmailException(
+          String.format(
+              "Invalid address '%s'. If the address contains UTF-8 characters in the local part please ensure the SMTP server supports the SMTPUTF8 extension and enable 'Allow UTF-8' in the email realm configuration.",
+              address));
     }
     return convertedAddress;
   }
@@ -351,29 +365,31 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
   private static String checkFromAddress(String from, boolean allowutf8) throws EmailException {
     final String covertedFrom = convertEmail(from, allowutf8);
     if (from == null) {
-      throw new EmailException(String.format("Invalid sender address '%s'. If the address contains UTF-8 characters in the local part please ensure the SMTP server supports the SMTPUTF8 extension and enable 'Allow UTF-8' in the email realm configuration.",
-                                             from));
+      throw new EmailException(
+          String.format(
+              "Invalid sender address '%s'. If the address contains UTF-8 characters in the local part please ensure the SMTP server supports the SMTPUTF8 extension and enable 'Allow UTF-8' in the email realm configuration.",
+              from));
     }
     return covertedFrom;
   }
-  
+
   private static String convertEmail(String email, boolean allowutf8) throws EmailException {
     if (!EmailValidationUtil.isValidEmail(email)) {
       return null;
     }
-    
+
     if (allowutf8) {
       // if allowutf8 the extension will manage both parts
       return email;
     }
-    
+
     // if no allowutf8, do the IDN conversion over the domain part
     final String convertedEmail = SMTPUtil.convertIDNEmailAddress(email);
     if (convertedEmail == null || !convertedEmail.chars().allMatch(c -> c < 128)) {
       // now if there are non-ascii characters, we should send an error
       return null;
     }
-    
+
     return convertedEmail;
   }
 

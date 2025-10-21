@@ -34,6 +34,8 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.ServicesLogger;
 import org.keycloak.truststore.JSSETruststoreConfigurator;
+import org.keycloak.utils.EmailValidationUtil;
+import org.keycloak.utils.SMTPUtil;
 
 @JBossLog
 public class OverridableEmailSenderProvider implements EmailSenderProvider {
@@ -63,6 +65,13 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
     } catch (Exception e) {
       log.warnf("Error loading counterCache %s", e);
     }
+  }
+
+  @Override
+  public void validate(Map<String, String> config) throws EmailException {
+    log.debugf("validate %s", config);
+    // just static configuration checking here, not really testing email
+    checkFromAddress(config.get("from"), isAllowUTF8(config));
   }
 
   @Override
@@ -149,11 +158,15 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
   public void doSend(
       Map<String, String> config, String address, String subject, String textBody, String htmlBody)
       throws EmailException {
+    final boolean allowutf8 = isAllowUTF8(config);
+    final String convertedAddress = checkUserAddress(address, allowutf8);
+    final String from = checkFromAddress(config.get("from"), allowutf8);
 
-    Session session = Session.getInstance(buildEmailProperties(config));
+    Session session = Session.getInstance(buildEmailProperties(config, from));
 
     Message message =
-        buildMessage(session, address, subject, config, buildMultipartBody(textBody, htmlBody));
+        buildMessage(
+            session, address, from, subject, config, buildMultipartBody(textBody, htmlBody));
 
     try (Transport transport = session.getTransport("smtp")) {
 
@@ -170,7 +183,8 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
     }
   }
 
-  private Properties buildEmailProperties(Map<String, String> config) throws EmailException {
+  private Properties buildEmailProperties(Map<String, String> config, String from)
+      throws EmailException {
     Properties props = new Properties();
 
     if (config.containsKey("host")) {
@@ -216,9 +230,9 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
       props.setProperty("mail.smtp.from", envelopeFrom);
     }
 
-    String from = config.get("from");
-    if (from == null) {
-      throw new EmailException("No sender address configured in the realm settings for emails");
+    final boolean allowutf8 = isAllowUTF8(config);
+    if (allowutf8) {
+      props.setProperty("mail.mime.allowutf8", "true");
     }
 
     // Specify 'mail.from' as InternetAddress.getLocalAddress() would otherwise do a
@@ -234,15 +248,12 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
   private Message buildMessage(
       Session session,
       String address,
+      String from,
       String subject,
       Map<String, String> config,
       Multipart multipart)
       throws EmailException {
 
-    String from = config.get("from");
-    if (from == null) {
-      throw new EmailException("No sender address configured in the realm settings for emails");
-    }
     String fromDisplayName = config.get("fromDisplayName");
     String replyTo = config.get("replyTo");
     String replyToDisplayName = config.get("replyToDisplayName");
@@ -258,10 +269,6 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
 
       msg.setHeader("To", address);
       msg.setSubject(MimeUtility.encodeText(subject, StandardCharsets.UTF_8.name(), null));
-
-      // custom code to add MessageBuilderProvider
-      runMessageBuilder(msg, multipart);
-
       msg.setContent(multipart);
       msg.saveChanges();
       msg.setSentDate(new Date());
@@ -328,6 +335,10 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
     return "true".equals(config.get("ssl"));
   }
 
+  private static boolean isAllowUTF8(Map<String, String> config) {
+    return "true".equals(config.get(CONFIG_ALLOW_UTF8));
+  }
+
   private static boolean isDebugEnabled(Map<String, String> config) {
     return "true".equals(config.get("debug"));
   }
@@ -338,6 +349,48 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
 
   private boolean isAuthTypeTokenConfigured(Map<String, String> config) {
     return "token".equals(config.get("authType"));
+  }
+
+  private static String checkUserAddress(String address, boolean allowutf8) throws EmailException {
+    final String convertedAddress = convertEmail(address, allowutf8);
+    if (convertedAddress == null) {
+      throw new EmailException(
+          String.format(
+              "Invalid address '%s'. If the address contains UTF-8 characters in the local part please ensure the SMTP server supports the SMTPUTF8 extension and enable 'Allow UTF-8' in the email realm configuration.",
+              address));
+    }
+    return convertedAddress;
+  }
+
+  private static String checkFromAddress(String from, boolean allowutf8) throws EmailException {
+    final String covertedFrom = convertEmail(from, allowutf8);
+    if (from == null) {
+      throw new EmailException(
+          String.format(
+              "Invalid sender address '%s'. If the address contains UTF-8 characters in the local part please ensure the SMTP server supports the SMTPUTF8 extension and enable 'Allow UTF-8' in the email realm configuration.",
+              from));
+    }
+    return covertedFrom;
+  }
+
+  private static String convertEmail(String email, boolean allowutf8) throws EmailException {
+    if (!EmailValidationUtil.isValidEmail(email)) {
+      return null;
+    }
+
+    if (allowutf8) {
+      // if allowutf8 the extension will manage both parts
+      return email;
+    }
+
+    // if no allowutf8, do the IDN conversion over the domain part
+    final String convertedEmail = SMTPUtil.convertIDNEmailAddress(email);
+    if (convertedEmail == null || !convertedEmail.chars().allMatch(c -> c < 128)) {
+      // now if there are non-ascii characters, we should send an error
+      return null;
+    }
+
+    return convertedEmail;
   }
 
   protected InternetAddress toInternetAddress(String email, String displayName)

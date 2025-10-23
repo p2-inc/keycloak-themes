@@ -2,17 +2,6 @@
   background: var(--pf-v5-global--BackgroundColor--100);
 }
 
-div.kc-logo-text {
-  background-size: contain;
-  background-position: center;
-  height: 130px;
-  width: 130px;
-}
-
-#kc-header-wrapper {
-  color: #363636;
-}
-
 a {
   color: var(--pf-v5-global--link--Color);
 }

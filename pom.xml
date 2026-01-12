@@ -35,7 +35,7 @@
     <main.java.package>io.phasetwo.keycloak.themes</main.java.package>
     <freemarker.version>2.3.33</freemarker.version>
     <junit.version>5.11.2</junit.version>
-    <keycloak.version>26.4.1</keycloak.version>
+    <keycloak.version>26.5.0</keycloak.version>
     <lombok.version>1.18.36</lombok.version>
     <auto-service.version>1.1.1</auto-service.version>
     <ossrh.url>https://ossrh-staging-api.central.sonatype.com</ossrh.url>

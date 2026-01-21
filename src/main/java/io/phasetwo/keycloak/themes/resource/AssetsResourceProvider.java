@@ -42,11 +42,18 @@ public class AssetsResourceProvider implements RealmResourceProvider {
   public static final String ASSETS_FAVICON_URL = "_providerConfig.assets.favicon.url";
   public static final String DEFAULT_LOGO_PATH = "img/empty.png";
   public static final String DEFAULT_FAVICON_PATH = "img/default-favicon.ico";
+  public static final String DEFAULT_PHASETWO_LOGO_PATH = "img/logo_phase_slash.svg";
 
   @GET
   @Path("img/logo")
   public Response logo(@Context HttpHeaders headers, @Context UriInfo uriInfo) throws IOException {
     return resourceRedirect(uriInfo, ASSETS_LOGO_URL, DEFAULT_LOGO_PATH);
+  }
+  
+  @GET
+  @Path("img/logo_phase_slash.svg")
+  public Response broughtToYou(@Context HttpHeaders headers, @Context UriInfo uriInfo) throws IOException {
+    return resourceRedirect(uriInfo, DEFAULT_PHASETWO_LOGO_PATH, DEFAULT_PHASETWO_LOGO_PATH);
   }
 
   @GET

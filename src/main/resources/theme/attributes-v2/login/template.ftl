@@ -228,9 +228,14 @@
       <div class="pf-v5-c-login__main-footer">
         <#nested "socialProviders">
       </div>
+
+      <div style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; font-size: 1.3rem !important; font-weight: semibold !important; color: inherit !important; opacity: 1 !important; visibility: visible !important; position: relative !important; z-index: 999999 !important; pointer-events: auto !important; margin: 10px 0 !important; padding: 10px !important;">Brought to you by <a href="https://www.phasetwo.io" target="_blank" rel="noopener noreferrer" style="color: inherit !important; text-decoration: underline !important; opacity: 1 !important; visibility: visible !important; display: inline !important; pointer-events: auto !important;"><img style="width: 80px !important; height: auto !important; display: block !important; opacity: 1 !important; visibility: visible !important; position: static !important; z-index: inherit !important; transform: none !important; clip: auto !important; overflow: visible !important; max-width: none !important; max-height: none !important; min-width: 0 !important; min-height: 0 !important; object-fit: contain !important; margin-bottom: -4px !important;" src="${url.resourcesPath?keep_before("/resources")}/realms/${realm.name}/assets/img/logo_phase_slash.svg"/></a></div>
     </main>
 
     <@loginFooter.content/>
+
+
+
   </div>
 </div>
 </body>

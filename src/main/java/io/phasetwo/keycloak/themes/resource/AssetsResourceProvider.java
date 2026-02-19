@@ -86,6 +86,7 @@ public class AssetsResourceProvider implements RealmResourceProvider {
     setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--primary-color--dark-100");
     setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--link--Color");
     setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--link--Color--dark");
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--keycloak-card-top-color");
     setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-v5-global--primary-color--200");
     setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-v5-global--link--Color--hover");
     setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, "--pf-v5-global--link--Color--dark--hover");

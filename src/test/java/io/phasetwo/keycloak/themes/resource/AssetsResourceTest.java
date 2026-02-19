@@ -37,6 +37,7 @@ public class AssetsResourceTest extends AbstractResourceTest {
     assertThat(css, containsString("--pf-global--primary-color--dark-100: #000000"));
     assertThat(css, containsString("--pf-global--link--Color: #000000"));
     assertThat(css, containsString("--pf-global--link--Color--dark: #000000"));
+    assertThat(css, containsString("--keycloak-card-top-color: #000000"));
 
     updateRealmAttribute(
         getKeycloak(), "master", AssetsResourceProvider.ASSETS_LOGIN_SECONDARY_COLOR, "#0AF0AF");
@@ -47,6 +48,7 @@ public class AssetsResourceTest extends AbstractResourceTest {
     assertThat(css, containsString("--pf-v5-global--primary-color--dark-100: #000000"));
     assertThat(css, containsString("--pf-v5-global--link--Color: #000000"));
     assertThat(css, containsString("--pf-v5-global--link--Color--dark: #000000"));
+    assertThat(css, containsString("--keycloak-card-top-color: #000000"));
     assertThat(css, containsString("--pf-v5-global--primary-color--200: #0AF0AF;"));
     assertThat(css, containsString("--pf-v5-global--link--Color--hover: #0AF0AF;"));
     assertThat(css, containsString("--pf-v5-global--link--Color--dark--hover: #0AF0AF;"));
@@ -69,6 +71,7 @@ public class AssetsResourceTest extends AbstractResourceTest {
     assertThat(css, containsString("--pf-v5-global--primary-color--dark-100: #000000"));
     assertThat(css, containsString("--pf-v5-global--link--Color: #000000"));
     assertThat(css, containsString("--pf-v5-global--link--Color--dark: #000000"));
+    assertThat(css, containsString("--keycloak-card-top-color: #000000"));
     assertThat(css, containsString("--pf-v5-global--primary-color--200: #0AF0AF;"));
     assertThat(css, containsString("--pf-v5-global--link--Color--hover: #0AF0AF;"));
     assertThat(css, containsString("--pf-v5-global--link--Color--dark--hover: #0AF0AF;"));

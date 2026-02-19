@@ -29,3 +29,16 @@ input[type="password"]:focus-within,
 input[type="password"]:focus-visible {
   outline: var(--pf-global--active-color--100) auto 1px;
 }
+
+#kc-social-providers svg:not(.google) {
+  filter: none;
+  color: var(--pf-global--BackgroundColor--100);
+}
+
+#kc-social-providers svg:not(.google) path,
+#kc-social-providers svg:not(.google) circle,
+#kc-social-providers svg:not(.google) rect,
+#kc-social-providers svg:not(.google) polygon {
+  fill: currentColor;
+  stroke: currentColor;
+}

@@ -18,7 +18,8 @@
             <span class="kc-tooltip-text">${msg("restartLoginTooltip")}</span>
         </button>
       </div>
-    </@field.group>
+    </div>
+  </@field.group>
 </#macro>
 
 <#macro registrationLayout bodyClass="" displayInfo=false displayMessage=true displayRequiredFields=false>
@@ -109,11 +110,11 @@
     </script>
 </head>
 
-<body id="keycloak-bg" class="${properties.kcBodyClass!}" >
+<body id="keycloak-bg" class="${properties.kcBodyClass!}" data-page-id="login-${pageId}">
 <div class="${properties.kcLogin!}">
   <div class="${properties.kcLoginContainer!}">
     <header id="kc-header" class="pf-v5-c-login__header">
-      <div id="kc-header-wrapper">
+      <div id="kc-header-wrapper" class="pf-v5-c-brand">
         <div class="kc-logo-text" style="background-image: url(${url.resourcesPath?keep_before("/resources")}/realms/${realm.name}/assets/img/logo);"><span>${realm.displayName}</span></div>
       </div>
     </header>
@@ -217,20 +218,23 @@
           </form>
         </#if>
 
-        <#if displayInfo>
-          <div id="kc-info" class="${properties.kcSignUpClass!}">
-              <div id="kc-info-wrapper" class="${properties.kcInfoAreaWrapperClass!}">
-                  <#nested "info">
-              </div>
-          </div>
-        </#if>
-      </div>
-      <div class="pf-v5-c-login__main-footer">
-        <#nested "socialProviders">
-      </div>
-    </main>
+          <div class="${properties.kcLoginMainFooter!}">
+              <#nested "socialProviders">
 
-    <@loginFooter.content/>
+              <#if displayInfo>
+                  <div id="kc-info" class="${properties.kcLoginMainFooterBand!} ${properties.kcFormClass}">
+                      <div id="kc-info-wrapper" class="${properties.kcLoginMainFooterBandItem!}">
+                          <#nested "info">
+                      </div>
+                  </div>
+              </#if>
+          </div>
+      </div>
+
+        <div class="${properties.kcLoginMainFooter!}">
+            <@loginFooter.content/>
+        </div>
+    </main>
   </div>
 </div>
 </body>

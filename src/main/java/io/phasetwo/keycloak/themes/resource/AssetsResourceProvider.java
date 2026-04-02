@@ -32,6 +32,9 @@ public class AssetsResourceProvider implements RealmResourceProvider {
   public static final String ASSETS_LOGIN_BACKGROUND_COLOR =
       ASSETS_LOGIN_PREFIX + ".backgroundColor";
   public static final String ASSETS_LOGIN_CSS = "_providerConfig.assets.login.css";
+  public static final String CSS_VAR_LOGIN_PRIMARY_COLOR = "--p2-login-primary-color";
+  public static final String CSS_VAR_LOGIN_SECONDARY_COLOR = "--p2-login-secondary-color";
+  public static final String CSS_VAR_LOGIN_BACKGROUND_COLOR = "--p2-login-background-color";
 
   @Override
   public Object getResource() {
@@ -81,6 +84,9 @@ public class AssetsResourceProvider implements RealmResourceProvider {
   }
 
   private void setColors(StringBuilder o) {
+    setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, CSS_VAR_LOGIN_PRIMARY_COLOR);
+    setColor(o, ASSETS_LOGIN_SECONDARY_COLOR, CSS_VAR_LOGIN_SECONDARY_COLOR);
+    setColor(o, ASSETS_LOGIN_BACKGROUND_COLOR, CSS_VAR_LOGIN_BACKGROUND_COLOR);
     setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--primary-color--100");
     setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--active-color--100");
     setColor(o, ASSETS_LOGIN_PRIMARY_COLOR, "--pf-v5-global--primary-color--dark-100");
@@ -115,14 +121,15 @@ public class AssetsResourceProvider implements RealmResourceProvider {
   @Produces("text/css")
   public Response cssLogin(@Context HttpHeaders headers, @Context UriInfo uriInfo)
       throws IOException {
-    String css = session.getContext().getRealm().getAttribute(ASSETS_LOGIN_CSS);
-    if (Strings.isNullOrEmpty(css)) {
-      StringBuilder o = new StringBuilder("/* custom login css */\n");
-      o.append(":root {\n");
-      setColors(o);
-      o.append("}\n");
-      css = o.toString();
+    String customCss = session.getContext().getRealm().getAttribute(ASSETS_LOGIN_CSS);
+    StringBuilder o = new StringBuilder("/* custom login css */\n");
+    o.append(":root {\n");
+    setColors(o);
+    o.append("}\n");
+    if (!Strings.isNullOrEmpty(customCss)) {
+      o.append("\n").append(customCss);
     }
+    String css = o.toString();
     InputStream resource = CharSource.wrap(css).asByteSource(StandardCharsets.UTF_8).openStream();
     String mimeType = "text/css";
     return null == resource

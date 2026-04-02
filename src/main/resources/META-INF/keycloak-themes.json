@@ -13,6 +13,12 @@
       ]
     },
     {
+      "name": "attributes-v3",
+      "types": [
+        "login"
+      ]
+    },
+    {
       "name": "mustache",
       "types": [
         "email"

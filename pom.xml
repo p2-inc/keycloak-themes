@@ -39,6 +39,9 @@
     <lombok.version>1.18.36</lombok.version>
     <auto-service.version>1.1.1</auto-service.version>
     <ossrh.url>https://ossrh-staging-api.central.sonatype.com</ossrh.url>
+    <attributes.v3.dir>${project.basedir}/themes/attributes-v3</attributes.v3.dir>
+    <attributes.v3.build.dir>${project.build.directory}/attributes-v3-keycloakify</attributes.v3.build.dir>
+    <attributes.v3.jar>${attributes.v3.build.dir}/attributes-v3-theme.jar</attributes.v3.jar>
   </properties>
 
   <scm>
@@ -152,6 +155,67 @@
 	    <keycloak-version>${keycloak.version}</keycloak-version>
           </systemPropertyVariables>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <id>attributes-v3-install</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <workingDirectory>${attributes.v3.dir}</workingDirectory>
+              <executable>pnpm</executable>
+              <arguments>
+                <argument>install</argument>
+                <argument>--frozen-lockfile</argument>
+                <argument>--prefer-offline</argument>
+              </arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>attributes-v3-build</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <workingDirectory>${attributes.v3.dir}</workingDirectory>
+              <executable>pnpm</executable>
+              <arguments>
+                <argument>run</argument>
+                <argument>build-keycloak-theme</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>attributes-v3-unpack</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <unzip src="${attributes.v3.jar}" dest="${project.build.outputDirectory}" overwrite="true">
+                  <patternset>
+                    <exclude name="META-INF/**" />
+                  </patternset>
+                </unzip>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

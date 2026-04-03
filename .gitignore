@@ -3,6 +3,7 @@ target/
 *.DS_Store
 tmp/*
 data/*
+.pnpm-store/
 dependency-reduced-pom.xml
 .classpath
 NOTES

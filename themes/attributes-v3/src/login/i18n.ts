@@ -38,6 +38,25 @@ const { I18nProvider, useI18n } = i18nBuilder
             invitationBody:
                 "You have been invited to join the following organization(s). Uncheck those you wish to decline.",
             doAccept: "Accept",
+            selectOrgTitle: "Select an Organization.",
+            selectOrgHeader: "Select an Organization.",
+            selectOrganization: "Select an Organization",
+            noOrganizationError:
+                "You are not part of any organization, Contact an Administrator.",
+            invalidOrganizationError: "Invalid Organization.",
+            incompatibleFlow:
+                "Authenticator needs an organization associated with the IDP.",
+            emailDomainMissing: "Could not extract user email domain.",
+            validDomainNotFound: "Valid identity email domain not found.",
+            selectIdpTitle: "Find your SSO provider",
+            selectIdpHeader: "Find your SSO provider",
+            doSelectIdp: "SSO provider alias",
+            "home-idp-discovery-identity-provider-login-label":
+                "Find your SSO provider",
+            validationSuccessTitle:
+                "Successful Identity Provider Validation!",
+            validationCloseWindow:
+                "You may now close this window and return to the application.",
         },
         fr: {
             welcomeMessage:
@@ -74,6 +93,25 @@ const { I18nProvider, useI18n } = i18nBuilder
             invitationBody:
                 "Vous avez été invité à rejoindre l'organisation suivante. Décochez celles que vous souhaitez refuser.",
             doAccept: "Accepter",
+            selectOrgTitle: "Select an Organization.",
+            selectOrgHeader: "Select an Organization.",
+            selectOrganization: "Select an Organization",
+            noOrganizationError:
+                "You are not part of any organization, Contact an Administrator.",
+            invalidOrganizationError: "Invalid Organization.",
+            incompatibleFlow:
+                "Authenticator needs an organization associated with the IDP.",
+            emailDomainMissing: "Could not extract user email domain.",
+            validDomainNotFound: "Valid identity email domain not found.",
+            selectIdpTitle: "Find your SSO provider",
+            selectIdpHeader: "Find your SSO provider",
+            doSelectIdp: "SSO provider alias",
+            "home-idp-discovery-identity-provider-login-label":
+                "Find your SSO provider",
+            validationSuccessTitle:
+                "Successful Identity Provider Validation!",
+            validationCloseWindow:
+                "You may now close this window and return to the application.",
         },
     })
     .build();

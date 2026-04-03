@@ -41,16 +41,30 @@ const Page_login_passkeys_conditional_authenticate = lazy(() => import("./defaul
 const Page_login_idp_link_confirm_override = lazy(() => import("./default/login-idp-link-confirm-override"));
 const Page_select_organization = lazy(() => import("./default/select-organization"));
 
-// Magic Link pages
-const Page_otp_form = lazy(() => import("./magic-link/otp-form"));
-const Page_email_confirmation = lazy(() => import("./magic-link/email-confirmation"));
-const Page_email_confirmation_error = lazy(() => import("./magic-link/email-confirmation-error"));
-const Page_view_email = lazy(() => import("./magic-link/view-email"));
-const Page_view_email_continuation = lazy(() => import("./magic-link/view-email-continuation"));
-
 // Extension pages
-const Page_invitations = lazy(() => import("./extensions/invitations"));
+const Page_invitations = lazy(() => import("./extensions/orgs/invitations"));
+const Page_ext_select_organization = lazy(
+    () => import("./extensions/orgs/ext-select-organization"),
+);
+const Page_login_select_idp = lazy(
+    () => import("./extensions/orgs/login-select-idp"),
+);
+const Page_hidpd_select_idp = lazy(
+    () => import("./extensions/orgs/hidpd-select-idp"),
+);
+const Page_idp_validation = lazy(
+    () => import("./extensions/orgs/idp-validation"),
+);
 const Page_login_recaptcha = lazy(() => import("./extensions/login-recaptcha"));
+const Page_otp_form = lazy(() => import("./extensions/magic-link/otp-form"));
+const Page_email_confirmation = lazy(() => import("./extensions/magic-link/email-confirmation"));
+const Page_email_confirmation_error = lazy(
+    () => import("./extensions/magic-link/email-confirmation-error"),
+);
+const Page_view_email = lazy(() => import("./extensions/magic-link/view-email"));
+const Page_view_email_continuation = lazy(
+    () => import("./extensions/magic-link/view-email-continuation"),
+);
 
 export function PageIndex() {
     const { kcContext } = useKcContext();
@@ -136,7 +150,7 @@ export function PageIndex() {
                         return <Page_login_idp_link_confirm_override />;
                     case "select-organization.ftl":
                         return <Page_select_organization />;
-                    // Magic Link pages
+                    // Extension pages
                     case "otp-form.ftl":
                         return <Page_otp_form />;
                     case "email-confirmation.ftl":
@@ -150,6 +164,14 @@ export function PageIndex() {
                     // Extension pages
                     case "invitations.ftl":
                         return <Page_invitations />;
+                    case "ext-select-organization.ftl":
+                        return <Page_ext_select_organization />;
+                    case "login-select-idp.ftl":
+                        return <Page_login_select_idp />;
+                    case "hidpd-select-idp.ftl":
+                        return <Page_hidpd_select_idp />;
+                    case "idp-validation.ftl":
+                        return <Page_idp_validation />;
                     case "login-recaptcha.ftl":
                         return <Page_login_recaptcha />;
                 }

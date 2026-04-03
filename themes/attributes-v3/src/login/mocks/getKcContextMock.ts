@@ -47,6 +47,35 @@ const kcContextExtensionPerPage: KcContextExtensionPerPage = {
             ],
         },
     },
+    "ext-select-organization.ftl": {
+        organizations: [
+            { id: "org1", name: "Organization 1" },
+            { id: "org2", name: "Organization 2" },
+        ],
+    },
+    "login-select-idp.ftl": {},
+    "hidpd-select-idp.ftl": {
+        hidpd: {
+            providers: [
+                {
+                    alias: "google",
+                    displayName: "Google",
+                    loginUrl: "/realms/test/broker/google/login",
+                },
+                {
+                    alias: "github",
+                    displayName: "GitHub",
+                    loginUrl: "/realms/test/broker/github/login",
+                },
+            ],
+        },
+    },
+    "idp-validation.ftl": {
+        message: {
+            type: "success",
+            summary: "Identity provider validation succeeded.",
+        },
+    },
     "login-recaptcha.ftl": {
         auth: {
             attemptedUsername: "user@example.com",

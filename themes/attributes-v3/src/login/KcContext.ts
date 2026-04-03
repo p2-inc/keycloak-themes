@@ -49,6 +49,26 @@ export type KcContextExtensionPerPage = {
             }[];
         };
     };
+    "ext-select-organization.ftl": {
+        organizations: {
+            id: string;
+            name: string;
+        }[];
+    };
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    "login-select-idp.ftl": {};
+    "hidpd-select-idp.ftl": {
+        hidpd: {
+            providers: {
+                loginUrl: string;
+                alias: string;
+                displayName: string;
+                iconClasses?: string;
+            }[];
+        };
+    };
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    "idp-validation.ftl": {};
     "login-recaptcha.ftl": {
         auth: {
             attemptedUsername: string;

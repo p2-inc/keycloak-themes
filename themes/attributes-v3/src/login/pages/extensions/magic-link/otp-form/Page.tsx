@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Template } from "../../../components/Template";
-import { useI18n } from "../../../i18n";
-import { useKcContext } from "../../../KcContext";
+import { Template } from "../../../../components/Template";
+import { useI18n } from "../../../../i18n";
+import { useKcContext } from "../../../../KcContext";
 import { assert } from "tsafe/assert";
 import { kcSanitize } from "@keycloakify/login-ui/kcSanitize";
 

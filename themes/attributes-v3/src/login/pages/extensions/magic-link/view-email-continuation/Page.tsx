@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { Template } from "../../../components/Template";
-import { useI18n } from "../../../i18n";
-import { useKcContext } from "../../../KcContext";
+import { Template } from "../../../../components/Template";
+import { useI18n } from "../../../../i18n";
+import { useKcContext } from "../../../../KcContext";
 import { assert } from "tsafe/assert";
 
 const RELOAD_DELAY = 5000;

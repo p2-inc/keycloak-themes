@@ -1,11 +1,11 @@
-import { Template } from "../../../components/Template";
-import { useI18n } from "../../../i18n";
-import { useKcContext } from "../../../KcContext";
+import { Template } from "../../../../components/Template";
+import { useI18n } from "../../../../i18n";
+import { useKcContext } from "../../../../KcContext";
 import { assert } from "tsafe/assert";
 
 export function Page() {
     const { kcContext } = useKcContext();
-    assert(kcContext.pageId === "view-email.ftl");
+    assert(kcContext.pageId === "email-confirmation-error.ftl");
 
     const { msg } = useI18n();
 
@@ -13,10 +13,10 @@ export function Page() {
         <Template
             displayInfo={false}
             displayMessage={false}
-            headerNode={msg("viewEmailTitle")}
+            headerNode={msg("magicLinkFailLoginTitle")}
         >
             <p className="text-sm text-muted-foreground">
-                {msg("magicLinkConfirmation")}
+                {msg("magicLinkFailLoginBody")}
             </p>
         </Template>
     );

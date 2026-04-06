@@ -4,7 +4,7 @@
 
 Themes and theme utilities meant for simple theme customization without deploying a packaged theme.
 
-- A modified login theme that allows colors, logo, CSS to be loaded from Realm attributes.
+- Modified login themes that allow colors, logo, CSS to be loaded from Realm attributes.
 - An implementation of `ThemeProvider` that loads named Freemarker templates and messages from Realm attributes. Currently only for email.
 - An implementation of `EmailTemplateProvider` that allows the use of mustache.js templates.
 - An implementation of `EmailSenderProvider` that allows overriding SMTP server with defaults.
@@ -34,18 +34,32 @@ mvn clean install -DskipTests
 
 2. If you are using your own Keycloak, copy the jar produced in `target/` to your `providers` directory (for Quarkus) or `standalone/deployments` directory (for legacy) and rebuild/restart keycloak. 
 
-After #1, you can also run `docker-compose up` if you want to take a quick look against our image. 
+After #1, you can also run `docker compose up` if you want to take a quick look against our image.
+
+### Local testing
+
+The included `docker-compose.yml` is set up for local testing of this repo's built `keycloak-themes` jar together with a vendored copy of the Phase Two admin UI extension at `providers/phasetwo-admin-ui-26.4.7.jar`. This makes the custom admin UI screens available locally without requiring you to clone `phasetwo-containers`.
+
+The usual local loop is:
+
+```
+mvn -DskipTests package
+docker compose up
+```
+
+Then open `http://localhost:8080/auth`.
 
 ## Overview
 
 ### Login theme(s)
 
-There are two login themes available. 
+There are three login themes available. 
 
 - `attributes` for patternfly installations v4 and below
 - `attributes-v2` for patternfly installation v5
+- `attributes-v3` for the Keycloakify-based shadcn login theme
 
-Both themes assume you will store the values as Realm attributes with the following keys:
+All three themes assume you will store the values as Realm attributes with the following keys:
 
 - `_providerConfig.assets.login.css`: CSS you want to be loaded after the standard login.css
 - `_providerConfig.assets.login.backgroundColor`: override for `--pf-v5-global--primary-color--100`.
@@ -53,6 +67,8 @@ Both themes assume you will store the values as Realm attributes with the follow
 - `_providerConfig.assets.login.secondaryColor`: override for `--pf-v5-global--BackgroundColor--100`.
 - `_providerConfig.assets.logo.url`: URL of logo file that will be served as the `div.kc-logo-text.background-image`. Constrained to 150x150.
 - `_providerConfig.assets.favicon.url`: URL of the favicon
+
+The `attributes` and `attributes-v2` themes consume the PatternFly-oriented CSS variables generated from these attributes. The `attributes-v3` theme is built with Keycloakify and shadcn, and consumes additional custom CSS variables emitted by the same `/realms/<realm>/assets/css/login.css` endpoint.
 
 #### Example CSS overrides
 

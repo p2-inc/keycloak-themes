@@ -1,0 +1,24 @@
+/**
+ * WARNING: Before modifying this file, run the following command:
+ * 
+ * $ npx keycloakify own --path "login/assets/fonts/inter/inter.css"
+ * 
+ * This file is provided by @oussemasahbeni/keycloakify-login-shadcn version 250004.0.15.
+ * It was copied into your repository by the postinstall script: `keycloakify sync-extensions`.
+ */
+
+@font-face {
+    font-family: "Inter var";
+    font-weight: 100 900;
+    font-display: swap;
+    font-style: normal;
+    src: url("./Inter-roman.var.woff2?v=3.18") format("woff2");
+}
+
+@font-face {
+    font-family: "Inter var";
+    font-weight: 100 900;
+    font-display: swap;
+    font-style: italic;
+    src: url("./Inter-italic.var.woff2?v=3.18") format("woff2");
+}

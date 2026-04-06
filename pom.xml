@@ -39,6 +39,9 @@
     <lombok.version>1.18.36</lombok.version>
     <auto-service.version>1.1.1</auto-service.version>
     <ossrh.url>https://ossrh-staging-api.central.sonatype.com</ossrh.url>
+    <attributes.v3.dir>${project.basedir}/themes/attributes-v3</attributes.v3.dir>
+    <attributes.v3.build.dir>${project.build.directory}/attributes-v3-keycloakify</attributes.v3.build.dir>
+    <attributes.v3.jar>${attributes.v3.build.dir}/attributes-v3-theme.jar</attributes.v3.jar>
   </properties>
 
   <scm>
@@ -152,6 +155,65 @@
 	    <keycloak-version>${keycloak.version}</keycloak-version>
           </systemPropertyVariables>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>2.0.0</version>
+        <configuration>
+          <nodeVersion>v24.12.0</nodeVersion>
+          <workingDirectory>${attributes.v3.dir}</workingDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attributes-v3-setup-node-and-corepack</id>
+            <goals>
+              <goal>install-node-and-corepack</goal>
+            </goals>
+            <phase>initialize</phase>
+          </execution>
+          <execution>
+            <id>attributes-v3-install</id>
+            <goals>
+              <goal>corepack</goal>
+            </goals>
+            <configuration>
+              <arguments>pnpm install --frozen-lockfile</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>attributes-v3-build</id>
+            <goals>
+              <goal>corepack</goal>
+            </goals>
+            <configuration>
+              <arguments>pnpm run build-keycloak-theme</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>attributes-v3-unpack</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <unzip src="${attributes.v3.jar}" dest="${project.build.outputDirectory}" overwrite="true">
+                  <patternset>
+                    <exclude name="META-INF/**" />
+                  </patternset>
+                </unzip>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

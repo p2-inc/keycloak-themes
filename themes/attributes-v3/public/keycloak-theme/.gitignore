@@ -1,0 +1,12 @@
+# This file is managed by Keycloakify, do not edit it manually.
+
+# === Owned files start ===
+# === Owned files end =====
+
+# === @oussemasahbeni/keycloakify-login-shadcn v250004.0.15 ===
+/early-color-scheme.js
+/keycloak-theme/login/js/authChecker.js
+/keycloak-theme/login/js/passkeysConditionalAuth.js
+/keycloak-theme/login/js/rfc4648.js
+/keycloak-theme/login/js/webauthnAuthenticate.js
+/keycloak-theme/login/js/webauthnRegister.js

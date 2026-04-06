@@ -1,3 +1,12 @@
+<!--
+ WARNING: Before modifying or replacing this file, run the following command:
+ 
+ $ npx keycloakify own -t "login/assets/img/auth-logo.svg"
+ 
+ This file is provided by @oussemasahbeni/keycloakify-login-shadcn version 250004.0.15.
+ It was copied into your repository by the postinstall script: `keycloakify sync-extensions`.
+-->
+
 <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
         d="M0 12.6316C0 5.65535 5.65535 0 12.6316 0H35.3684C42.3446 0 48 5.65535 48 12.6316V35.3684C48 42.3446 42.3446 48 35.3684 48H12.6316C5.65535 48 0 42.3446 0 35.3684V12.6316Z"

@@ -1,3 +1,14 @@
+/**
+ * WARNING: Before modifying this file, run the following command:
+ * 
+ * $ npx keycloakify own --path "components/ui/alert.tsx"
+ * 
+ * This file is provided by @oussemasahbeni/keycloakify-login-shadcn version 250004.0.15.
+ * It was copied into your repository by the postinstall script: `keycloakify sync-extensions`.
+ */
+
+/* eslint-disable */
+
 import { cn } from "@/components/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import { AlertTriangle, Info, XCircle } from "lucide-react";
@@ -49,6 +60,7 @@ function Alert({
             {...props}
         >
             {showIcon && <Icon className="size-5 shrink-0" data-slot="alert-icon" />}
+            {/* We use a div wrapper for children to ensure Title and Description stack vertically */}
             <div className="flex flex-col gap-0.5 flex-1">
                 {children}
             </div>

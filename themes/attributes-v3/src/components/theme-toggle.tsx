@@ -1,3 +1,14 @@
+/**
+ * WARNING: Before modifying this file, run the following command:
+ * 
+ * $ npx keycloakify own --path "components/theme-toggle.tsx"
+ * 
+ * This file is provided by @oussemasahbeni/keycloakify-login-shadcn version 250004.0.15.
+ * It was copied into your repository by the postinstall script: `keycloakify sync-extensions`.
+ */
+
+/* eslint-disable */
+
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "./theme-provider";
 import { Button } from "./ui/button";

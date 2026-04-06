@@ -1,8 +1,19 @@
+/**
+ * WARNING: Before modifying this file, run the following command:
+ * 
+ * $ npx keycloakify own --path "login/mocks/KcPageStory.tsx"
+ * 
+ * This file is provided by @oussemasahbeni/keycloakify-login-shadcn version 250004.0.15.
+ * It was copied into your repository by the postinstall script: `keycloakify sync-extensions`.
+ */
+
+/* eslint-disable */
+
 import type { DeepPartial } from "@keycloakify/login-ui/tools/DeepPartial";
 import { getKcContextMock } from "./getKcContextMock";
 import type { KcContext } from "../KcContext";
 import KcPage from "../KcPage";
-export type { Meta, StoryObj } from "@storybook/react";
+export type { Meta, StoryObj } from "../../kc.gen";
 
 export function createKcPageStory<PageId extends KcContext["pageId"]>(params: {
     pageId: PageId;

@@ -1,3 +1,14 @@
+/**
+ * WARNING: Before modifying this file, run the following command:
+ * 
+ * $ npx keycloakify own --path "login/components/UserProfileFormFields/InputLabel.tsx"
+ * 
+ * This file is provided by @oussemasahbeni/keycloakify-login-shadcn version 250004.0.15.
+ * It was copied into your repository by the postinstall script: `keycloakify sync-extensions`.
+ */
+
+/* eslint-disable */
+
 import type { Attribute } from "@keycloakify/login-ui/KcContext";
 import { useI18n } from "../../i18n";
 

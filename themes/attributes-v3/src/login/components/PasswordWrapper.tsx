@@ -1,3 +1,14 @@
+/**
+ * WARNING: Before modifying this file, run the following command:
+ * 
+ * $ npx keycloakify own --path "login/components/PasswordWrapper.tsx"
+ * 
+ * This file is provided by @oussemasahbeni/keycloakify-login-shadcn version 250004.0.15.
+ * It was copied into your repository by the postinstall script: `keycloakify sync-extensions`.
+ */
+
+/* eslint-disable */
+
 import { useI18n } from "@/login/i18n";
 import { useKcContext } from "@/login/KcContext";
 import { useIsPasswordRevealed } from "keycloakify/tools/useIsPasswordRevealed";

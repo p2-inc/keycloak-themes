@@ -44,7 +44,7 @@ public class AssetsResourceProvider implements RealmResourceProvider {
   public static final String ASSETS_LOGO_URL = "_providerConfig.assets.logo.url";
   public static final String ASSETS_FAVICON_URL = "_providerConfig.assets.favicon.url";
   public static final String ASSETS_APPICON_URL = "_providerConfig.assets.appicon.url";
-  public static final String DEFAULT_LOGO_PATH = "img/empty.png";
+  public static final String DEFAULT_LOGO_PATH = "img/default-logo.svg";
   public static final String DEFAULT_FAVICON_PATH = "img/default-favicon.svg";
   public static final String DEFAULT_APPICON_PATH = "img/default-appicon.svg";
 

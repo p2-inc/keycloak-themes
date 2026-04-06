@@ -18,6 +18,9 @@ export default defineConfig({
     react(),
     keycloakify({
       accountThemeImplementation: "none",
+      environmentVariables: [
+        { name: "SHOW_DARK_MODE_TOGGLE", default: "false" },
+      ],
       themeName: ["attributes-v3"],
       themeVersion: "0.0.1",
       keycloakifyBuildDirPath: path.resolve(

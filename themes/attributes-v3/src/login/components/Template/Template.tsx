@@ -31,7 +31,6 @@ import { useI18n } from "../../i18n";
 import { useKcContext } from "../../KcContext";
 import shape from "./../../assets/img/shape.svg";
 import fallbackLogo from "./../../assets/img/phasetwo-logo.svg";
-import authLogo from "./../../assets/img/auth-logo.svg";
 import { useInitializeTemplate } from "./useInitializeTemplate";
 
 export function Template(props: {
@@ -67,7 +66,7 @@ export function Template(props: {
 
     // Load dynamic realm CSS and favicon
     useDynamicCss(kcContext);
-    useDynamicFavicon(kcContext, authLogo, authLogo);
+    useDynamicFavicon(kcContext);
 
     const assetsBase = useRealmAssetsBase(kcContext);
     const logoUrl = `${assetsBase}/assets/img/logo`;
@@ -120,7 +119,7 @@ export function Template(props: {
 
                     {enabledLanguages.length > 1 && <Languages />}
 
-                    {kcContext.darkMode !== false && <ModeToggle />}
+                    {kcContext.properties.SHOW_DARK_MODE_TOGGLE === "true" && kcContext.darkMode !== false && <ModeToggle />}
                 </div>
 
                 {/* Mobile header with dynamic logo */}
@@ -131,14 +130,14 @@ export function Template(props: {
                                 <img
                                     src={logoUrl}
                                     alt={realmDisplayName}
-                                    className="h-10 max-w-[200px] object-contain dark:invert"
+                                    className="h-10 max-w-[200px] object-contain"
                                     onError={() => setLogoError(true)}
                                 />
                             ) : (
                                 <img
                                     src={fallbackLogo}
                                     alt={realmDisplayName}
-                                    className="h-10 max-w-[200px] object-contain dark:invert"
+                                    className="h-10 max-w-[200px] object-contain"
                                 />
                             )}
                         </div>
@@ -321,14 +320,14 @@ export function Template(props: {
                                 <img
                                     src={logoUrl}
                                     alt={realmDisplayName}
-                                    className="h-12 max-w-[200px] object-contain brightness-0 invert"
+                                    className="h-12 max-w-[200px] object-contain"
                                     onError={() => setLogoError(true)}
                                 />
                             ) : (
                                 <img
                                     src={fallbackLogo}
                                     alt={realmDisplayName}
-                                    className="h-12 max-w-[200px] object-contain brightness-0 invert"
+                                    className="h-12 max-w-[200px] object-contain"
                                 />
                             )}
                         </div>

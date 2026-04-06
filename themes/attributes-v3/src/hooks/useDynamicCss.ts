@@ -70,35 +70,27 @@ export function useDynamicCss(kcContext: {
 }
 
 function setLinkHref(rel: string, href: string) {
-    const existing = document.querySelector(
-        `link[rel="${rel}"]`,
-    ) as HTMLLinkElement | null;
-    if (existing) {
-        existing.href = href;
-    } else {
-        const link = document.createElement("link");
-        link.rel = rel;
-        link.href = href;
-        document.head.appendChild(link);
-    }
+    // Remove and re-append to force browsers (especially Chrome) to re-fetch.
+    const existing = document.querySelector(`link[rel="${rel}"]`);
+    if (existing) existing.remove();
+    const link = document.createElement("link");
+    link.rel = rel;
+    link.href = href;
+    document.head.appendChild(link);
 }
 
 /**
- * Sets the favicon and apple-touch-icon to the provided defaults, then checks
- * if the realm has custom assets at the Phase Two assets endpoint and switches
- * to those if available.
+ * Sets the favicon and apple-touch-icon to the realm assets endpoints.
+ * The backend handles the default (returns default-favicon.svg / default-appicon.svg
+ * when no custom asset is configured via realm attributes).
  */
-export function useDynamicFavicon(
-    kcContext: {
-        realm: { name: string };
-        url: {
-            resourcesPath?: string;
-            loginAction?: string;
-        };
-    },
-    defaultFaviconUrl: string,
-    defaultAppiconUrl: string,
-) {
+export function useDynamicFavicon(kcContext: {
+    realm: { name: string };
+    url: {
+        resourcesPath?: string;
+        loginAction?: string;
+    };
+}) {
     const { url } = kcContext;
     const basePath = useMemo(
         () => getRealmBasePath(kcContext.realm.name, url),
@@ -106,23 +98,9 @@ export function useDynamicFavicon(
     );
 
     useEffect(() => {
-        setLinkHref("icon", defaultFaviconUrl);
-        setLinkHref("apple-touch-icon", defaultAppiconUrl);
-
-        const realmFaviconUrl = `${basePath}/assets/img/favicon`;
-        fetch(realmFaviconUrl, { method: "HEAD" })
-            .then((res) => {
-                if (res.ok) setLinkHref("icon", realmFaviconUrl);
-            })
-            .catch(() => { /* keep default */ });
-
-        const realmAppiconUrl = `${basePath}/assets/img/appicon`;
-        fetch(realmAppiconUrl, { method: "HEAD" })
-            .then((res) => {
-                if (res.ok) setLinkHref("apple-touch-icon", realmAppiconUrl);
-            })
-            .catch(() => { /* keep default */ });
-    }, [basePath, defaultFaviconUrl, defaultAppiconUrl]);
+        setLinkHref("icon", `${basePath}/assets/img/favicon`);
+        setLinkHref("apple-touch-icon", `${basePath}/assets/img/appicon`);
+    }, [basePath]);
 }
 
 /**

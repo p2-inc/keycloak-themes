@@ -88,9 +88,9 @@
     --brand-primary: var(--p2-login-primary-color, #3b82f6);
 
     /* Dynamic theme bridge — reads from injected CSS, falls back to blue theme */
-    --background: var(--p2-login-background-color, oklch(1 0 0));
+    --background: var(--p2-login-background-color, oklch(0.97 0 0));
     --foreground: oklch(0.145 0 0);
-    --card: var(--p2-login-background-color, oklch(1 0 0));
+    --card: oklch(1 0 0 / 88%);
     --card-foreground: oklch(0.145 0 0);
     --popover: var(--p2-login-background-color, oklch(1 0 0));
     --popover-foreground: oklch(0.145 0 0);

@@ -11,5 +11,6 @@ NOTES
 .project
 .settings/
 themes/attributes-v3/node_modules/
+themes/attributes-v3/node/
 themes/attributes-v3/dist/
 themes/attributes-v3/dist_keycloak/

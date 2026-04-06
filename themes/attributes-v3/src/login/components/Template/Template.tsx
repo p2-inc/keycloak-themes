@@ -303,6 +303,16 @@ export function Template(props: {
                         </Card>
                     </div>
                 </div>
+                <div className="pb-6 text-center">
+                    <a
+                        href="https://phasetwo.io"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                        Powered by Phase Two
+                    </a>
+                </div>
             </div>
 
             <div className="relative hidden lg:block" style={{ backgroundColor: 'var(--brand-primary)' }}>

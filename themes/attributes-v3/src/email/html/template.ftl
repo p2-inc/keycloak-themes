@@ -41,7 +41,7 @@
 ><table align="center" width="600" style="border-spacing:0;width:600px;" role="presentation"><tr><td><![endif]
 -->
             <table align="center" width="100%" role="presentation" cellspacing="0" cellpadding="0" border="0"
-              style="max-width:576px;background-color:#${branding.card!"ffffff"};border-radius:${branding.radius!"0.65rem"};color:#${branding.foreground!"1a1a1a"};margin:0 auto;margin-bottom:64px;padding:48px 0 48px;width:100%;box-shadow:0 0 #0000,0 0 #0000,0 1px 3px 0 rgb(0 0 0/0.1),0 1px 2px -1px rgb(0 0 0/0.1);"
+              style="max-width:576px;background-color:#${branding.card!"ffffff"};border-radius:${branding.radius!"0.65rem"};color:#${branding.foreground!"1a1a1a"};margin:0 auto;margin-bottom:64px;padding:48px 0 16px;width:100%;box-shadow:0 0 #0000,0 0 #0000,0 1px 3px 0 rgb(0 0 0/0.1),0 1px 2px -1px rgb(0 0 0/0.1);"
               id="emailContainer">
               <tbody>
                 <tr style="width:100%">

@@ -43,8 +43,10 @@ public class AssetsResourceProvider implements RealmResourceProvider {
 
   public static final String ASSETS_LOGO_URL = "_providerConfig.assets.logo.url";
   public static final String ASSETS_FAVICON_URL = "_providerConfig.assets.favicon.url";
+  public static final String ASSETS_APPICON_URL = "_providerConfig.assets.appicon.url";
   public static final String DEFAULT_LOGO_PATH = "img/empty.png";
-  public static final String DEFAULT_FAVICON_PATH = "img/default-favicon.ico";
+  public static final String DEFAULT_FAVICON_PATH = "img/default-favicon.svg";
+  public static final String DEFAULT_APPICON_PATH = "img/default-appicon.svg";
 
   @GET
   @Path("img/logo")
@@ -57,6 +59,13 @@ public class AssetsResourceProvider implements RealmResourceProvider {
   public Response favicon(@Context HttpHeaders headers, @Context UriInfo uriInfo)
       throws IOException {
     return resourceRedirect(uriInfo, ASSETS_FAVICON_URL, DEFAULT_FAVICON_PATH);
+  }
+
+  @GET
+  @Path("img/appicon")
+  public Response appicon(@Context HttpHeaders headers, @Context UriInfo uriInfo)
+      throws IOException {
+    return resourceRedirect(uriInfo, ASSETS_APPICON_URL, DEFAULT_APPICON_PATH);
   }
 
   private Response resourceRedirect(UriInfo uriInfo, String key, String defaultPath) {

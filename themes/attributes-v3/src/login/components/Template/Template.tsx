@@ -31,6 +31,7 @@ import { useI18n } from "../../i18n";
 import { useKcContext } from "../../KcContext";
 import shape from "./../../assets/img/shape.svg";
 import fallbackLogo from "./../../assets/img/phasetwo-logo.svg";
+import authLogo from "./../../assets/img/auth-logo.svg";
 import { useInitializeTemplate } from "./useInitializeTemplate";
 
 export function Template(props: {
@@ -66,7 +67,7 @@ export function Template(props: {
 
     // Load dynamic realm CSS and favicon
     useDynamicCss(kcContext);
-    useDynamicFavicon(kcContext);
+    useDynamicFavicon(kcContext, authLogo, authLogo);
 
     const assetsBase = useRealmAssetsBase(kcContext);
     const logoUrl = `${assetsBase}/assets/img/logo`;

@@ -43,13 +43,10 @@ export function useDynamicCss(kcContext: {
         loginAction?: string;
     };
 }) {
+    const { url } = kcContext;
     const basePath = useMemo(
-        () => getRealmBasePath(kcContext.realm.name, kcContext.url),
-        [
-            kcContext.realm.name,
-            kcContext.url.resourcesPath,
-            kcContext.url.loginAction,
-        ],
+        () => getRealmBasePath(kcContext.realm.name, url),
+        [kcContext.realm.name, url],
     );
 
     useEffect(() => {
@@ -72,40 +69,60 @@ export function useDynamicCss(kcContext: {
     }, [basePath]);
 }
 
+function setLinkHref(rel: string, href: string) {
+    const existing = document.querySelector(
+        `link[rel="${rel}"]`,
+    ) as HTMLLinkElement | null;
+    if (existing) {
+        existing.href = href;
+    } else {
+        const link = document.createElement("link");
+        link.rel = rel;
+        link.href = href;
+        document.head.appendChild(link);
+    }
+}
+
 /**
- * Dynamically sets the favicon to the realm's custom favicon from the assets endpoint.
+ * Sets the favicon and apple-touch-icon to the provided defaults, then checks
+ * if the realm has custom assets at the Phase Two assets endpoint and switches
+ * to those if available.
  */
-export function useDynamicFavicon(kcContext: {
-    realm: { name: string };
-    url: {
-        resourcesPath?: string;
-        loginAction?: string;
-    };
-}) {
+export function useDynamicFavicon(
+    kcContext: {
+        realm: { name: string };
+        url: {
+            resourcesPath?: string;
+            loginAction?: string;
+        };
+    },
+    defaultFaviconUrl: string,
+    defaultAppiconUrl: string,
+) {
+    const { url } = kcContext;
     const basePath = useMemo(
-        () => getRealmBasePath(kcContext.realm.name, kcContext.url),
-        [
-            kcContext.realm.name,
-            kcContext.url.resourcesPath,
-            kcContext.url.loginAction,
-        ],
+        () => getRealmBasePath(kcContext.realm.name, url),
+        [kcContext.realm.name, url],
     );
 
     useEffect(() => {
-        const faviconUrl = `${basePath}/assets/img/favicon`;
+        setLinkHref("icon", defaultFaviconUrl);
+        setLinkHref("apple-touch-icon", defaultAppiconUrl);
 
-        const existingFavicon = document.querySelector(
-            'link[rel="icon"]',
-        ) as HTMLLinkElement | null;
-        if (existingFavicon) {
-            existingFavicon.href = faviconUrl;
-        } else {
-            const link = document.createElement("link");
-            link.rel = "icon";
-            link.href = faviconUrl;
-            document.head.appendChild(link);
-        }
-    }, [basePath]);
+        const realmFaviconUrl = `${basePath}/assets/img/favicon`;
+        fetch(realmFaviconUrl, { method: "HEAD" })
+            .then((res) => {
+                if (res.ok) setLinkHref("icon", realmFaviconUrl);
+            })
+            .catch(() => { /* keep default */ });
+
+        const realmAppiconUrl = `${basePath}/assets/img/appicon`;
+        fetch(realmAppiconUrl, { method: "HEAD" })
+            .then((res) => {
+                if (res.ok) setLinkHref("apple-touch-icon", realmAppiconUrl);
+            })
+            .catch(() => { /* keep default */ });
+    }, [basePath, defaultFaviconUrl, defaultAppiconUrl]);
 }
 
 /**
@@ -118,12 +135,9 @@ export function useRealmAssetsBase(kcContext: {
         loginAction?: string;
     };
 }): string {
+    const { url } = kcContext;
     return useMemo(
-        () => getRealmBasePath(kcContext.realm.name, kcContext.url),
-        [
-            kcContext.realm.name,
-            kcContext.url.resourcesPath,
-            kcContext.url.loginAction,
-        ],
+        () => getRealmBasePath(kcContext.realm.name, url),
+        [kcContext.realm.name, url],
     );
 }

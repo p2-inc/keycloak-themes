@@ -15,7 +15,8 @@
     {
       "name": "attributes-v3",
       "types": [
-        "login"
+        "login",
+        "email"
       ]
     },
     {

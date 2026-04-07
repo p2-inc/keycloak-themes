@@ -42,6 +42,9 @@
     <attributes.v3.dir>${project.basedir}/themes/attributes-v3</attributes.v3.dir>
     <attributes.v3.build.dir>${project.build.directory}/attributes-v3-keycloakify</attributes.v3.build.dir>
     <attributes.v3.jar>${attributes.v3.build.dir}/attributes-v3-theme.jar</attributes.v3.jar>
+    <phasetwo.admin.ui.dir>${project.basedir}/themes/phasetwo-admin-ui</phasetwo.admin.ui.dir>
+    <phasetwo.admin.ui.build.dir>${project.build.directory}/phasetwo-admin-ui-keycloakify</phasetwo.admin.ui.build.dir>
+    <phasetwo.admin.ui.jar>${phasetwo.admin.ui.build.dir}/phasetwo-admin-ui-theme.jar</phasetwo.admin.ui.jar>
   </properties>
 
   <scm>
@@ -162,7 +165,6 @@
         <version>2.0.0</version>
         <configuration>
           <nodeVersion>v24.12.0</nodeVersion>
-          <workingDirectory>${attributes.v3.dir}</workingDirectory>
         </configuration>
         <executions>
           <execution>
@@ -171,6 +173,9 @@
               <goal>install-node-and-corepack</goal>
             </goals>
             <phase>initialize</phase>
+            <configuration>
+              <workingDirectory>${attributes.v3.dir}</workingDirectory>
+            </configuration>
           </execution>
           <execution>
             <id>attributes-v3-install</id>
@@ -178,6 +183,7 @@
               <goal>corepack</goal>
             </goals>
             <configuration>
+              <workingDirectory>${attributes.v3.dir}</workingDirectory>
               <arguments>pnpm install --frozen-lockfile</arguments>
             </configuration>
           </execution>
@@ -187,6 +193,37 @@
               <goal>corepack</goal>
             </goals>
             <configuration>
+              <workingDirectory>${attributes.v3.dir}</workingDirectory>
+              <arguments>pnpm build</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>phasetwo-admin-ui-setup-node-and-corepack</id>
+            <goals>
+              <goal>install-node-and-corepack</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <workingDirectory>${phasetwo.admin.ui.dir}</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>phasetwo-admin-ui-install</id>
+            <goals>
+              <goal>corepack</goal>
+            </goals>
+            <configuration> 
+              <workingDirectory>${phasetwo.admin.ui.dir}</workingDirectory>
+              <arguments>pnpm install --frozen-lockfile</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>phasetwo-admin-ui-build</id>
+            <goals>
+              <goal>corepack</goal>
+            </goals>
+            <configuration>
+              <workingDirectory>${phasetwo.admin.ui.dir}</workingDirectory>
               <arguments>pnpm build</arguments>
             </configuration>
           </execution>
@@ -206,6 +243,22 @@
             <configuration>
               <target>
                 <unzip src="${attributes.v3.jar}" dest="${project.build.outputDirectory}" overwrite="true">
+                  <patternset>
+                    <exclude name="META-INF/**" />
+                  </patternset>
+                </unzip>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>phasetwo-admin-ui-unpack</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <unzip src="${phasetwo.admin.ui.jar}" dest="${project.build.outputDirectory}" overwrite="true">
                   <patternset>
                     <exclude name="META-INF/**" />
                   </patternset>

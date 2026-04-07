@@ -20,6 +20,12 @@
       ]
     },
     {
+      "name": "phasetwo-admin-ui",
+      "types": [
+        "admin"
+      ]
+    },
+    {
       "name": "mustache",
       "types": [
         "email"

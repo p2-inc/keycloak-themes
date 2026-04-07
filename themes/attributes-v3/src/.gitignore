@@ -272,4 +272,15 @@
 /email/text/org-invite.ftl
 /email/text/password-reset.ftl
 
-# === @oussemasahbeni/keycloakify-login-shadcn v250004.0.15 ===
+# === @oussemasahbeni/keycloakify-login-shadcn v250004.0.20 ===
+/components/ThemeProvider.tsx
+/components/ui/input-group.tsx
+/components/ui/textarea.tsx
+/login/components/PasswordVisibilityButton.tsx
+/login/components/Template/useAuthChecker.ts
+/login/components/ui/Langauges.tsx
+/login/components/ui/ThemeToggle.tsx
+/login/components/WebAuthnConditionalUi/index.ts
+/login/components/WebAuthnConditionalUi/useLogic.tsx
+/login/components/WebAuthnConditionalUi/WebAuthnConditionalUi.tsx
+/login/pages/webauthn-register/useLogic.ts

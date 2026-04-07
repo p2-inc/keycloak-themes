@@ -820,7 +820,7 @@
 /account/components/datalist/EmptyRow.tsx
 /account/components/page/Page.tsx
 
-# === @oussemasahbeni/keycloakify-login-shadcn v250004.0.19 ===
+# === @oussemasahbeni/keycloakify-login-shadcn v250004.0.20 ===
 /components/ThemeProvider.tsx
 /login/i18n.ts
 /login/index.css

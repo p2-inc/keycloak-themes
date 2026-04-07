@@ -187,7 +187,7 @@
               <goal>corepack</goal>
             </goals>
             <configuration>
-              <arguments>pnpm run build-keycloak-theme</arguments>
+              <arguments>pnpm build</arguments>
             </configuration>
           </execution>
         </executions>

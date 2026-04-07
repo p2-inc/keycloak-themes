@@ -6,10 +6,10 @@
   "scripts": {
     "postinstall": "keycloakify sync-extensions",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && keycloakify build",
+    "build:app": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build-keycloak-theme": "pnpm run build && keycloakify build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

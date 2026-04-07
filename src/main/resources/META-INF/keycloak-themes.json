@@ -20,7 +20,7 @@
       ]
     },
     {
-      "name": "admin-ui",
+      "name": "phasetwo-admin-ui",
       "types": [
         "admin"
       ]

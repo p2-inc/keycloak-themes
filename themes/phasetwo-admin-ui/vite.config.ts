@@ -15,15 +15,15 @@ export default defineConfig({
     react(),
     keycloakify({
       accountThemeImplementation: "none",
-      themeName: ["admin-ui"],
+      themeName: ["phasetwo-admin-ui"],
       themeVersion: "0.0.1",
       keycloakifyBuildDirPath: path.resolve(
         dirname,
-        "../../target/admin-ui-keycloakify",
+        "../../target/phasetwo-admin-ui-keycloakify",
       ),
       keycloakVersionTargets: {
         "22-to-25": false,
-        "all-other-versions": "admin-ui-theme.jar",
+        "all-other-versions": "phasetwo-admin-ui-theme.jar",
       },
     }),
     tailwindcss(),

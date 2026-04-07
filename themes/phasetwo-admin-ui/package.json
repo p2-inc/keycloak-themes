@@ -1,16 +1,15 @@
 {
-  "name": "admin-ui-keycloakify",
+  "name": "phasetwo-admin-ui-keycloakify",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "postinstall": "keycloakify sync-extensions",
     "dev": "vite",
-    "build": "vite build",
-    "typecheck": "tsc -b",
+    "build": "tsc -b && vite build && keycloakify build",
+    "build:app": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "build-keycloak-theme": "pnpm run build && keycloakify build"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@oussemasahbeni/keycloakify-login-shadcn": "^250004.0.19",

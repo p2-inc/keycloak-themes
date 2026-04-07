@@ -52,13 +52,13 @@ export default function OrgRoles({ org, refresh: orgRefresh }: OrgRolesProps) {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const loader = async (first?: number, max?: number, search?: string) => {
+  const loader = async (_first?: number, _max?: number, _search?: string) => {
     const roles = (await getRolesForOrg(org.id)) as RoleRepresentation[];
     // sort alphabetically
     // sort by the user defined (and editable) vs default ones
     return (
       roles
-        // @ts-ignore
+        // @ts-expect-error possibily undefined
         .sort((a, b) => a.name - b.name)
         .sort(
           (a, b) =>

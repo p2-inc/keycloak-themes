@@ -1,35 +1,33 @@
-import { useTranslation } from "react-i18next";
-import { useEffect, useMemo, useState } from "react";
+import { PaginatingTableToolbar, useFetch } from "@/shared/keycloak-ui-shared";
+import { fetchWithError } from "@keycloak/keycloak-admin-client";
+import IdentityProviderRepresentation from "@keycloak/keycloak-admin-client/lib/defs/identityProviderRepresentation";
 import {
+  Alert,
+  AlertVariant,
+  Badge,
   Button,
   ButtonVariant,
   Form,
+  FormGroup,
+  FormSelect,
+  FormSelectOption,
   Modal,
   ModalVariant,
   PageSection,
   Radio,
-  FormGroup,
-  FormSelect,
-  FormSelectOption,
-  AlertGroup,
-  Alert,
-  AlertVariant,
-  Badge,
 } from "@patternfly/react-core";
-import { PaginatingTableToolbar } from "@/shared/keycloak-ui-shared";
-import IdentityProviderRepresentation from "@keycloak/keycloak-admin-client/lib/defs/identityProviderRepresentation";
-import useLocaleSort, { mapByKey } from "../../../utils/useLocaleSort";
-import { useFetch } from "@/shared/keycloak-ui-shared";
-import { AlertInfo, SyncMode, idpRep } from "../OrgIdentityProviders";
-import useOrgFetcher from "../useOrgFetcher";
-import { useRealm } from "../../../context/realm-context/RealmContext";
-import { OrgRepresentation } from "../routes";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { AuthenticationType } from "../../../authentication/constants";
-import { fetchWithError } from "@keycloak/keycloak-admin-client";
-import { addTrailingSlash } from "../../../util";
+import { useTranslation } from "react-i18next";
 import { useAdminClient } from "../../../admin-client";
+import { AuthenticationType } from "../../../authentication/constants";
+import { useRealm } from "../../../context/realm-context/RealmContext";
+import { addTrailingSlash } from "../../../util";
 import { getAuthorizationHeaders } from "../../../utils/getAuthorizationHeaders";
+import useLocaleSort, { mapByKey } from "../../../utils/useLocaleSort";
+import { SyncMode, idpRep } from "../OrgIdentityProviders";
+import { OrgRepresentation } from "../routes";
+import useOrgFetcher from "../useOrgFetcher";
 import { OrgConfigType } from "./ManageOrgSettingsDialog";
 
 type IdentityProviderListProps = {
@@ -160,7 +158,6 @@ export function AssignIdentityProvider({
 
   useEffect(() => {
     setFormValue("postBrokerLoginFlowAlias", value?.postBrokerLoginFlowAlias);
-    //@ts-ignore
     setFormValue("syncMode", value?.config?.syncMode);
   }, [value]);
 
@@ -197,7 +194,7 @@ export function AssignIdentityProvider({
     });
   }, []);
 
-  const page = useMemo(() => {
+  useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
     return localeSort(identityProviders ?? [], mapByKey("displayName"))
       .filter(

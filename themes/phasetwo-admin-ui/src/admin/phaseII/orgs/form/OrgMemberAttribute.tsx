@@ -1,25 +1,25 @@
-import { useTranslation } from "react-i18next";
-import { Controller } from "react-hook-form";
-import { FormGroup, Grid, GridItem, TextInput } from "@patternfly/react-core";
-import { MultiLineInput } from "../../../components/multi-line-input/MultiLineInput";
-import { HelpItem } from "@/shared/keycloak-ui-shared";
-import { useEffect } from "react";
+import { useAlerts } from "@/shared/keycloak-ui-shared";
 import {
-  Form,
-  Button,
   ActionGroup,
   AlertVariant,
+  Button,
+  Form,
+  FormGroup,
+  Grid,
+  GridItem,
+  TextInput,
 } from "@patternfly/react-core";
-import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
-import { defaultOrgState, OrgFormType } from "../modals/NewOrgModal";
-import type { OrgRepresentation } from "../routes";
-import { OrgFields } from "../form/OrgFields";
+import {
+  Controller,
+  FormProvider,
+  SubmitHandler,
+  useForm,
+} from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useRealm } from "../../../context/realm-context/RealmContext";
 import useOrgFetcher, {
   PhaseTwoOrganizationMemberAttributesRepresentation,
-  PhaseTwoOrganizationUserRepresentation,
 } from "../useOrgFetcher";
-import { useRealm } from "../../../context/realm-context/RealmContext";
-import { useAlerts } from "@/shared/keycloak-ui-shared";
 
 type Inputs = {
   name: string;

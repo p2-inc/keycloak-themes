@@ -133,7 +133,7 @@ export default function EditIdentityProviderHomeIdpDomains({
                           label={domain}
                           isChecked={field.value.includes(domain)}
                           className="pf-v5-u-mt-sm"
-                          onChange={(event, checked) => {
+                          onChange={(_event, checked) => {
                             const currentValues = field.value || [];
                             if (checked) {
                               // Add domain if not already selected

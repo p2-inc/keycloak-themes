@@ -1,7 +1,7 @@
 import { lazy } from "react";
 import { Path } from "react-router-dom";
-import type { AppRouteObject } from "../../../../routes";
-import { generateEncodedPath } from "../../../../utils/generateEncodedPath";
+import type { AppRouteObject } from "../../../routes";
+import { generateEncodedPath } from "../../../utils/generateEncodedPath";
 
 export type OrgsParams = {
   realm: string;

@@ -143,7 +143,7 @@ export const EmailTemplate = ({ realm, refresh }: EmailTemplateTabProps) => {
   };
 
   const selectTemplate = (
-    event: MouseEvent | ChangeEvent | BaseSyntheticEvent,
+    _event: MouseEvent | ChangeEvent | BaseSyntheticEvent,
     value: string,
   ) => {
     if (value === "Clear selection") clearSelection();
@@ -253,7 +253,7 @@ export const EmailTemplate = ({ realm, refresh }: EmailTemplateTabProps) => {
               </MenuToggle>
             )}
             aria-label="Select email template"
-            // @ts-ignore
+            // @ts-expect-error: event assignment description
             onSelect={selectTemplate}
             selected={selectedTemplate}
             isOpen={isTemplateSelectOpen}

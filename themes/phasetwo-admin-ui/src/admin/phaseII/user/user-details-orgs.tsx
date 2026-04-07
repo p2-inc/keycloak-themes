@@ -26,9 +26,9 @@ export const UserOrgs = () => {
   const { id } = useParams<UserParams>();
   const { realm } = useRealm();
   const { t } = useTranslation();
-  const [key, setKey] = useState(0);
+  const [key] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const refresh = () => setKey((value) => value + 1);
+  // const refresh = () => setKey((value) => value + 1);
 
   const { getOrgsForUser } = useOrgFetcher(realm);
   const loader = async () => await getOrgsForUser(id);

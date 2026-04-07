@@ -1,3 +1,4 @@
+import { useAlerts } from "@/shared/keycloak-ui-shared";
 import {
   Alert,
   AlertVariant,
@@ -14,12 +15,10 @@ import {
 } from "@patternfly/react-core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { HelpItem, useAlerts } from "@/shared/keycloak-ui-shared";
-
 import { useFetch } from "@/shared/keycloak-ui-shared";
-import useOrgFetcher from "../useOrgFetcher";
-import { useRealm } from "../../../context/realm-context/RealmContext";
 import { isNil } from "lodash-es";
+import { useRealm } from "../../../context/realm-context/RealmContext";
+import useOrgFetcher from "../useOrgFetcher";
 
 type ManageOrderDialogProps = {
   onClose: () => void;
@@ -127,7 +126,7 @@ export const ManageOrgSettingsDialog = ({
             description={t("createAdminUserExplainer")}
             isChecked={orgConfig?.createAdminUserEnabled}
             isDisabled={isNil(orgConfig)}
-            onChange={(evt, checked) =>
+            onChange={(_evt, checked) =>
               setOrgConfig({ ...orgConfig!, createAdminUserEnabled: checked })
             }
           />
@@ -144,7 +143,7 @@ export const ManageOrgSettingsDialog = ({
             description={t("sharedIdpsExplainer")}
             isChecked={orgConfig?.sharedIdpsEnabled}
             isDisabled={isNil(orgConfig)}
-            onChange={(evt, checked) =>
+            onChange={(_evt, checked) =>
               setOrgConfig({ ...orgConfig!, sharedIdpsEnabled: checked })
             }
           />
@@ -170,7 +169,7 @@ export const ManageOrgSettingsDialog = ({
             description={t("multipleIdpsEnabledExplainer")}
             isChecked={orgConfig?.multipleIdpsEnabled}
             isDisabled={isNil(orgConfig)}
-            onChange={(evt, checked) =>
+            onChange={(_evt, checked) =>
               setOrgConfig({ ...orgConfig!, multipleIdpsEnabled: checked })
             }
           />
@@ -196,7 +195,7 @@ export const ManageOrgSettingsDialog = ({
             description={t("validateIdpEnabledExplainer")}
             isChecked={orgConfig?.validateIdpEnabled}
             isDisabled={isNil(orgConfig)}
-            onChange={(evt, checked) =>
+            onChange={(_evt, checked) =>
               setOrgConfig({ ...orgConfig!, validateIdpEnabled: checked })
             }
           />

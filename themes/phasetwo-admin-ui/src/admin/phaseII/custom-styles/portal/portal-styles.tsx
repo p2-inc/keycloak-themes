@@ -172,7 +172,7 @@ export const PortalStyles = ({ refresh, realm }: PortalStylesArgs) => {
         },
       };
     } else {
-      // @ts-ignore
+      // @ts-expect-error: possibly undefined
       delete updatedObj["attributes"][fullKeyPath];
     }
     return updatedObj;
@@ -185,7 +185,7 @@ export const PortalStyles = ({ refresh, realm }: PortalStylesArgs) => {
     const portalItems = pick(portalValues, visibilityItems);
     const newPortalItems = mapKeys(
       portalItems,
-      (value, key) => `_providerConfig.${key.replaceAll("_", ".")}`,
+      (_value, key) => `_providerConfig.${key.replaceAll("_", ".")}`,
     );
 
     return {

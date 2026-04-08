@@ -5,8 +5,3 @@
 
 # === @oussemasahbeni/keycloakify-login-shadcn v250004.0.20 ===
 /early-color-scheme.js
-/keycloak-theme/login/js/authChecker.js
-/keycloak-theme/login/js/passkeysConditionalAuth.js
-/keycloak-theme/login/js/rfc4648.js
-/keycloak-theme/login/js/webauthnAuthenticate.js
-/keycloak-theme/login/js/webauthnRegister.js

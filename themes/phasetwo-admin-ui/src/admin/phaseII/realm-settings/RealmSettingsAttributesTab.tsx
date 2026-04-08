@@ -9,6 +9,8 @@ import {
 } from "@patternfly/react-core";
 
 import { useAlerts } from "@/shared/keycloak-ui-shared";
+import { FormattedLink } from "../../components/external-link/FormattedLink";
+import helpUrls from "../../help-urls";
 
 import {
   AttributeForm,
@@ -78,7 +80,12 @@ export const RealmSettingsAttributeTab = ({
       >
         <p>
           This may override configuration changes elsewhere and cause unexpected
-          behavior. Use this only if you are sure what you are doing.
+          behavior. Use this only if you are sure what you are doing.{" "}
+          <FormattedLink
+            title={t("learn more")}
+            href={helpUrls.realmAttributesUrl}
+            isInline
+          />
         </p>
       </Alert>
       <div className="pf-v5-u-mb-lg pf-v5-u-w-75-on-md">

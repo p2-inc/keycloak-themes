@@ -4,15 +4,22 @@
 # admin/help-urls.ts
 # admin/index.css
 # admin/PageNav.tsx
+# admin/routes.tsx
 # admin/assets/favicon.svg
 # admin/assets/icon.svg
 # admin/assets/img_avatar.svg
 # admin/assets/logo.svg
+# admin/identity-providers/IdentityProvidersSection.tsx
+# admin/realm-settings/GeneralTab.tsx
+# admin/realm-settings/RealmSettingsTabs.tsx
+# admin/user/EditUser.tsx
 # components/ui/button.tsx
 # components/ui/dropdown-menu.tsx
 # components/ui/select.tsx
 # components/ui/tooltip.tsx
 # admin/context/access/Access.tsx
+# admin/realm-settings/routes/RealmSettings.tsx
+# admin/user/routes/User.tsx
 # shared/@patternfly/react-core/index.tsx
 # === Owned files end =====
 
@@ -33,7 +40,6 @@
 /admin/PageHeaderClearCachesModal.tsx
 /admin/PageNotFoundSection.tsx
 /admin/Root.tsx
-/admin/routes.tsx
 /admin/util.ts
 /admin/authentication/AuthenticationSection.tsx
 /admin/authentication/BindFlowDialog.tsx
@@ -111,7 +117,6 @@
 /admin/i18n/messages_tr.properties
 /admin/i18n/messages_zh_Hans.properties
 /admin/i18n/messages_zh_Hant.properties
-/admin/identity-providers/IdentityProvidersSection.tsx
 /admin/identity-providers/ManageOrderDialog.tsx
 /admin/identity-providers/OIDCConfigurationRepresentation.ts
 /admin/identity-providers/routes.ts
@@ -150,7 +155,6 @@
 /admin/realm-settings/DefaultGroupsTab.tsx
 /admin/realm-settings/EmailTab.tsx
 /admin/realm-settings/ExecutorForm.tsx
-/admin/realm-settings/GeneralTab.tsx
 /admin/realm-settings/LoginTab.tsx
 /admin/realm-settings/NewAttributeSettings.tsx
 /admin/realm-settings/NewClientPolicy.tsx
@@ -162,7 +166,6 @@
 /admin/realm-settings/ProfilesTab.tsx
 /admin/realm-settings/realm-settings-section.css
 /admin/realm-settings/RealmSettingsSection.tsx
-/admin/realm-settings/RealmSettingsTabs.tsx
 /admin/realm-settings/routes.ts
 /admin/realm-settings/SessionsTab.tsx
 /admin/realm-settings/TokensTab.tsx
@@ -174,7 +177,6 @@
 /admin/sessions/SessionsSection.tsx
 /admin/sessions/SessionsTable.tsx
 /admin/user/CreateUser.tsx
-/admin/user/EditUser.tsx
 /admin/user/FederatedUserLink.tsx
 /admin/user/form-state.ts
 /admin/user/Organizations.tsx
@@ -565,7 +567,6 @@
 /admin/realm-settings/routes/KeyProvider.tsx
 /admin/realm-settings/routes/KeysTab.tsx
 /admin/realm-settings/routes/NewAttributesGroup.tsx
-/admin/realm-settings/routes/RealmSettings.tsx
 /admin/realm-settings/routes/ThemesTab.tsx
 /admin/realm-settings/routes/UserProfile.tsx
 /admin/realm-settings/security-defences/BruteForceDetection.tsx
@@ -593,7 +594,6 @@
 /admin/sessions/routes/Sessions.tsx
 /admin/user/details/SearchFilter.tsx
 /admin/user/routes/AddUser.tsx
-/admin/user/routes/User.tsx
 /admin/user/routes/Users.tsx
 /admin/user/user-credentials/CredentialDataDialog.tsx
 /admin/user/user-credentials/CredentialRow.tsx

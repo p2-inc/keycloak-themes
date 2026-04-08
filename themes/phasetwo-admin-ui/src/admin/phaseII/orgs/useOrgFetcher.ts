@@ -21,6 +21,14 @@ export type PhaseTwoOrganizationMemberAttributesRepresentation = Record<
   string[]
 >;
 
+export type OrganizationDomainRepresentation = {
+  domain_name: string;
+  verified: boolean;
+  record_key: string;
+  record_value: string;
+  type: string;
+};
+
 type OrgResp = Response & { error: string; data?: any[] };
 
 export default function useOrgFetcher(realm: string) {
@@ -620,6 +628,43 @@ export default function useOrgFetcher(realm: string) {
     }
   }
 
+  // GET /:realm/orgs/:orgId/domains
+  async function getOrgDomains(
+    orgId: string,
+  ): Promise<OrganizationDomainRepresentation[]> {
+    const resp = await fetchGet(`${baseUrl}/orgs/${orgId}/domains`);
+    if (resp.ok) {
+      return await resp.json();
+    }
+    return [];
+  }
+
+  // GET /:realm/orgs/:orgId/domains/:domainName
+  async function getOrgDomain(
+    orgId: string,
+    domainName: string,
+  ): Promise<OrganizationDomainRepresentation | null> {
+    const resp = await fetchGet(
+      `${baseUrl}/orgs/${orgId}/domains/${encodeURIComponent(domainName)}`,
+    );
+    if (resp.ok) {
+      return await resp.json();
+    }
+    return null;
+  }
+
+  // POST /:realm/orgs/:orgId/domains/:domainName/verify
+  async function verifyDomain(orgId: string, domainName: string) {
+    const resp = await fetchPost(
+      `${baseUrl}/orgs/${orgId}/domains/${encodeURIComponent(domainName)}/verify`,
+      {},
+    );
+    if (resp.ok) {
+      return { success: true, message: "Domain verification triggered." };
+    }
+    return { error: true, message: await resp.text() };
+  }
+
   return {
     addOrgMember,
     checkOrgRoleForUser,
@@ -632,6 +677,8 @@ export default function useOrgFetcher(realm: string) {
     getIdpsForOrg,
     getIdpsForRealm,
     getOrg,
+    getOrgDomain,
+    getOrgDomains,
     getOrgInvitations,
     getOrgMembers,
     getOrgsConfig,
@@ -649,6 +696,7 @@ export default function useOrgFetcher(realm: string) {
     setOrgRoleForUser,
     unlinkIDPtoOrg,
     updateAttributesForOrgMember,
+    verifyDomain,
     updateIdentityProvider,
     updateOrg,
     updateOrgsConfig,

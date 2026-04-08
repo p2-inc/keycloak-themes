@@ -3,8 +3,12 @@ import {
   AlertVariant,
   Badge,
   Button,
+  TextContent,
+  Text,
   ToolbarItem,
 } from "@patternfly/react-core";
+import { FormattedLink } from "../../components/external-link/FormattedLink";
+import helpUrls from "../../help-urls";
 
 import type { OrgRepresentation } from "./routes";
 import { KeycloakDataTable } from "@/shared/keycloak-ui-shared";
@@ -98,6 +102,15 @@ export default function OrgRoles({ org, refresh: orgRefresh }: OrgRolesProps) {
 
   return (
     <>
+      <TextContent className="pf-v5-u-px-lg pf-v5-u-pt-lg">
+        <Text>
+          <FormattedLink
+            title={t("learnMore")}
+            href={helpUrls.orgRolesUrl}
+            isInline
+          />
+        </Text>
+      </TextContent>
       <KeycloakDataTable
         data-testid="roles-org-table"
         key={`${org.id}${key}`}

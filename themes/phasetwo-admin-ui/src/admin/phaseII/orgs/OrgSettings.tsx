@@ -15,6 +15,8 @@ import useOrgFetcher from "./useOrgFetcher";
 import { useRealm } from "../../context/realm-context/RealmContext";
 import { useTranslation } from "react-i18next";
 import { useAlerts } from "@/shared/keycloak-ui-shared";
+import { FormattedLink } from "../../components/external-link/FormattedLink";
+import helpUrls from "../../help-urls";
 
 type OrgSettingsProps = {
   org: OrgRepresentation;
@@ -75,6 +77,13 @@ export default function OrgSettings({ org, refresh }: OrgSettingsProps) {
   return (
     <Grid hasGutter className="pf-v5-u-px-lg pf-v5-u-mt-xl">
       <GridItem span={8}>
+        <div className="pf-v5-u-mb-md">
+          <FormattedLink
+            title={t("learnMore")}
+            href={helpUrls.orgDomainsUrl}
+            isInline
+          />
+        </div>
         <FormProvider {...organizationForm}>
           <Form
             isHorizontal

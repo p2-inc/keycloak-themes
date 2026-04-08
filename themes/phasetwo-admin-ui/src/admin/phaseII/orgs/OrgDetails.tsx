@@ -21,6 +21,7 @@ import useToggle from "../../utils/useToggle";
 import OrgIdentityProviders from "./OrgIdentityProviders";
 import OrgSettings from "./OrgSettings";
 import OrgAttributes from "./OrgAttributes";
+import OrgDomains from "./OrgDomains";
 import {
   RoutableTabs,
   useRoutableTab,
@@ -55,6 +56,7 @@ export default function OrgDetails() {
     );
 
   const settingsTab = useTab("settings");
+  const domainsTab = useTab("domains");
   const attributesTab = useTab("attributes");
   const membersTab = useTab("members");
   const invitationsTab = useTab("invitations");
@@ -89,6 +91,13 @@ export default function OrgDetails() {
             {...settingsTab}
           >
             <OrgSettings org={org} refresh={refresh} />
+          </Tab>
+          <Tab
+            id="domains"
+            title={<TabTitleText>Domains</TabTitleText>}
+            {...domainsTab}
+          >
+            <OrgDomains org={org} refresh={refresh} />
           </Tab>
           <Tab
             id="attributes"

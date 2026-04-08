@@ -1,4 +1,5 @@
 import {
+  Alert,
   AlertVariant,
   Flex,
   FlexItem,
@@ -164,6 +165,17 @@ export const LoginStyles = ({ refresh, realm }: LoginStylesArgs) => {
 
   return (
     <PageSection variant="light" className="keycloak__form">
+      <Alert
+        variant="info"
+        title="Theme activation required"
+        isInline
+        className="pf-v5-u-mb-lg"
+      >
+        <p>
+          Ensure that the <code>attributes.v2</code> theme is enabled in order
+          to see these take effect.
+        </p>
+      </Alert>
       <Form isHorizontal>
         <FormProvider {...form}>
           {/* Primary Color */}

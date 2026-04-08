@@ -6,6 +6,7 @@ import { Path } from "react-router-dom";
 
 export type OrgTab =
   | "settings"
+  | "domains"
   | "attributes"
   | "members"
   | "invitations"

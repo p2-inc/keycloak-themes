@@ -9,7 +9,9 @@ import type { OrgRepresentation } from "./routes";
 import useOrgFetcher, {
   PhaseTwoOrganizationUserRepresentation,
 } from "./useOrgFetcher";
-import { Button, ToolbarItem } from "@patternfly/react-core";
+import { Button, TextContent, Text, ToolbarItem } from "@patternfly/react-core";
+import { FormattedLink } from "../../components/external-link/FormattedLink";
+import helpUrls from "../../help-urls";
 import type UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
 import { Link } from "react-router-dom";
 import { toUser } from "../../user/routes/User";
@@ -74,6 +76,15 @@ export default function OrgMembers({
 
   return (
     <>
+      <TextContent className="pf-v5-u-px-lg pf-v5-u-pt-lg">
+        <Text>
+          <FormattedLink
+            title={t("learnMore")}
+            href={helpUrls.orgMembersUrl}
+            isInline
+          />
+        </Text>
+      </TextContent>
       {addMembersVisibility && (
         <AddMember
           refresh={refresh}

@@ -1,12 +1,18 @@
 # This file is managed by Keycloakify, do not edit it manually.
 
 # === Owned files start ===
+# admin/help-urls.ts
 # admin/index.css
+# admin/PageNav.tsx
 # admin/assets/favicon.svg
 # admin/assets/icon.svg
 # admin/assets/img_avatar.svg
 # admin/assets/logo.svg
 # components/ui/button.tsx
+# components/ui/dropdown-menu.tsx
+# components/ui/select.tsx
+# components/ui/tooltip.tsx
+# admin/context/access/Access.tsx
 # shared/@patternfly/react-core/index.tsx
 # === Owned files end =====
 
@@ -18,7 +24,6 @@
 /admin/colorScheme.ts
 /admin/environment.ts
 /admin/ForbiddenSection.tsx
-/admin/help-urls.ts
 /admin/i18next.d.ts
 /admin/KcAdminUi.tsx
 /admin/KcContext.ts
@@ -26,7 +31,6 @@
 /admin/page-nav.css
 /admin/PageHeader.tsx
 /admin/PageHeaderClearCachesModal.tsx
-/admin/PageNav.tsx
 /admin/PageNotFoundSection.tsx
 /admin/Root.tsx
 /admin/routes.tsx
@@ -441,7 +445,6 @@
 /admin/components/view-header/ViewHeader.tsx
 /admin/components/wizard-section-header/wizard-section-header.css
 /admin/components/wizard-section-header/WizardSectionHeader.tsx
-/admin/context/access/Access.tsx
 /admin/context/auth/admin-ui-endpoint.ts
 /admin/context/auth/uiRealmInfo.ts
 /admin/context/realm-context/RealmContext.tsx
@@ -831,17 +834,14 @@
 /components/ui/alert.tsx
 /components/ui/card.tsx
 /components/ui/checkbox.tsx
-/components/ui/dropdown-menu.tsx
 /components/ui/field.tsx
 /components/ui/input-group.tsx
 /components/ui/input-otp.tsx
 /components/ui/input.tsx
 /components/ui/label.tsx
 /components/ui/radio-group.tsx
-/components/ui/select.tsx
 /components/ui/separator.tsx
 /components/ui/textarea.tsx
-/components/ui/tooltip.tsx
 /login/components/LogoutOtherSessions.tsx
 /login/components/PasswordVisibilityButton.tsx
 /login/mocks/getKcContextMock.ts

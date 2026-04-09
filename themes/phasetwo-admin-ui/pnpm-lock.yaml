@@ -24,7 +24,7 @@ importers:
         specifier: ~260502.0.0
         version: 260502.0.0(@keycloak/keycloak-admin-client@26.5.2)(@patternfly/react-core@5.4.14(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@patternfly/react-icons@5.4.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@patternfly/react-styles@5.4.1)(@patternfly/react-table@5.4.16(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/lodash-es@4.17.12)(@types/react@19.2.14)(i18next@25.10.10(typescript@5.9.3))(lodash-es@4.18.1)(oidc-spa@10.0.9(@types/react@19.2.14)(react@19.2.4))(react-hook-form@7.72.1(react@19.2.4))(react-i18next@16.6.6(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(react@19.2.4)
       '@keycloakify/login-ui':
-        specifier: ~250004.6.7
+        specifier: ~250004.6.5
         version: 250004.6.7(tsafe@1.8.12)
       '@oussemasahbeni/keycloakify-login-shadcn':
         specifier: ^250004.0.20
@@ -45,7 +45,7 @@ importers:
         specifier: ^5.4.16
         version: 5.4.16(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tailwindcss/vite':
-        specifier: ^4.2.2
+        specifier: ^4.2.1
         version: 4.2.2(vite@8.0.7(@types/node@24.12.2)(jiti@2.6.1)(yaml@2.8.3))
       '@uiw/react-textarea-code-editor':
         specifier: ^3.1.1
@@ -63,7 +63,7 @@ importers:
         specifier: ^6.0.1
         version: 6.0.1
       i18next:
-        specifier: ^25.10.10
+        specifier: ^25.7.3
         version: 25.10.10(typescript@5.9.3)
       i18next-fetch-backend:
         specifier: ^6.0.0
@@ -78,13 +78,13 @@ importers:
         specifier: ^11.15.3
         version: 11.15.3
       lodash-es:
-        specifier: ^4.18.1
+        specifier: ^4.17.22
         version: 4.18.1
       lucide-react:
         specifier: ^0.473.0
         version: 0.473.0(react@19.2.4)
       oidc-spa:
-        specifier: ~10.0.9
+        specifier: ~10.0.5
         version: 10.0.9(@types/react@19.2.14)(react@19.2.4)
       p-debounce:
         specifier: ^5.1.0
@@ -99,16 +99,16 @@ importers:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
       react-hook-form:
-        specifier: ^7.72.1
+        specifier: ^7.70.0
         version: 7.72.1(react@19.2.4)
       react-i18next:
-        specifier: ^16.6.6
+        specifier: ^16.5.1
         version: 16.6.6(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       react-icons:
-        specifier: ^5.6.0
+        specifier: ^5.5.0
         version: 5.6.0(react@19.2.4)
       react-router-dom:
-        specifier: ^6.30.3
+        specifier: ^6.30.2
         version: 6.30.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       reactflow:
         specifier: ^11.11.4
@@ -117,13 +117,13 @@ importers:
         specifier: ^1.5.4
         version: 1.5.4
       tailwind-merge:
-        specifier: ^2.6.1
+        specifier: ^2.6.0
         version: 2.6.1
       tailwindcss:
-        specifier: ^4.2.2
+        specifier: ^4.2.1
         version: 4.2.2
       tsafe:
-        specifier: ^1.8.12
+        specifier: ^1.8.5
         version: 1.8.12
       tw-animate-css:
         specifier: ^1.4.0
@@ -132,7 +132,7 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1(react-router-dom@6.30.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
       yaml:
-        specifier: ^2.8.3
+        specifier: ^2.8.2
         version: 2.8.3
     devDependencies:
       '@eslint/js':
@@ -1244,42 +1244,36 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@rolldown/binding-linux-arm64-musl@1.0.0-rc.13':
     resolution: {integrity: sha512-bmRg3O6Z0gq9yodKKWCIpnlH051sEfdVwt+6m5UDffAQMUUqU0xjnQqqAUm+Gu7ofAAly9DqiQDtKu2nPDEABA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@rolldown/binding-linux-ppc64-gnu@1.0.0-rc.13':
     resolution: {integrity: sha512-8Wtnbw4k7pMYN9B/mOEAsQ8HOiq7AZ31Ig4M9BKn2So4xRaFEhtCSa4ZJaOutOWq50zpgR4N5+L/opnlaCx8wQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [ppc64]
     os: [linux]
-    libc: [glibc]
 
   '@rolldown/binding-linux-s390x-gnu@1.0.0-rc.13':
     resolution: {integrity: sha512-D/0Nlo8mQuxSMohNJUF2lDXWRsFDsHldfRRgD9bRgktj+EndGPj4DOV37LqDKPYS+osdyhZEH7fTakTAEcW7qg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [s390x]
     os: [linux]
-    libc: [glibc]
 
   '@rolldown/binding-linux-x64-gnu@1.0.0-rc.13':
     resolution: {integrity: sha512-eRrPvat2YaVQcwwKi/JzOP6MKf1WRnOCr+VaI3cTWz3ZoLcP/654z90lVCJ4dAuMEpPdke0n+qyAqXDZdIC4rA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@rolldown/binding-linux-x64-musl@1.0.0-rc.13':
     resolution: {integrity: sha512-PsdONiFRp8hR8KgVjTWjZ9s7uA3uueWL0t74/cKHfM4dR5zXYv4AjB8BvA+QDToqxAFg4ZkcVEqeu5F7inoz5w==}
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@rolldown/binding-openharmony-arm64@1.0.0-rc.13':
     resolution: {integrity: sha512-hCNXgC5dI3TVOLrPT++PKFNZ+1EtS0mLQwfXXXSUD/+rGlB65gZDwN/IDuxLpQP4x8RYYHqGomlUXzpO8aVI2w==}
@@ -1348,28 +1342,24 @@ packages:
     engines: {node: '>= 20'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@tailwindcss/oxide-linux-arm64-musl@4.2.2':
     resolution: {integrity: sha512-oCfG/mS+/+XRlwNjnsNLVwnMWYH7tn/kYPsNPh+JSOMlnt93mYNCKHYzylRhI51X+TbR+ufNhhKKzm6QkqX8ag==}
     engines: {node: '>= 20'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@tailwindcss/oxide-linux-x64-gnu@4.2.2':
     resolution: {integrity: sha512-rTAGAkDgqbXHNp/xW0iugLVmX62wOp2PoE39BTCGKjv3Iocf6AFbRP/wZT/kuCxC9QBh9Pu8XPkv/zCZB2mcMg==}
     engines: {node: '>= 20'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@tailwindcss/oxide-linux-x64-musl@4.2.2':
     resolution: {integrity: sha512-XW3t3qwbIwiSyRCggeO2zxe3KWaEbM0/kW9e8+0XpBgyKU4ATYzcVSMKteZJ1iukJ3HgHBjbg9P5YPRCVUxlnQ==}
     engines: {node: '>= 20'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@tailwindcss/oxide-wasm32-wasi@4.2.2':
     resolution: {integrity: sha512-eKSztKsmEsn1O5lJ4ZAfyn41NfG7vzCg496YiGtMDV86jz1q/irhms5O0VrY6ZwTUkFy/EKG3RfWgxSI3VbZ8Q==}
@@ -2167,28 +2157,24 @@ packages:
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   lightningcss-linux-arm64-musl@1.32.0:
     resolution: {integrity: sha512-UpQkoenr4UJEzgVIYpI80lDFvRmPVg6oqboNHfoH4CQIfNA+HOrZ7Mo7KZP02dC6LjghPQJeBsvXhJod/wnIBg==}
     engines: {node: '>= 12.0.0'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   lightningcss-linux-x64-gnu@1.32.0:
     resolution: {integrity: sha512-V7Qr52IhZmdKPVr+Vtw8o+WLsQJYCTd8loIfpDaMRWGUZfBOYEJeyJIkqGIDMZPwPx24pUMfwSxxI8phr/MbOA==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   lightningcss-linux-x64-musl@1.32.0:
     resolution: {integrity: sha512-bYcLp+Vb0awsiXg/80uCRezCYHNg1/l3mt0gzHnWV9XP1W5sKa5/TCdGWaR/zBM2PeF/HbsQv/j2URNOiVuxWg==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   lightningcss-win32-arm64-msvc@1.32.0:
     resolution: {integrity: sha512-8SbC8BR40pS6baCM8sbtYDSwEVQd4JlFTOlaD3gWGHfThTcABnNDBda6eTZeqbofalIJhFx0qKzgHJmcPTnGdw==}

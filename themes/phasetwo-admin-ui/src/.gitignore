@@ -7,6 +7,9 @@
 # admin/assets/img_avatar.svg
 # admin/assets/logo.svg
 # components/ui/button.tsx
+# components/ui/dropdown-menu.tsx
+# components/ui/select.tsx
+# components/ui/tooltip.tsx
 # shared/@patternfly/react-core/index.tsx
 # === Owned files end =====
 
@@ -831,17 +834,14 @@
 /components/ui/alert.tsx
 /components/ui/card.tsx
 /components/ui/checkbox.tsx
-/components/ui/dropdown-menu.tsx
 /components/ui/field.tsx
 /components/ui/input-group.tsx
 /components/ui/input-otp.tsx
 /components/ui/input.tsx
 /components/ui/label.tsx
 /components/ui/radio-group.tsx
-/components/ui/select.tsx
 /components/ui/separator.tsx
 /components/ui/textarea.tsx
-/components/ui/tooltip.tsx
 /login/components/LogoutOtherSessions.tsx
 /login/components/PasswordVisibilityButton.tsx
 /login/mocks/getKcContextMock.ts

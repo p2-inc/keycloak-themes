@@ -1,4 +1,4 @@
-import { HelpItem, useAlerts } from "@/shared/keycloak-ui-shared";
+import { useAlerts } from "@/shared/keycloak-ui-shared";
 import {
   Alert,
   AlertVariant,

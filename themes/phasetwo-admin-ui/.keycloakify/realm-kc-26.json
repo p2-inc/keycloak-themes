@@ -1683,9 +1683,9 @@
     "strictTransportSecurity": "max-age=31536000; includeSubDomains"
   },
   "smtpServer": {},
-  "loginTheme": "admin-ui",
+  "loginTheme": "phasetwo-admin-ui",
   "accountTheme": "",
-  "adminTheme": "admin-ui",
+  "adminTheme": "phasetwo-admin-ui",
   "emailTheme": "",
   "eventsEnabled": false,
   "eventsListeners": [

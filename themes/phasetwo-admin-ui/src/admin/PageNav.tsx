@@ -25,6 +25,7 @@ import { useRealm } from "./context/realm-context/RealmContext";
 import { useServerInfo } from "./context/server-info/ServerInfoProvider";
 import { Environment } from "./environment";
 import { toPage } from "./page/routes";
+import Extensions from "./phaseII/navigation/extensions";
 import { routes } from "./routes";
 import useIsFeatureEnabled, { Feature } from "./utils/useIsFeatureEnabled";
 
@@ -171,6 +172,7 @@ export const PageNav = () => {
                 ))}
             </NavGroup>
           )}
+          <Extensions />
         </Nav>
       </PageSidebarBody>
     </PageSidebar>

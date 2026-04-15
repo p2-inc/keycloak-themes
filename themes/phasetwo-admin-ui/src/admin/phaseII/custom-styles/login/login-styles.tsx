@@ -50,13 +50,7 @@ export const LoginStyles = ({ refresh, realm }: LoginStylesArgs) => {
       css: "",
     },
   });
-  const {
-    control,
-    reset,
-    getValues,
-    setValue,
-    formState: { isDirty },
-  } = form;
+  const { control, reset, getValues, setValue } = form;
 
   async function loadRealm() {
     const realmInfo = realm;

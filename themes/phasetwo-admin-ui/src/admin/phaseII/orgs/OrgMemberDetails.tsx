@@ -32,13 +32,8 @@ import {
   cellWidth,
 } from "@patternfly/react-table";
 import { OrgMemberAttribute } from "./form/OrgMemberAttribute";
-import { Divider } from "@patternfly/react-core";
 import { toOrg } from "./routes/Org";
-import {
-  toOrgMember,
-  type OrgMemberParams,
-  type OrgMemberTab,
-} from "./routes/OrgMember";
+import { toOrgMember, type OrgMemberTab } from "./routes/OrgMember";
 
 type OrgMemberRouteParams = {
   realm: string;
@@ -48,7 +43,7 @@ type OrgMemberRouteParams = {
 };
 
 export default function OrgMemberDetails() {
-  const { orgId, userId, tab } = useParams<OrgMemberRouteParams>();
+  const { orgId, userId } = useParams<OrgMemberRouteParams>();
   const { t } = useTranslation();
   const { addAlert, addError } = useAlerts();
   const { realm } = useRealm();
@@ -252,7 +247,7 @@ export default function OrgMemberDetails() {
               <Table aria-label="Assign roles to member" variant="compact">
                 <Thead>
                   <Tr>
-                    <Th className={cellWidth(5)().className}>
+                    <Th className={cellWidth(10)().className}>
                       <input
                         type="checkbox"
                         name="selectAll"

@@ -13,6 +13,7 @@ import { useAlerts } from "@/shared/keycloak-ui-shared";
 import useOrgFetcher from "./useOrgFetcher";
 import type { OrgParams } from "./routes/Org";
 import { ViewHeader } from "../../components/view-header/ViewHeader";
+import helpUrls from "../../help-urls";
 import OrgMembers from "./OrgMembers";
 import OrgInvitations from "./OrgInvitations";
 import OrgRoles from "./OrgRoles";
@@ -28,8 +29,18 @@ import {
 } from "../../components/routable-tabs/RoutableTabs";
 import { toOrg, OrgTab } from "./routes/Org";
 
+const tabHelpUrls: Record<OrgTab, string> = {
+  settings: helpUrls.orgsUrl,
+  domains: helpUrls.orgDomainsUrl,
+  attributes: helpUrls.orgAttributesUrl,
+  members: helpUrls.orgMembersUrl,
+  invitations: helpUrls.orgInvitationsUrl,
+  roles: helpUrls.orgRolesUrl,
+  identityproviders: helpUrls.orgIdpsUrl,
+};
+
 export default function OrgDetails() {
-  const { orgId } = useParams<OrgParams>();
+  const { orgId, tab } = useParams<OrgParams>();
   const { t } = useTranslation();
   const { addError } = useAlerts();
   const [portalLinkOpen, togglePortalLinkOpen] = useToggle(false);
@@ -76,6 +87,7 @@ export default function OrgDetails() {
       <ViewHeader
         titleKey={org.displayName || org.name || org.id}
         divider={false}
+        helpUrl={tab ? tabHelpUrls[tab] : helpUrls.orgsUrl}
         dropdownItems={dropdownItems}
       />
       <PortalLink

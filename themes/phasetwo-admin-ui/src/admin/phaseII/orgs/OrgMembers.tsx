@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Action, KeycloakDataTable } from "@/shared/keycloak-ui-shared";
+import { KeycloakDataTable } from "@/shared/keycloak-ui-shared";
 import { ListEmptyState } from "@/shared/keycloak-ui-shared";
 import { useRealm } from "../../context/realm-context/RealmContext";
 import { AddMember } from "./AddMember";
@@ -9,29 +9,17 @@ import type { OrgRepresentation } from "./routes";
 import useOrgFetcher, {
   PhaseTwoOrganizationUserRepresentation,
 } from "./useOrgFetcher";
-import { Button, TextContent, Text, ToolbarItem } from "@patternfly/react-core";
-import { FormattedLink } from "../../components/external-link/FormattedLink";
-import helpUrls from "../../help-urls";
+import { Button, ButtonVariant, ToolbarItem } from "@patternfly/react-core";
 import type UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
 import { Link } from "react-router-dom";
-import { toUser } from "../../user/routes/User";
-import { AssignRoleToMemberModal } from "./modals/AssignRoleToMemberInOrgModal";
-import type RoleRepresentation from "@keycloak/keycloak-admin-client/lib/defs/roleRepresentation";
-import { ViewOrganizationUserAttributes } from "./modals/ViewUserOrganizationAttributes";
+import { toOrgMember } from "./routes/OrgMember";
+import { TrashAltIcon } from "@patternfly/react-icons";
+import { useConfirmDialog } from "../../components/confirm-dialog/ConfirmDialog";
 
 type OrgMembersTypeProps = {
   org: OrgRepresentation;
   refresh: () => void;
 };
-
-const UserDetailLink = (
-  user: PhaseTwoOrganizationUserRepresentation,
-  realm: string,
-) => (
-  <Link key={user.id} to={toUser({ realm, id: user.id!, tab: "settings" })}>
-    {user.username}
-  </Link>
-);
 
 export default function OrgMembers({
   org,
@@ -44,24 +32,25 @@ export default function OrgMembers({
     setKey(new Date().getTime());
     refreshOrg();
   };
-  const { getOrgMembers, removeMemberFromOrg, getRolesForOrg } =
-    useOrgFetcher(realm);
-  const [assignRoleModalOpen, setAssignRoleModalOpen] = useState<
-    UserRepresentation | boolean
-  >(false);
-  const [viewUserOrganizationAttributes, setViewUserOrganizationAttributes] =
-    useState<UserRepresentation | boolean>(false);
+  const { getOrgMembers, removeMemberFromOrg } = useOrgFetcher(realm);
+  const [memberToRemove, setMemberToRemove] =
+    useState<UserRepresentation | null>(null);
 
-  const [orgRoles, setOrgRoles] = useState<RoleRepresentation[]>([]);
+  const [addMembersVisibility, setAddMembersVisibility] = useState(false);
+  const toggleAddMembersVisibility = () =>
+    setAddMembersVisibility(!addMembersVisibility);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getRolesForOrg(org.id);
-      setOrgRoles(data);
-    };
-
-    fetchData();
-  }, []);
+  const [toggleRemoveDialog, RemoveConfirm] = useConfirmDialog({
+    titleKey: "removeMemberConfirmTitle",
+    messageKey: "removeMemberConfirm",
+    continueButtonLabel: "remove",
+    onConfirm: async () => {
+      if (memberToRemove?.id) {
+        await removeMemberFromOrg(org.id, memberToRemove.id);
+        refresh();
+      }
+    },
+  });
 
   const loader = async (
     first: number,
@@ -70,43 +59,38 @@ export default function OrgMembers({
   ): Promise<PhaseTwoOrganizationUserRepresentation[]> =>
     await getOrgMembers(org.id, { first, max, search });
 
-  const [addMembersVisibility, setAddMembersVisibility] = useState(false);
-  const toggleAddMembersVisibility = () =>
-    setAddMembersVisibility(!addMembersVisibility);
+  const MemberLink = (user: PhaseTwoOrganizationUserRepresentation) => (
+    <Link
+      key={user.id}
+      to={toOrgMember({ realm, orgId: org.id, userId: user.id!, tab: "roles" })}
+    >
+      {user.username}
+    </Link>
+  );
+
+  const RemoveButton = (user: UserRepresentation) => (
+    <Button
+      variant={ButtonVariant.plain}
+      isDanger
+      aria-label={t("removeMember")}
+      onClick={(e) => {
+        e.stopPropagation();
+        setMemberToRemove(user);
+        toggleRemoveDialog();
+      }}
+    >
+      <TrashAltIcon />
+    </Button>
+  );
 
   return (
     <>
-      <TextContent className="pf-v5-u-px-lg pf-v5-u-pt-lg">
-        <Text>
-          <FormattedLink
-            title={t("learnMore")}
-            href={helpUrls.orgMembersUrl}
-            isInline
-          />
-        </Text>
-      </TextContent>
+      <RemoveConfirm />
       {addMembersVisibility && (
         <AddMember
           refresh={refresh}
           orgId={org.id}
           onClose={toggleAddMembersVisibility}
-        />
-      )}
-      {assignRoleModalOpen && (
-        <AssignRoleToMemberModal
-          orgId={org.id}
-          user={assignRoleModalOpen as PhaseTwoOrganizationUserRepresentation}
-          handleModalToggle={() => setAssignRoleModalOpen(false)}
-          refresh={refresh}
-          orgRoles={orgRoles}
-        />
-      )}
-      {viewUserOrganizationAttributes && typeof viewUserOrganizationAttributes === "object" && (
-        <ViewOrganizationUserAttributes
-          userId={viewUserOrganizationAttributes.id}
-          handleModalToggle={() => setViewUserOrganizationAttributes(false)}
-          refresh={refresh}
-          orgId={org.id}
         />
       )}
       <KeycloakDataTable
@@ -129,41 +113,12 @@ export default function OrgMembers({
             </Button>
           </ToolbarItem>
         }
-        actions={[
-          {
-            title: t("assignRole"),
-            onRowClick: async (user: UserRepresentation): Promise<boolean> => {
-              setAssignRoleModalOpen(user);
-              // open a modal
-              // modal pulls in roles
-              // allow selecting roles and assigning to the user
-              return Promise.resolve(true);
-            },
-          } as Action<any>,
-          {
-            title: t("manageAttributes"),
-            onRowClick: async (user: UserRepresentation): Promise<boolean> => {
-              setViewUserOrganizationAttributes(user);
-              // open a modal
-              // only able to view current attributes from passed in user
-              return Promise.resolve(true);
-            },
-          } as Action<any>,
-          {
-            title: t("removeMember"),
-            onRowClick: async (user: UserRepresentation): Promise<boolean> => {
-              await removeMemberFromOrg(org.id, user.id!);
-              refresh();
-              return Promise.resolve(true);
-            },
-          } as Action<any>,
-        ]}
         columns={[
           {
             name: "username",
             displayKey: "Name",
             cellRenderer: (user: PhaseTwoOrganizationUserRepresentation) =>
-              UserDetailLink(user, realm),
+              MemberLink(user),
           },
           {
             name: "email",
@@ -176,6 +131,11 @@ export default function OrgMembers({
           {
             name: "lastName",
             displayKey: "Last Name",
+          },
+          {
+            name: "remove",
+            displayKey: "",
+            cellRenderer: (user: UserRepresentation) => RemoveButton(user),
           },
         ]}
         emptyState={

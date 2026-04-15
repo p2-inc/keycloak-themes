@@ -3,9 +3,7 @@ import { Action, KeycloakDataTable } from "@/shared/keycloak-ui-shared";
 import { useRealm } from "../../context/realm-context/RealmContext";
 import type { OrgRepresentation } from "./routes";
 import useOrgFetcher from "./useOrgFetcher";
-import { Button, TextContent, Text, ToolbarItem } from "@patternfly/react-core";
-import { FormattedLink } from "../../components/external-link/FormattedLink";
-import helpUrls from "../../help-urls";
+import { Button, ToolbarItem } from "@patternfly/react-core";
 import { ListEmptyState } from "@/shared/keycloak-ui-shared";
 import AddInvitation from "./AddInvitation";
 import { useAlerts } from "@/shared/keycloak-ui-shared";
@@ -54,15 +52,6 @@ export default function OrgInvitations({
 
   return (
     <>
-      <TextContent className="pf-v5-u-px-lg pf-v5-u-pt-lg">
-        <Text>
-          <FormattedLink
-            title={t("learnMore")}
-            href={helpUrls.orgInvitationsUrl}
-            isInline
-          />
-        </Text>
-      </TextContent>
       {invitationModalVisibility && (
         <AddInvitation
           refresh={refresh}

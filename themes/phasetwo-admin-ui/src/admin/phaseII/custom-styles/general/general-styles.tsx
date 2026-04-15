@@ -1,4 +1,5 @@
 import {
+  Alert,
   AlertVariant,
   Brand,
   Form,
@@ -247,6 +248,14 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
 
   return (
     <PageSection variant="light" className="keycloak__form">
+      <Alert
+        variant="info"
+        title={t("generalStylesAlertTitle")}
+        isInline
+        className="pf-v5-u-mb-lg"
+      >
+        <p>{t("generalStylesAlertBody")}</p>
+      </Alert>
       <Form isHorizontal id="general-styles">
         <FormProvider {...form}>
           {/* Logo Url */}

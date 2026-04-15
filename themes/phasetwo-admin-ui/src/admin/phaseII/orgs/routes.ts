@@ -2,6 +2,7 @@ import type { AppRouteObject } from "../../routes";
 
 import { OrgsRoute } from "./routes/Orgs";
 import { OrgRoute } from "./routes/Org";
+import { OrgMemberRoute } from "./routes/OrgMember";
 
 export type OrgRepresentation = {
   id: string;
@@ -12,6 +13,6 @@ export type OrgRepresentation = {
   attributes: Record<string, string[]>;
 };
 
-const routes: AppRouteObject[] = [OrgsRoute, OrgRoute];
+const routes: AppRouteObject[] = [OrgsRoute, OrgMemberRoute, OrgRoute];
 
 export default routes;

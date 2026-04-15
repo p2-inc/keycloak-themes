@@ -14,8 +14,6 @@ import { Table, Tbody, Td, Th, Thead, Tr } from "@patternfly/react-table";
 import { CheckCircleIcon } from "@patternfly/react-icons";
 import { useRealm } from "../../context/realm-context/RealmContext";
 import { useAlerts } from "@/shared/keycloak-ui-shared";
-import { FormattedLink } from "../../components/external-link/FormattedLink";
-import helpUrls from "../../help-urls";
 import useOrgFetcher, {
   OrganizationDomainRepresentation,
 } from "./useOrgFetcher";
@@ -75,14 +73,7 @@ export default function OrgDomains({ org, refresh }: OrgDomainsProps) {
         Domains
       </Title>
       <TextContent className="pf-v5-u-mb-lg">
-        <Text>
-          View linked domains and verify dns entries.{" "}
-          <FormattedLink
-            title={t("learnMore")}
-            href={helpUrls.orgDomainsUrl}
-            isInline
-          />
-        </Text>
+        <Text>View linked domains and verify dns entries.</Text>
       </TextContent>
       {domains.length === 0 ? (
         <TextContent>

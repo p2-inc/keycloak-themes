@@ -91,7 +91,7 @@ const getDuplicateKeys = (rows: ProviderConfigRow[]) => {
 export const RealmSettingsAttributeTab = ({
   realm: defaultRealm,
 }: RealmSettingsAttributeTabProps) => {
-  const { t } = useTranslation("realm-settings");
+  const { t } = useTranslation();
   const { addAlert, addError } = useAlerts();
   const { adminClient } = useAdminClient();
 

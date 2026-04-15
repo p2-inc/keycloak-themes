@@ -70,7 +70,7 @@ export default function OrgDomains({ org, refresh }: OrgDomainsProps) {
   return (
     <PageSection variant="light">
       <Title headingLevel="h2" size="lg" className="pf-v5-u-mb-sm">
-        Domains
+        {t("domains")}
       </Title>
       <TextContent className="pf-v5-u-mb-lg">
         <Text>View linked domains and verify dns entries.</Text>

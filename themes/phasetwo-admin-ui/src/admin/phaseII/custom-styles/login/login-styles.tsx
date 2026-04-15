@@ -17,6 +17,9 @@ import { useAlerts } from "@/shared/keycloak-ui-shared";
 
 import { ColorPicker } from "../components/ColorPicker";
 import { useAdminClient } from "../../../admin-client";
+import { useEnvironment } from "@/shared/keycloak-ui-shared";
+import { useRealm } from "../../../context/realm-context/RealmContext";
+import type { Environment } from "../../../environment";
 
 type LoginStylesType = {
   primaryColor: string;
@@ -35,6 +38,9 @@ const HexColorPattern = /^#([0-9a-f]{3}){1,2}$/;
 export const LoginStyles = ({ refresh, realm }: LoginStylesArgs) => {
   const { t } = useTranslation();
   const { adminClient } = useAdminClient();
+  const { environment } = useEnvironment<Environment>();
+  const { realm: realmName } = useRealm();
+  const accountConsoleUrl = `${environment.serverBaseUrl}/realms/${realmName}/account`;
   const { addAlert, addError } = useAlerts();
   const form = useForm<LoginStylesType>({
     defaultValues: {
@@ -44,13 +50,7 @@ export const LoginStyles = ({ refresh, realm }: LoginStylesArgs) => {
       css: "",
     },
   });
-  const {
-    control,
-    reset,
-    getValues,
-    setValue,
-    formState: { isDirty },
-  } = form;
+  const { control, reset, getValues, setValue } = form;
 
   async function loadRealm() {
     const realmInfo = realm;
@@ -167,13 +167,30 @@ export const LoginStyles = ({ refresh, realm }: LoginStylesArgs) => {
     <PageSection variant="light" className="keycloak__form">
       <Alert
         variant="info"
-        title="Theme activation required"
+        title={t("loginThemeActivationAlertTitle")}
         isInline
         className="pf-v5-u-mb-lg"
       >
         <p>
-          Ensure that the <code>attributes.v2</code> theme is enabled in order
-          to see these take effect.
+          Ensure that the <code>attributes.v3</code> theme is selected for the{" "}
+          <strong>Login</strong> theme in Realm Settings &gt; Themes in order
+          for these changes to take effect.
+        </p>
+      </Alert>
+      <Alert
+        variant="info"
+        title={t("loginPreviewAlertTitle")}
+        isInline
+        className="pf-v5-u-mb-lg"
+      >
+        <p>
+          View the{" "}
+          <a href={accountConsoleUrl} target="_blank" rel="noopener noreferrer">
+            {t("loginPreviewAlertBodyAccountConsole")}
+          </a>{" "}
+          to preview login page changes. For accurate results, open in an{" "}
+          <strong>{t("loginPreviewAlertBodyIncognito")}</strong> or a separate
+          browser session to be presented with a Login page.
         </p>
       </Alert>
       <Form isHorizontal>
@@ -276,12 +293,7 @@ export const LoginStyles = ({ refresh, realm }: LoginStylesArgs) => {
             data-testid="css"
           />
 
-          <SaveReset
-            name="generalStyles"
-            save={save}
-            reset={reset}
-            isActive={isDirty}
-          />
+          <SaveReset name="generalStyles" save={save} reset={reset} />
         </FormProvider>
       </Form>
     </PageSection>

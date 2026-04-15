@@ -3,12 +3,10 @@ import {
   AlertVariant,
   Badge,
   Button,
-  TextContent,
-  Text,
+  ButtonVariant,
   ToolbarItem,
 } from "@patternfly/react-core";
-import { FormattedLink } from "../../components/external-link/FormattedLink";
-import helpUrls from "../../help-urls";
+import { useConfirmDialog } from "../../components/confirm-dialog/ConfirmDialog";
 
 import type { OrgRepresentation } from "./routes";
 import { KeycloakDataTable } from "@/shared/keycloak-ui-shared";
@@ -76,41 +74,39 @@ export default function OrgRoles({ org, refresh: orgRefresh }: OrgRolesProps) {
   const [editRoleModalVisibility, setEditRoleModalVisibility] = useState<
     RoleRepresentation | boolean
   >(false);
+  const [roleToDelete, setRoleToDelete] = useState<RoleRepresentation | null>(
+    null,
+  );
 
-  // TODO: change this to a confirm dialog for the built in option
-  async function deleteRole(role: RoleRepresentation): Promise<boolean> {
-    if (
-      !confirm(
-        `Confirm you wish to remove role: ${role.name}. This cannot be undone.`,
-      )
-    ) {
-      return Promise.resolve(true);
-    }
-    const resp = await deleteRoleFromOrg(org.id, role);
-    if (resp.success) {
-      addAlert(resp.message, AlertVariant.success);
-      refresh();
-    } else {
-      addAlert(
-        `${t("removeRoleFromOrgFail")} ${resp.message}`,
-        AlertVariant.danger,
-      );
-    }
+  const [toggleDeleteRoleDialog, DeleteRoleConfirm] = useConfirmDialog({
+    titleKey: "deleteRoleConfirmTitle",
+    messageKey: "deleteRoleConfirm",
+    continueButtonLabel: "delete",
+    continueButtonVariant: ButtonVariant.danger,
+    onConfirm: async () => {
+      if (!roleToDelete) return;
+      const resp = await deleteRoleFromOrg(org.id, roleToDelete);
+      if (resp.success) {
+        addAlert(resp.message, AlertVariant.success);
+        refresh();
+      } else {
+        addAlert(
+          `${t("removeRoleFromOrgFail")} ${resp.message}`,
+          AlertVariant.danger,
+        );
+      }
+    },
+  });
 
+  function deleteRole(role: RoleRepresentation): Promise<boolean> {
+    setRoleToDelete(role);
+    toggleDeleteRoleDialog();
     return Promise.resolve(true);
   }
 
   return (
     <>
-      <TextContent className="pf-v5-u-px-lg pf-v5-u-pt-lg">
-        <Text>
-          <FormattedLink
-            title={t("learnMore")}
-            href={helpUrls.orgRolesUrl}
-            isInline
-          />
-        </Text>
-      </TextContent>
+      <DeleteRoleConfirm />
       <KeycloakDataTable
         data-testid="roles-org-table"
         key={`${org.id}${key}`}

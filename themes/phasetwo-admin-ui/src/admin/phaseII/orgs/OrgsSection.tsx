@@ -3,8 +3,10 @@ import {
   PageSection,
   ToolbarItem,
   Button,
+  ButtonVariant,
   AlertVariant,
 } from "@patternfly/react-core";
+import { useConfirmDialog } from "../../components/confirm-dialog/ConfirmDialog";
 import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ViewHeader } from "../../components/view-header/ViewHeader";
@@ -35,6 +37,29 @@ export default function OrgsSection() {
   const [createOrgModalVisibility, setCreateOrgModalVisibility] =
     useState(false);
   const [manageOrgSettingsDialog, setManageOrgSettingsDialog] = useState(false);
+  const [orgToDelete, setOrgToDelete] = useState<OrgRepresentation | null>(
+    null,
+  );
+
+  const [toggleDeleteOrgDialog, DeleteOrgConfirm] = useConfirmDialog({
+    titleKey: "deleteOrgConfirmTitle",
+    messageKey: "deleteOrgConfirm",
+    continueButtonLabel: "delete",
+    continueButtonVariant: ButtonVariant.danger,
+    onConfirm: async () => {
+      if (!orgToDelete) return;
+      const resp = await deleteOrgApi(orgToDelete);
+      if (resp.success) {
+        addAlert(resp.message, AlertVariant.success);
+      } else {
+        addAlert(
+          `${t("couldNotDeleteOrg")} ${resp.message}`,
+          AlertVariant.danger,
+        );
+      }
+      refresh();
+    },
+  });
 
   function toggleCreateModalVisibility() {
     setCreateOrgModalVisibility(!createOrgModalVisibility);
@@ -44,29 +69,15 @@ export default function OrgsSection() {
     return val ? <div>{val}</div> : <div>--</div>;
   }
 
-  const deleteOrg = async (org: OrgRepresentation) => {
-    if (
-      !confirm(
-        `Confirm you wish to remove Organization: ${org.name}. This cannot be undone.`,
-      )
-    ) {
-      return Promise.resolve(true);
-    }
-    const resp = await deleteOrgApi(org);
-    if (resp.success) {
-      addAlert(resp.message, AlertVariant.success);
-    } else {
-      addAlert(
-        `${t("couldNotDeleteOrg")} ${resp.message}`,
-        AlertVariant.danger,
-      );
-    }
-    refresh();
+  const deleteOrg = (org: OrgRepresentation): Promise<boolean> => {
+    setOrgToDelete(org);
+    toggleDeleteOrgDialog();
     return Promise.resolve(true);
   };
 
   return (
     <>
+      <DeleteOrgConfirm />
       <ViewHeader
         titleKey={t("orgList")}
         subKey={

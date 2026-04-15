@@ -1,7 +1,11 @@
 import {
   Alert,
   AlertVariant,
+  Card,
+  CardBody,
+  CardTitle,
   Checkbox,
+  Divider,
   Form,
   PageSection,
   Title,
@@ -13,12 +17,14 @@ import { SaveReset } from "../components/SaveReset";
 import { useEffect } from "react";
 import RealmRepresentation from "@keycloak/keycloak-admin-client/lib/defs/realmRepresentation";
 import { get, mapKeys, pick } from "lodash-es";
-import { useAlerts } from "@/shared/keycloak-ui-shared";
+import { useAlerts, useEnvironment } from "@/shared/keycloak-ui-shared";
 
 import { useAdminClient } from "../../../admin-client";
 import ColorFormGroup from "../components/color-form-group";
 import { FormattedLink } from "../../../components/external-link/FormattedLink";
 import helpUrls from "../../../help-urls";
+import { useRealm } from "../../../context/realm-context/RealmContext";
+import type { Environment } from "../../../environment";
 
 import "./portal-styles.css";
 
@@ -96,6 +102,9 @@ export const PortalStyles = ({ refresh, realm }: PortalStylesArgs) => {
   const { t } = useTranslation();
   const { adminClient } = useAdminClient();
   const { addAlert, addError } = useAlerts();
+  const { environment } = useEnvironment<Environment>();
+  const { realm: realmName } = useRealm();
+  const portalUrl = `${environment.serverBaseUrl}/realms/${realmName}/portal`;
   const form = useForm<PortalStylesType>({
     defaultValues: {
       primaryColor100: "",
@@ -125,10 +134,10 @@ export const PortalStyles = ({ refresh, realm }: PortalStylesArgs) => {
   const {
     register,
     control,
-    reset,
     getValues,
     setValue,
-    formState: { errors, isDirty },
+    resetField,
+    formState: { errors },
   } = form;
 
   async function loadRealm() {
@@ -181,64 +190,68 @@ export const PortalStyles = ({ refresh, realm }: PortalStylesArgs) => {
     return updatedObj;
   };
 
-  const updatePortalValues = (
-    portalValues: PortalStylesType,
-    fullObj: RealmRepresentation,
-  ) => {
-    const portalItems = pick(portalValues, visibilityItems);
-    const newPortalItems = mapKeys(
-      portalItems,
-      (_value, key) => `_providerConfig.${key.replaceAll("_", ".")}`,
-    );
+  const saveBranding = async () => {
+    const { css } = getValues();
+    let updatedRealm = { ...realm };
 
-    return {
-      ...fullObj,
-      attributes: {
-        ...fullObj!.attributes,
-        ...newPortalItems,
-      },
-    };
-  };
-
-  const generateUpdatedRealm = () => {
-    const { css, ...portalValues } = getValues();
-
-    let updatedRealm = {
-      ...realm,
-    };
-
-    // @ts-ignore
-    updatedRealm = updatePortalValues(portalValues, updatedRealm);
-
-    colorKeys.map((k) => {
+    colorKeys.forEach((k) => {
       updatedRealm = addOrRemoveItem(
         `assets.portal.${k}`,
         getValues(k),
         updatedRealm,
       );
     });
-
     updatedRealm = addOrRemoveItem("assets.portal.css", css, updatedRealm);
 
-    return updatedRealm;
-  };
-
-  const save = async () => {
-    // update realm with new attributes
-    const updatedRealm = generateUpdatedRealm();
-
-    // save values
     try {
       await adminClient.realms.update(
         { realm: realm.realm as string },
         updatedRealm,
       );
-      addAlert("Attributes for realm have been updated.", AlertVariant.success);
+      addAlert("Branding updated.", AlertVariant.success);
       refresh();
     } catch (e) {
       console.error("Could not update realm with attributes.", e);
       addError("Failed to update realm.", e);
     }
+  };
+
+  const resetBranding = () => {
+    colorKeys.forEach((k) => resetField(k));
+    resetField("css");
+  };
+
+  const saveVisibility = async () => {
+    const values = getValues();
+    const portalItems = pick(values, visibilityItems);
+    const newPortalItems = mapKeys(
+      portalItems,
+      (_value, key) => `_providerConfig.${(key as string).replaceAll("_", ".")}`,
+    );
+
+    const updatedRealm = {
+      ...realm,
+      attributes: {
+        ...realm!.attributes,
+        ...newPortalItems,
+      },
+    };
+
+    try {
+      await adminClient.realms.update(
+        { realm: realm.realm as string },
+        updatedRealm,
+      );
+      addAlert("Visibility settings updated.", AlertVariant.success);
+      refresh();
+    } catch (e) {
+      console.error("Could not update realm with attributes.", e);
+      addError("Failed to update realm.", e);
+    }
+  };
+
+  const resetVisibility = () => {
+    visibilityItems.forEach((i) => resetField(i));
   };
 
   // To get color picker to update when text input is changed
@@ -283,14 +296,15 @@ export const PortalStyles = ({ refresh, realm }: PortalStylesArgs) => {
     <PageSection variant="light" className="keycloak__form portal-styles">
       <Alert
         variant="info"
-        title="Admin Portal"
+        title={t("portalInfoAlertTitle")}
         isInline
         className="pf-v5-u-mb-lg"
       >
         <p>
-          Learn more about how the Admin Portal works and how to customize it.
-          Launch the &quot;admin portal&quot; client from the client list to see
-          the portal in action.{" "}
+          {t("portalInfoAlertBody")}{" "}
+          <a href={portalUrl} target="_blank" rel="noopener noreferrer">
+            {t("portalInfoAlertBodyOpenPortal")}
+          </a>{" "}
           <FormattedLink
             title={t("learnMore")}
             href={helpUrls.adminPortalUrl}
@@ -300,91 +314,120 @@ export const PortalStyles = ({ refresh, realm }: PortalStylesArgs) => {
       </Alert>
       <Form isHorizontal>
         <FormProvider {...form}>
-          <Title headingLevel="h3" className="pf-c-title pf-m-xl">
-            {t("branding")}
-          </Title>
-          <p>
-            Follows Tailwind CSS{" "}
-            <a
-              href="https://tailwindcss.com/docs/theme#colors"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              color
-            </a>{" "}
-            naming convention. There are custom defined colors available for
-            configuration below.
-          </p>
+          {/* Branding Section */}
+          <Card isFlat isCompact className="pf-v5-u-mb-lg">
+            <CardTitle>
+              <Title headingLevel="h3" className="pf-c-title pf-m-xl">
+                {t("branding")}
+              </Title>
+            </CardTitle>
+            <CardBody>
+              <Form isHorizontal>
+                <p className="pf-v5-u-mb-md">
+                  {t("portalBrandingColorHelp")}
+                </p>
 
-          {/* Primary Color */}
-          {colorKeys.map((k) => (
-            <ColorFormGroup
-              key={k}
-              colorKey={k}
-              {...{ register, errors, getValues, setValue }}
-            />
-          ))}
+                {colorKeys.map((k) => (
+                  <ColorFormGroup
+                    key={k}
+                    colorKey={k}
+                    {...{ register, errors, getValues, setValue }}
+                  />
+                ))}
 
-          {/* CSS */}
-          <TextAreaControl
-            id="kc-styles-logo-url"
-            name="css"
-            label={t("css")}
-            labelIcon={t("cssHelp")}
-            type="text"
-            data-testid="kc-styles-logo-url"
-            rules={{ required: true }}
-          />
+                {/* CSS */}
+                <TextAreaControl
+                  id="kc-styles-logo-url"
+                  name="css"
+                  label={t("css")}
+                  labelIcon={t("cssHelp")}
+                  type="text"
+                  data-testid="kc-styles-logo-url"
+                  rules={{ required: true }}
+                />
+              </Form>
+              <SaveReset
+                name="brandingStyles"
+                save={saveBranding}
+                reset={resetBranding}
+              />
+            </CardBody>
+          </Card>
 
-          {/* Visibility  */}
-          <Title headingLevel="h3" className="pf-c-title pf-m-xl">
-            {t("visibility")}
-          </Title>
+          {/* Visibility Section */}
+          <Card isFlat isCompact className="pf-v5-u-mb-lg">
+            <CardTitle>
+              <Title headingLevel="h3" className="pf-c-title pf-m-xl">
+                {t("portalVisibilityCardTitle")}
+              </Title>
+            </CardTitle>
+            <CardBody>
+              <Alert
+                variant="info"
+                title={t("portalFeatureFlagsAlertTitle")}
+                isInline
+                className="pf-v5-u-mb-lg"
+              >
+                <p>
+                  {t("portalFeatureFlagsAlertBody")}
+                </p>
+              </Alert>
 
-          {/*   Profile */}
-          <Title headingLevel="h4" className="pf-c-title pf-m-lg">
-            {t("profile")}
-          </Title>
-          {visiblityProfileItems.map((i) => (
-            <Controller
-              name={i}
-              key={i}
-              control={control}
-              render={({ field, field: { value } }) => (
-                <div className="pf-v5-l-flex pf-m-align-items-center">
-                  {/* @ts-ignore */}
-                  <Checkbox id={i} label={t(i)} isChecked={value} {...field} />
-                  <HelpItem helpText={t(`${i}_tooltip`)} fieldLabelId={i} />
-                </div>
-              )}
-            />
-          ))}
+              {/*   Profile */}
+              <div className="pf-v5-u-mb-xs pf-v5-u-mt-sm">
+                <Title headingLevel="h4" className="pf-c-title pf-m-md">
+                  {t("profile")}
+                </Title>
+                <Divider className="pf-v5-u-mt-xs" />
+              </div>
+              <Form isHorizontal className="pf-v5-u-mb-lg pf-v5-u-pl-md">
+                {visiblityProfileItems.map((i) => (
+                  <Controller
+                    name={i}
+                    key={i}
+                    control={control}
+                    render={({ field, field: { value } }) => (
+                      <div className="pf-v5-l-flex pf-m-align-items-center">
+                        {/* @ts-ignore */}
+                        <Checkbox id={i} label={t(i)} isChecked={value} {...field} />
+                        <HelpItem helpText={t(`${i}_tooltip`)} fieldLabelId={i} />
+                      </div>
+                    )}
+                  />
+                ))}
+              </Form>
 
-          {/*   Organizations */}
-          <Title headingLevel="h4" className="pf-c-title pf-m-lg">
-            {t("organizations")}
-          </Title>
-          {visiblityOrganizationItems.map((i) => (
-            <Controller
-              name={i}
-              key={i}
-              control={control}
-              render={({ field, field: { value } }) => (
-                <div className="pf-v5-l-flex pf-m-align-items-center">
-                  {/* @ts-ignore */}
-                  <Checkbox id={i} label={t(i)} isChecked={value} {...field} />
-                  <HelpItem helpText={t(`${i}_tooltip`)} fieldLabelId={i} />
-                </div>
-              )}
-            />
-          ))}
+              {/*   Organizations */}
+              <div className="pf-v5-u-mb-xs">
+                <Title headingLevel="h4" className="pf-c-title pf-m-md">
+                  {t("organizations")}
+                </Title>
+                <Divider className="pf-v5-u-mt-xs" />
+              </div>
+              <Form isHorizontal className="pf-v5-u-pl-md">
+                {visiblityOrganizationItems.map((i) => (
+                  <Controller
+                    name={i}
+                    key={i}
+                    control={control}
+                    render={({ field, field: { value } }) => (
+                      <div className="pf-v5-l-flex pf-m-align-items-center">
+                        {/* @ts-ignore */}
+                        <Checkbox id={i} label={t(i)} isChecked={value} {...field} />
+                        <HelpItem helpText={t(`${i}_tooltip`)} fieldLabelId={i} />
+                      </div>
+                    )}
+                  />
+                ))}
+              </Form>
+              <SaveReset
+                name="visibilityStyles"
+                save={saveVisibility}
+                reset={resetVisibility}
+              />
+            </CardBody>
+          </Card>
 
-          <SaveReset
-            name="generalStyles"
-            save={save}
-            reset={reset}
-            isActive={isDirty}
-          />
         </FormProvider>
       </Form>
     </PageSection>

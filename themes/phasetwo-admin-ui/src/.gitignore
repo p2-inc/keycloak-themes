@@ -17,6 +17,7 @@
 # components/ui/dropdown-menu.tsx
 # components/ui/select.tsx
 # components/ui/tooltip.tsx
+# admin/components/view-header/ViewHeader.tsx
 # admin/context/access/Access.tsx
 # admin/realm-settings/routes/RealmSettings.tsx
 # admin/user/routes/User.tsx
@@ -444,7 +445,6 @@
 /admin/components/users/UserDataTableAttributeSearchForm.tsx
 /admin/components/users/UserDataTableToolbarItems.tsx
 /admin/components/users/UserSelect.tsx
-/admin/components/view-header/ViewHeader.tsx
 /admin/components/wizard-section-header/wizard-section-header.css
 /admin/components/wizard-section-header/WizardSectionHeader.tsx
 /admin/context/auth/admin-ui-endpoint.ts

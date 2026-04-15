@@ -78,9 +78,8 @@ export default function OrgMembers({
         setMemberToRemove(user);
         toggleRemoveDialog();
       }}
-    >
-      <TrashAltIcon />
-    </Button>
+      icon={<TrashAltIcon />}
+    />
   );
 
   return (
@@ -133,7 +132,7 @@ export default function OrgMembers({
             displayKey: "Last Name",
           },
           {
-            name: "remove",
+            name: "",
             displayKey: "",
             cellRenderer: (user: UserRepresentation) => RemoveButton(user),
           },

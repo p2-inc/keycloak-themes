@@ -1,10 +1,14 @@
 # This file is managed by Keycloakify, do not edit it manually.
 
 # === Owned files start ===
+# account/KcAccountUi.tsx
 # admin/help-urls.ts
 # admin/index.css
 # admin/PageNav.tsx
 # admin/routes.tsx
+# account/assets/favicon.svg
+# account/assets/logo.svg
+# account/root/Header.tsx
 # admin/assets/favicon.svg
 # admin/assets/icon.svg
 # admin/assets/img_avatar.svg
@@ -741,7 +745,6 @@
 /account/colorScheme.ts
 /account/environment.ts
 /account/i18next.d.ts
-/account/KcAccountUi.tsx
 /account/KcContext.ts
 /account/KcPage.tsx
 /account/routes.tsx
@@ -758,8 +761,6 @@
 /account/api/request.ts
 /account/applications/Applications.tsx
 /account/assets/content.ts
-/account/assets/favicon.svg
-/account/assets/logo.svg
 /account/content/ContentComponent.tsx
 /account/content/fetchContent.ts
 /account/groups/Groups.tsx
@@ -813,7 +814,6 @@
 /account/resources/SharedWith.tsx
 /account/resources/ShareTheResource.tsx
 /account/root/header.module.css
-/account/root/Header.tsx
 /account/root/PageNav.tsx
 /account/root/Root.tsx
 /account/utils/formatDate.ts

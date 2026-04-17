@@ -1684,7 +1684,7 @@
   },
   "smtpServer": {},
   "loginTheme": "phasetwo-admin-ui",
-  "accountTheme": "",
+  "accountTheme": "phasetwo-admin-ui",
   "adminTheme": "phasetwo-admin-ui",
   "emailTheme": "",
   "eventsEnabled": false,

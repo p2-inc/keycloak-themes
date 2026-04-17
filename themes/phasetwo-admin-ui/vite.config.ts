@@ -14,7 +14,7 @@ export default defineConfig({
   plugins: [
     react(),
     keycloakify({
-      accountThemeImplementation: "none",
+      accountThemeImplementation: "Single-Page",
       themeName: ["phasetwo-admin-ui"],
       themeVersion: "0.0.1",
       keycloakifyBuildDirPath: path.resolve(

@@ -15,9 +15,9 @@ import { Controller, useForm } from "react-hook-form";
 
 import { useAlerts } from "@/shared/keycloak-ui-shared";
 
-import useOrgFetcher from "./useOrgFetcher";
-import { useRealm } from "../../context/realm-context/RealmContext";
-import type { OrgRepresentation } from "./routes";
+import useOrgFetcher from "../useOrgFetcher";
+import { useRealm } from "../../../context/realm-context/RealmContext";
+import type { OrgRepresentation } from "../routes";
 import { HelpItem } from "@/shared/keycloak-ui-shared";
 import { useTranslation } from "react-i18next";
 
@@ -26,6 +26,12 @@ type AddInvitationProps = {
   org: OrgRepresentation;
   refresh: () => void;
 };
+
+type InvitationFormValues = {
+  email: string;
+  redirectUri?: string;
+};
+
 export default function AddInvitation({
   toggleVisibility,
   org,
@@ -36,21 +42,25 @@ export default function AddInvitation({
     formState: { errors },
     handleSubmit,
     control,
-  } = useForm();
+  } = useForm<InvitationFormValues>();
   const { realm } = useRealm();
   const { createInvitation } = useOrgFetcher(realm);
-  const { addAlert } = useAlerts();
+  const { addAlert, addError } = useAlerts();
 
-  const submitForm = async (invitation: any) => {
-    await createInvitation(
-      org.id,
-      invitation.email,
-      true,
-      invitation.redirectUri,
-    );
-    addAlert(`${invitation.email} has been invited`);
-    refresh();
-    toggleVisibility();
+  const submitForm = async (invitation: InvitationFormValues) => {
+    try {
+      await createInvitation(
+        org.id,
+        invitation.email,
+        true,
+        invitation.redirectUri ?? "",
+      );
+      addAlert(t("inviteSent"));
+      refresh();
+      toggleVisibility();
+    } catch (error) {
+      addError("inviteSentError", error);
+    }
   };
 
   return (

@@ -31,6 +31,14 @@ export default defineConfig({
         "22-to-25": false,
         "all-other-versions": "attributes-v3-theme.jar",
       },
+      startKeycloakOptions: {
+        dockerImage: "quay.io/phasetwo/phasetwo-keycloak:26.5.7",
+        keycloakExtraArgs: [
+          "--spi-email-template-provider=freemarker-plus-mustache",
+          "--spi-email-template-freemarker-plus-mustache-enabled=true",
+          "--spi-theme-cache-themes=false",
+        ],
+      },
     }),
     tailwindcss(),
   ],

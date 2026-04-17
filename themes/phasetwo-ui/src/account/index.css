@@ -1,0 +1,213 @@
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "tw-animate-css";
+
+@source "./**/*.{ts,tsx}";
+@source "../components/**/*.{ts,tsx}";
+
+@custom-variant dark (&:where(.dark, .dark *, .pf-v5-theme-dark, .pf-v5-theme-dark *));
+
+@theme {
+  --radius: var(--radius);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  /*
+    Semantic theme tokens mirrored from admin/index.css so the account SPA
+    can use the same palette while keeping the existing PatternFly screens.
+  */
+  --background: oklch(0.968 0.007 247.896);
+  --foreground: oklch(0.3211 0 0);
+  --card: oklch(0.984 0.003 247.858);
+  --card-foreground: oklch(0.3211 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.3211 0 0);
+  --primary: oklch(0.6231 0.188 259.8145);
+  --primary-foreground: oklch(1 0 0);
+  --primary-hover: oklch(0.5461 0.2152 262.8809);
+  --secondary: oklch(0.937 0.0029 264.5419);
+  --secondary-foreground: oklch(0.4461 0.0263 256.8018);
+  --muted: oklch(0.9846 0.0017 247.8389);
+  --muted-foreground: oklch(0.551 0.0234 264.3637);
+  --accent: oklch(0.9514 0.025 236.8242);
+  --accent-foreground: oklch(0.3791 0.1378 265.5222);
+  --destructive: oklch(0.6368 0.2078 25.3313);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.9276 0.0058 264.5313);
+  --input: oklch(0.9276 0.0058 264.5313);
+  --ring: oklch(0.6231 0.188 259.8145);
+  --nav-surface: oklch(0.36 0.075 259.8145);
+  --nav-surface-emphasis: oklch(0.31 0.067 259.8145);
+  --nav-hover: oklch(0.4 0.082 259.8145);
+  --nav-active: oklch(0.45 0.094 259.8145);
+  --nav-border: oklch(0.46 0.085 259.8145 / 0.72);
+  --radius: 0.375rem;
+}
+
+:where(.pf-v5-theme-dark, .dark) {
+  --background: oklch(0.2478 0 0);
+  --foreground: oklch(0.9219 0 0);
+  --card: oklch(0.216 0.006 56.043);
+  --card-foreground: oklch(0.985 0.001 106.423);
+  --popover: oklch(0.2686 0 0);
+  --popover-foreground: oklch(0.9219 0 0);
+  --primary: oklch(0.6231 0.188 259.8145);
+  --primary-foreground: oklch(1 0 0);
+  --primary-hover: oklch(0.7137 0.1434 254.624);
+  --secondary: oklch(0.2686 0 0);
+  --secondary-foreground: oklch(0.9219 0 0);
+  --muted: oklch(0.2686 0 0);
+  --muted-foreground: oklch(0.7155 0 0);
+  --accent: oklch(0.3791 0.1378 265.5222);
+  --accent-foreground: oklch(0.8823 0.0571 254.1284);
+  --destructive: oklch(0.6368 0.2078 25.3313);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.3715 0 0);
+  --input: oklch(0.3715 0 0);
+  --ring: oklch(0.6231 0.188 259.8145);
+  --nav-surface: oklch(0.3 0.06 259.8145);
+  --nav-surface-emphasis: oklch(0.26 0.055 259.8145);
+  --nav-hover: oklch(0.34 0.068 259.8145);
+  --nav-active: oklch(0.39 0.082 259.8145);
+  --nav-border: oklch(0.5 0.08 259.8145 / 0.56);
+}
+
+:root,
+:where(.pf-v5-theme-dark, .dark) {
+  /*
+    PatternFly globals are remapped to the semantic tokens above so the
+    existing account SPA picks up the same styling changes via CSS alone.
+  */
+  --pf-v5-global--Color--100: var(--foreground);
+  --pf-v5-global--Color--200: var(--muted-foreground);
+  --pf-v5-global--Color--dark-100: var(--foreground);
+  --pf-v5-global--Color--dark-200: var(--muted-foreground);
+  --pf-v5-global--Color--light-100: var(--primary-foreground);
+
+  --pf-v5-global--BackgroundColor--100: var(--card);
+  --pf-v5-global--BackgroundColor--150: var(--muted);
+  --pf-v5-global--BackgroundColor--200: var(--secondary);
+  --pf-v5-global--BackgroundColor--light-100: var(--card);
+  --pf-v5-global--BackgroundColor--light-200: var(--secondary);
+  --pf-v5-global--BackgroundColor--light-300: var(--background);
+  --pf-v5-global--BackgroundColor--400: var(--card);
+  --pf-v5-global--BackgroundColor--dark-100: var(--nav-surface);
+  --pf-v5-global--BackgroundColor--dark-200: var(--nav-surface-emphasis);
+  --pf-v5-global--BackgroundColor--dark-300: var(--nav-surface);
+
+  --pf-v5-global--BorderColor--100: var(--border);
+  --pf-v5-global--BorderColor--200: var(--input);
+  --pf-v5-global--BorderColor--300: var(--input);
+  --pf-v5-global--BorderColor--400: var(--input);
+  --pf-v5-global--BorderColor--dark-100: var(--border);
+
+  --pf-v5-global--FontFamily--text: var(--font-sans);
+  --pf-v5-global--FontFamily--heading: var(--font-sans);
+  --pf-v5-global--FontFamily--text--vf: var(--font-sans);
+  --pf-v5-global--FontFamily--heading--vf: var(--font-sans);
+  --pf-v5-global--FontFamily--monospace: var(--font-mono);
+  --pf-v5-global--FontFamily--monospace--vf: var(--font-mono);
+
+  --pf-v5-global--primary-color--100: var(--primary);
+  --pf-v5-global--primary-color--200: var(--primary-hover);
+  --pf-v5-global--primary-color--light-100: var(--accent);
+  --pf-v5-global--primary-color--dark-100: var(--primary);
+
+  --pf-v5-global--active-color--100: var(--primary);
+  --pf-v5-global--active-color--200: var(--accent);
+  --pf-v5-global--active-color--300: var(--secondary);
+  --pf-v5-global--active-color--400: var(--muted);
+
+  --pf-v5-global--link--Color: var(--primary);
+  --pf-v5-global--link--Color--hover: var(--primary-hover);
+  --pf-v5-global--link--Color--dark: var(--primary);
+  --pf-v5-global--link--Color--dark--hover: var(--primary-hover);
+  --pf-v5-global--link--Color--light: var(--primary-foreground);
+
+  --pf-v5-global--danger-color--100: var(--destructive);
+
+  --pf-v5-global--icon--Color--light: var(--muted-foreground);
+  --pf-v5-global--icon--Color--dark: var(--muted-foreground);
+  --pf-v5-global--icon--Color--light--dark: var(--muted-foreground);
+  --pf-v5-global--icon--Color--dark--dark: var(--muted-foreground);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border);
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  body {
+    margin: 0;
+  }
+}
+
+.pf-v5-c-page {
+  --pf-v5-c-page--BackgroundColor: var(--background);
+  --pf-v5-c-page__main-section--BackgroundColor: var(--background);
+  --pf-v5-c-page__main-section--m-light--BackgroundColor: var(--card);
+}
+
+.pf-v5-c-masthead {
+  --pf-v5-c-masthead--BackgroundColor: var(--nav-surface-emphasis);
+  --pf-v5-c-masthead__main--before--BorderBottomColor: var(--nav-border);
+  --pf-v5-c-masthead--item-border-color--base: var(--nav-border);
+}
+
+.pf-v5-c-page__sidebar {
+  --pf-v5-c-page__sidebar--BackgroundColor: var(--nav-surface);
+}
+
+.pf-v5-c-page__sidebar-body {
+  --pf-v5-c-page__sidebar-body--m-menu--BorderTopColor: var(--nav-border);
+  --pf-v5-c-page__sidebar-body--m-menu--c-context-selector--BorderBottomColor: var(
+    --nav-border
+  );
+}
+
+.pf-v5-c-nav {
+  --pf-v5-c-nav__item--before--BorderColor: var(--nav-border);
+  --pf-v5-c-nav__link--before--BorderColor: var(--nav-border);
+  --pf-v5-c-nav__link--hover--BackgroundColor: var(--nav-hover);
+  --pf-v5-c-nav__link--focus--BackgroundColor: var(--nav-hover);
+  --pf-v5-c-nav__link--active--BackgroundColor: var(--nav-active);
+  --pf-v5-c-nav__link--m-current--BackgroundColor: var(--nav-active);
+  --pf-v5-c-nav__item--m-current--not--m-expanded__link--BackgroundColor: var(
+    --nav-active
+  );
+  --pf-v5-c-nav__link--m-current--after--BorderColor: var(--primary-foreground);
+}

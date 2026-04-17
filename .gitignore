@@ -15,6 +15,6 @@ themes/attributes-v3/node/
 themes/attributes-v3/dist/
 themes/attributes-v3/dist_keycloak/
 themes/admin-ui/node_modules/
-themes/phasetwo-admin-ui/node/
+themes/phasetwo-ui/node/
 themes/admin-ui/dist/
 themes/admin-ui/dist_keycloak/

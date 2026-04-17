@@ -26,19 +26,19 @@ If you wish to build this yourself, you can do so with a few simple steps:
 mvn clean install
 ```
 
-or without tests (quicker) 
+or without tests (quicker)
 
 ```
 mvn clean install -DskipTests
 ```
 
-2. If you are using your own Keycloak, copy the jar produced in `target/` to your `providers` directory (for Quarkus) or `standalone/deployments` directory (for legacy) and rebuild/restart keycloak. 
+2. If you are using your own Keycloak, copy the jar produced in `target/` to your `providers` directory (for Quarkus) or `standalone/deployments` directory (for legacy) and rebuild/restart keycloak.
 
 After #1, you can also run `docker compose up` if you want to take a quick look against our image.
 
 ### Local testing
 
-The included `docker-compose.yml` is set up for local testing of this repo's built `keycloak-themes` jar together with a vendored copy of the Phase Two admin UI extension at `providers/phasetwo-admin-ui-26.4.7.jar`. This makes the custom admin UI screens available locally without requiring you to clone `phasetwo-containers`.
+The included `docker-compose.yml` is set up for local testing of this repo's built `keycloak-themes` jar against the Phase Two image.
 
 The usual local loop is:
 
@@ -53,7 +53,7 @@ Then open `http://localhost:8080/auth`.
 
 ### Login theme(s)
 
-There are three login themes available. 
+There are three login themes available.
 
 - `attributes` for patternfly installations v4 and below
 - `attributes-v2` for patternfly installation v5
@@ -141,23 +141,23 @@ This can also be useful in environments where you want to allow realms to "test"
 
 If you wish to set the global overrides, you can set the following variables:
 
-| Variable | Required | Default | Description |
-| ---- | ---- | ---- | ---- |
-| `--spi-email-sender-provider` | yes | `ext-email-override` | Must be set in order to use this provider. |
-| `--spi-email-sender-ext-email-override-enabled` | yes | `true` | Must be set in order to use this provider. |
-| `--spi-email-sender-ext-email-override-max-emails` | no | 100 | Maximum number of emails that can be sent in a day for a realm using the override. Fails silently after this maximum. Set to `-1` for no limit. |
-| `--spi-email-sender-ext-email-override-host` | yes |  | SMTP hostname. Must be set in order to use this provider. |
-| `--spi-email-sender-ext-email-override-from` | yes |  | From email address. Must be set in order to use this provider. |
-| `--spi-email-sender-ext-email-override-auth` | no | `false` | `true` for auth enabled. |
-| `--spi-email-sender-ext-email-override-user` | no |  | From email address. |
-| `--spi-email-sender-ext-email-override-password` | no |  | From email address. |
-| `--spi-email-sender-ext-email-override-ssl` | no | `false` | `true` for SSL enabled. |
-| `--spi-email-sender-ext-email-override-starttls` | no | `false` | `true` for StartTLS enabled. |
-| `--spi-email-sender-ext-email-override-port` | no | `25` | SMTP port. |
-| `--spi-email-sender-ext-email-override-from-display-name` | no |  | From email address display name. |
-| `--spi-email-sender-ext-email-override-reply-to` | no |  | Reply-to email address. |
-| `--spi-email-sender-ext-email-override-reply-to-display-name` | no |  | Reply-to email address display name. |
-| `--spi-email-sender-ext-email-override-envelope-from` | no |  | Envelope-from email address. |
+| Variable                                                      | Required | Default              | Description                                                                                                                                     |
+| ------------------------------------------------------------- | -------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--spi-email-sender-provider`                                 | yes      | `ext-email-override` | Must be set in order to use this provider.                                                                                                      |
+| `--spi-email-sender-ext-email-override-enabled`               | yes      | `true`               | Must be set in order to use this provider.                                                                                                      |
+| `--spi-email-sender-ext-email-override-max-emails`            | no       | 100                  | Maximum number of emails that can be sent in a day for a realm using the override. Fails silently after this maximum. Set to `-1` for no limit. |
+| `--spi-email-sender-ext-email-override-host`                  | yes      |                      | SMTP hostname. Must be set in order to use this provider.                                                                                       |
+| `--spi-email-sender-ext-email-override-from`                  | yes      |                      | From email address. Must be set in order to use this provider.                                                                                  |
+| `--spi-email-sender-ext-email-override-auth`                  | no       | `false`              | `true` for auth enabled.                                                                                                                        |
+| `--spi-email-sender-ext-email-override-user`                  | no       |                      | From email address.                                                                                                                             |
+| `--spi-email-sender-ext-email-override-password`              | no       |                      | From email address.                                                                                                                             |
+| `--spi-email-sender-ext-email-override-ssl`                   | no       | `false`              | `true` for SSL enabled.                                                                                                                         |
+| `--spi-email-sender-ext-email-override-starttls`              | no       | `false`              | `true` for StartTLS enabled.                                                                                                                    |
+| `--spi-email-sender-ext-email-override-port`                  | no       | `25`                 | SMTP port.                                                                                                                                      |
+| `--spi-email-sender-ext-email-override-from-display-name`     | no       |                      | From email address display name.                                                                                                                |
+| `--spi-email-sender-ext-email-override-reply-to`              | no       |                      | Reply-to email address.                                                                                                                         |
+| `--spi-email-sender-ext-email-override-reply-to-display-name` | no       |                      | Reply-to email address display name.                                                                                                            |
+| `--spi-email-sender-ext-email-override-envelope-from`         | no       |                      | Envelope-from email address.                                                                                                                    |
 
 #### Attachments
 
@@ -171,10 +171,10 @@ In order to workaround some issues with the `ThemeProvider` API, subdirectory th
 
 The following variables can be set in order to configure this provider:
 
-| Variable | Required | Default | Description |
-| ---- | ---- | ---- | ---- |
-| `--spi-theme-cache-themes` | yes | true | Must be set to `false` in order to use this provider. |
-| `--spi-theme-ext-theme-jar-folder-dir` | yes |  | Directory to be watched by this provider for theme JARs. |
+| Variable                               | Required | Default | Description                                              |
+| -------------------------------------- | -------- | ------- | -------------------------------------------------------- |
+| `--spi-theme-cache-themes`             | yes      | true    | Must be set to `false` in order to use this provider.    |
+| `--spi-theme-ext-theme-jar-folder-dir` | yes      |         | Directory to be watched by this provider for theme JARs. |
 
 ---
 

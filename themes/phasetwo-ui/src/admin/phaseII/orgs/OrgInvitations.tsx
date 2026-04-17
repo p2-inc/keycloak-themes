@@ -1,18 +1,25 @@
 import { useState } from "react";
-import { Action, KeycloakDataTable } from "@/shared/keycloak-ui-shared";
+import { KeycloakDataTable } from "@/shared/keycloak-ui-shared";
 import { useRealm } from "../../context/realm-context/RealmContext";
 import type { OrgRepresentation } from "./routes";
 import useOrgFetcher from "./useOrgFetcher";
-import { Button, ToolbarItem } from "@patternfly/react-core";
+import { Button, ToolbarItem, Tooltip } from "@patternfly/react-core";
 import { ListEmptyState } from "@/shared/keycloak-ui-shared";
-import AddInvitation from "./AddInvitation";
+import AddInvitation from "./modals/AddInvitation";
 import { useAlerts } from "@/shared/keycloak-ui-shared";
+import { SyncAltIcon, TrashAltIcon } from "@patternfly/react-icons";
 
 import { useTranslation } from "react-i18next";
 
 type OrgInvitationsTypeProps = {
   org: OrgRepresentation;
   refresh: () => void;
+};
+
+type OrgInvitationRepresentation = {
+  id: string;
+  email: string;
+  createdAt?: number | string;
 };
 
 export default function OrgInvitations({
@@ -29,8 +36,9 @@ export default function OrgInvitations({
 
   // Needed State
   const { realm } = useRealm();
-  const { getOrgInvitations, deleteOrgInvitation } = useOrgFetcher(realm);
-  const { addAlert } = useAlerts();
+  const { getOrgInvitations, deleteOrgInvitation, resendOrgInvitation } =
+    useOrgFetcher(realm);
+  const { addAlert, addError } = useAlerts();
 
   const loader = async () => {
     return await getOrgInvitations(org.id);
@@ -43,12 +51,63 @@ export default function OrgInvitations({
     setInvitationModalVisibility(!invitationModalVisibility);
   }
 
-  async function removeInvitation(row: any): Promise<boolean> {
-    await deleteOrgInvitation(org.id, row.id);
-    addAlert("Pending invitation removed");
-    refresh();
-    return true;
+  async function resendInvitation(
+    row: OrgInvitationRepresentation,
+  ): Promise<boolean> {
+    try {
+      await resendOrgInvitation(org.id, row.id);
+      addAlert(t("organizationInvitationResent"));
+      refresh();
+      return true;
+    } catch (error) {
+      addError("organizationInvitationResendError", error);
+      return false;
+    }
   }
+
+  async function removeInvitation(
+    row: OrgInvitationRepresentation,
+  ): Promise<boolean> {
+    try {
+      await deleteOrgInvitation(org.id, row.id);
+      addAlert(t("organizationInvitationsDeleted", { count: 1 }));
+      refresh();
+      return true;
+    } catch (error) {
+      addError("organizationInvitationsDeleteError", error);
+      return false;
+    }
+  }
+
+  const InvitationActions = (invitation: OrgInvitationRepresentation) => (
+    <div className="pf-v5-u-display-flex pf-v5-u-justify-content-flex-end pf-v5-u-gap-sm">
+      <Tooltip content={t("resendInvitation")} entryDelay={500}>
+        <Button
+          variant="plain"
+          aria-label={t("resendInvitation")}
+          onClick={(event) => {
+            event.stopPropagation();
+            void resendInvitation(invitation);
+          }}
+        >
+          <SyncAltIcon />
+        </Button>
+      </Tooltip>
+      <Tooltip content={t("deleteInvitation")} entryDelay={500}>
+        <Button
+          variant="plain"
+          isDanger
+          aria-label={t("deleteInvitation")}
+          onClick={(event) => {
+            event.stopPropagation();
+            void removeInvitation(invitation);
+          }}
+        >
+          <TrashAltIcon />
+        </Button>
+      </Tooltip>
+    </div>
+  );
 
   return (
     <>
@@ -75,12 +134,6 @@ export default function OrgInvitations({
             </Button>
           </ToolbarItem>
         }
-        actions={[
-          {
-            title: "Remove Pending Invitation",
-            onRowClick: removeInvitation,
-          } as Action<any>,
-        ]}
         columns={[
           {
             name: "email",
@@ -89,10 +142,19 @@ export default function OrgInvitations({
           {
             name: "createdAt",
             displayKey: "Invited at",
-            cellRenderer: (data: any) => {
-              const date = new Date(data?.createdAt);
+            cellRenderer: (data: OrgInvitationRepresentation) => {
+              if (!data.createdAt) {
+                return <div>-</div>;
+              }
+
+              const date = new Date(data.createdAt);
               return <div>{date.toLocaleString()}</div>;
             },
+          },
+          {
+            name: "actions",
+            displayKey: "",
+            cellRenderer: InvitationActions,
           },
         ]}
         emptyState={

@@ -7,7 +7,6 @@
 
 import "@patternfly/patternfly/patternfly-addons.css";
 import "@patternfly/react-core/dist/styles/base.css";
-import "./index.css";
 
 import { useReducer, useEffect } from "react";
 import { startColorSchemeManagement } from "./colorScheme";
@@ -16,6 +15,8 @@ import { environment } from "./environment";
 import { i18n } from "./i18n/i18n";
 import { Root } from "./root/Root";
 import { SessionExpirationWarningOverlay } from "../shared/SessionExpirationWarningOverlay";
+
+import "./index.css";
 
 document.title = "Account Management";
 

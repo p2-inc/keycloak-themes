@@ -210,4 +210,29 @@
     --nav-active
   );
   --pf-v5-c-nav__link--m-current--after--BorderColor: var(--primary-foreground);
+  --pf-v5-c-nav__link--m-current--BackgroundColor: var(--nav-active);
+  --pf-v5-c-nav__link--PaddingBottom: var(--pf-v5-global--spacer--sm);
+  --pf-v5-c-nav__link--PaddingTop: var(--pf-v5-global--spacer--sm);
+}
+
+img.keycloak__pageheader_brand {
+  height: 35px;
+}
+
+.keycloak__page_nav__nav {
+  --pf-v5-c-page__sidebar--BackgroundColor: var(--nav-surface);
+  --pf-v5-c-nav__item--before--BorderColor: var(--nav-border);
+  --pf-v5-c-nav__link--before--BorderColor: var(--nav-border);
+  --pf-v5-c-nav__link--hover--BackgroundColor: var(--nav-hover);
+  --pf-v5-c-nav__link--focus--BackgroundColor: var(--nav-hover);
+  --pf-v5-c-nav__link--active--BackgroundColor: var(--nav-active);
+  --pf-v5-c-nav__link--m-current--BackgroundColor: var(--nav-active);
+  --pf-v5-c-nav__item--m-current--not--m-expanded__link--BackgroundColor: var(
+    --nav-active
+  );
+  --pf-v5-c-nav__link--m-current--after--BorderColor: var(--primary-foreground);
+  --pf-v5-c-page__sidebar-body--m-menu--BorderTopColor: var(--nav-border);
+  --pf-v5-c-page__sidebar-body--m-menu--c-context-selector--BorderBottomColor: var(
+    --nav-border
+  );
 }

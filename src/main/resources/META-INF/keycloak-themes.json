@@ -20,9 +20,11 @@
       ]
     },
     {
-      "name": "phasetwo-admin-ui",
+      "name": "phasetwo-ui",
       "types": [
-        "admin"
+        "account",
+        "admin",
+        "login"
       ]
     },
     {

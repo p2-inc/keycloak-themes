@@ -16,7 +16,7 @@ import {
   PageSection,
   Radio,
 } from "@patternfly/react-core";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useAdminClient } from "../../../admin-client";
@@ -24,11 +24,11 @@ import { AuthenticationType } from "../../../authentication/constants";
 import { useRealm } from "../../../context/realm-context/RealmContext";
 import { addTrailingSlash } from "../../../util";
 import { getAuthorizationHeaders } from "../../../utils/getAuthorizationHeaders";
-import useLocaleSort, { mapByKey } from "../../../utils/useLocaleSort";
 import { SyncMode, idpRep } from "../OrgIdentityProviders";
 import { OrgRepresentation } from "../routes";
 import useOrgFetcher from "../useOrgFetcher";
 import { OrgConfigType } from "./ManageOrgSettingsDialog";
+import { getPaginatedItemCount } from "@/shared/keycloak-ui-shared/controls/table/pagination-utils";
 
 type IdentityProviderListProps = {
   list?: IdentityProviderRepresentation[];
@@ -137,7 +137,6 @@ export function AssignIdentityProvider({
   const [max, setMax] = useState(10);
   const [first, setFirst] = useState(0);
   const [search, setSearch] = useState("");
-  const localeSort = useLocaleSort();
   const [authFlowOptions, setAuthFlowOptions] = useState<
     { label: string; value: string }[]
   >([]);
@@ -194,22 +193,11 @@ export function AssignIdentityProvider({
     });
   }, []);
 
-  useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
-    return localeSort(identityProviders ?? [], mapByKey("displayName"))
-      .filter(
-        ({ displayName, alias }) =>
-          displayName?.toLowerCase().includes(normalizedSearch) ||
-          alias?.toLowerCase().includes(normalizedSearch),
-      )
-      .slice(first, first + max + 1);
-  }, [identityProviders, search, first, max]);
-
   useFetch(
     async () => {
       const args: { first: number; max: number; search?: string } = {
         first,
-        max,
+        max: max + 1,
         search: search || undefined,
       };
       return (await getIdpsForRealm(args)) as idpRep[];
@@ -224,6 +212,11 @@ export function AssignIdentityProvider({
   if (value?.config?.["home.idp.discovery.org"]) {
     warning = t("idpWarningTextLinkedToAnotherOrg");
   }
+
+  const visibleIdentityProviders = identityProviders?.slice(0, max);
+  const paginationCount = identityProviders
+    ? getPaginatedItemCount(first, max, identityProviders.length)
+    : undefined;
 
   return (
     <Modal
@@ -256,7 +249,7 @@ export function AssignIdentityProvider({
     >
       {identityProviders && (
         <PaginatingTableToolbar
-          count={identityProviders.length + 1}
+          count={paginationCount}
           first={first}
           max={max}
           onNextClick={setFirst}
@@ -270,7 +263,7 @@ export function AssignIdentityProvider({
           inputGroupOnEnter={setSearch}
         >
           <IdentityProviderList
-            list={identityProviders}
+            list={visibleIdentityProviders}
             setValue={setValue}
             org={organization}
           />

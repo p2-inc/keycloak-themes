@@ -26,6 +26,8 @@
 # admin/realm-settings/routes/RealmSettings.tsx
 # admin/user/routes/User.tsx
 # shared/@patternfly/react-core/index.tsx
+# shared/keycloak-ui-shared/controls/table/KeycloakDataTable.tsx
+# shared/keycloak-ui-shared/controls/table/PaginatingTableToolbar.tsx
 # === Owned files end =====
 
 # === @keycloakify/keycloak-admin-ui v260502.0.0 ===
@@ -735,9 +737,7 @@
 /shared/keycloak-ui-shared/controls/select-control/SelectControl.tsx
 /shared/keycloak-ui-shared/controls/select-control/SingleSelectControl.tsx
 /shared/keycloak-ui-shared/controls/select-control/TypeaheadSelectControl.tsx
-/shared/keycloak-ui-shared/controls/table/KeycloakDataTable.tsx
 /shared/keycloak-ui-shared/controls/table/ListEmptyState.tsx
-/shared/keycloak-ui-shared/controls/table/PaginatingTableToolbar.tsx
 /shared/keycloak-ui-shared/controls/table/TableToolbar.tsx
 
 # === @keycloakify/keycloak-account-ui v260502.0.2 ===

@@ -1,69 +1,23 @@
-import { useAdminClient } from "../../admin-client";
 import { useRealm } from "../../context/realm-context/RealmContext";
 import { environment } from "../../environment";
+import { useAuthFetch } from "../api/client";
 
 export interface EmailTemplateMap {
   [key: string]: string;
 }
 
-interface Errors {
-  error: boolean;
-  message: string;
-}
-
 export default function useStylesFetcher() {
   const { realm: realmName } = useRealm();
-  const { adminClient } = useAdminClient();
+  const { authFetch } = useAuthFetch();
 
-  const authUrl = environment.serverBaseUrl;
-  const baseUrl = `${authUrl}/realms/${realmName}`;
+  const baseUrl = `${environment.serverBaseUrl}/realms/${realmName}`;
 
-  async function fetchG(url: string, headers = {}) {
-    const token = await adminClient.getAccessToken();
-    return await fetch(url, {
-      method: "GET",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-        ...headers,
-      },
-      redirect: "follow",
-    });
-  }
-
-  async function fetchM(
-    url: string,
-    body: any,
-    verb: "POST" | "PUT",
-    headers: RequestInit["headers"] = {},
-  ) {
-    const token = await adminClient.getAccessToken();
-    return await fetch(url, {
-      method: verb,
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...headers,
-      },
-      body: body,
-      redirect: "follow",
-    });
-  }
-
-  // GET /auth/realms/{realm}/emails/templates
   async function getEmailTemplates(): Promise<EmailTemplateMap> {
-    const resp = await fetchG(`${baseUrl}/emails/templates`)
+    return authFetch(`${baseUrl}/emails/templates`)
       .then((r) => r.json())
-      .catch(() => ({
-        error: "Error pulling email templates.",
-      }));
-    return resp;
+      .catch(() => ({ error: "Error pulling email templates." }));
   }
 
-  // GET /auth/realms/{realm}/emails/templates/{html|text}/{templateName}
   async function getEmailTemplateValue({
     templateType,
     templateName,
@@ -71,9 +25,9 @@ export default function useStylesFetcher() {
     templateType: "html" | "text";
     templateName: string;
   }): Promise<{ error: boolean; message: string }> {
-    const resp = await fetchG(
+    return authFetch(
       `${baseUrl}/emails/templates/${templateType}/${templateName}`,
-      { Accept: "text/plain" },
+      { headers: { Accept: "text/plain" } },
     )
       .then(async (r) => {
         if (r.ok) return { error: false, message: await r.text() };
@@ -83,11 +37,8 @@ export default function useStylesFetcher() {
         error: true,
         message: `Error pulling email template value for ${templateName} (${templateType})`,
       }));
-
-    return resp;
   }
 
-  // PUT /auth/realms/{realm}/emails/templates/html/{templateName}
   async function updateEmailTemplateValue({
     templateType,
     templateName,
@@ -96,14 +47,13 @@ export default function useStylesFetcher() {
     templateType: "html" | "text";
     templateName: string;
     templateBody: string;
-  }): Promise<Errors> {
+  }): Promise<{ error: boolean; message: string }> {
     const formData = new FormData();
     formData.append("template", templateBody);
 
-    const resp = await fetchM(
+    return authFetch(
       `${baseUrl}/emails/templates/${templateType}/${templateName}`,
-      formData,
-      "PUT",
+      { method: "PUT", body: formData },
     )
       .then((r) => {
         if (r.ok) return { error: false, message: "Email template updated." };
@@ -113,8 +63,6 @@ export default function useStylesFetcher() {
         error: true,
         message: `Error updating email template for ${templateName}.`,
       }));
-
-    return resp;
   }
 
   return { getEmailTemplates, getEmailTemplateValue, updateEmailTemplateValue };

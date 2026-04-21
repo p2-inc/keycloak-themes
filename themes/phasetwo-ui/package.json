@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "postinstall": "keycloakify sync-extensions",
+    "generate:api": "openapi-typescript https://raw.githubusercontent.com/p2-inc/phasetwo-docs/main/openapi.yaml -o src/admin/phaseII/api/phasetwo-schema.d.ts",
     "dev": "vite",
     "build": "tsc -b && vite build && keycloakify build",
     "build:app": "tsc -b && vite build",
@@ -39,6 +40,7 @@
     "lodash-es": "^4.17.22",
     "lucide-react": "^0.473.0",
     "oidc-spa": "~10.0.5",
+    "openapi-fetch": "^0.17.0",
     "p-debounce": "^5.1.0",
     "radix-ui": "latest",
     "react": "^19.2.4",
@@ -68,6 +70,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "openapi-typescript": "^7.13.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.58.0",
     "vite": "^8.0.7",

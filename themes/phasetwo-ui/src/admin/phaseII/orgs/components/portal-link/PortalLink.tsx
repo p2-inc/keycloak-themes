@@ -32,7 +32,7 @@ export const PortalLink = ({ id, open, toggleDialog }: PortalLinkProps) => {
   const fetchPortalLink = async () => {
     try {
       const pl = await getPortalLink(orgId!, "");
-      setPortalLink(pl?.link);
+      setPortalLink(pl?.link ?? "error");
     } catch (e) {
       setPortalLink("error");
       console.log(e);

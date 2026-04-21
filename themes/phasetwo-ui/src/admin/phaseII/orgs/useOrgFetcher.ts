@@ -203,8 +203,8 @@ export default function useOrgFetcher(realm: string) {
       { params: { path: { realm, orgId } } },
     );
 
-    if (response.ok) return data ?? [];
-    return [];
+    if (response.ok) return (data ?? []) as { id: string; email: string; createdAt?: string }[];
+    return [] as { id: string; email: string; createdAt?: string }[];
   }
 
   async function deleteOrgInvitation(orgId: string, invitationId: string) {
@@ -320,7 +320,10 @@ export default function useOrgFetcher(realm: string) {
     );
 
     if (response.ok) {
-      return { success: true, data };
+      return {
+        success: true,
+        data: (data ?? []) as { id: string; name: string; description?: string }[],
+      };
     }
 
     return { error: true, message: await response.json() };

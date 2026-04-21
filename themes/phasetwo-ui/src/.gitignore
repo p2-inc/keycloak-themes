@@ -4,6 +4,7 @@
 # account/KcAccountUi.tsx
 # admin/help-urls.ts
 # admin/index.css
+# admin/PageHeader.tsx
 # admin/PageNav.tsx
 # admin/routes.tsx
 # account/assets/favicon.svg
@@ -13,6 +14,7 @@
 # admin/assets/icon.svg
 # admin/assets/img_avatar.svg
 # admin/assets/logo.svg
+# admin/dashboard/Dashboard.tsx
 # admin/identity-providers/IdentityProvidersSection.tsx
 # admin/realm-settings/GeneralTab.tsx
 # admin/realm-settings/RealmSettingsTabs.tsx
@@ -43,7 +45,6 @@
 /admin/KcContext.ts
 /admin/KcPage.tsx
 /admin/page-nav.css
-/admin/PageHeader.tsx
 /admin/PageHeaderClearCachesModal.tsx
 /admin/PageNotFoundSection.tsx
 /admin/Root.tsx
@@ -78,7 +79,6 @@
 /admin/components/SwitchControl.tsx
 /admin/context/RecentRealms.tsx
 /admin/dashboard/dashboard.css
-/admin/dashboard/Dashboard.tsx
 /admin/dashboard/ProviderInfo.tsx
 /admin/dashboard/routes.ts
 /admin/events/AdminEvents.tsx

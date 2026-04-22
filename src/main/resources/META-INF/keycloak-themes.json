@@ -13,17 +13,11 @@
       ]
     },
     {
-      "name": "attributes-v3",
-      "types": [
-        "login",
-        "email"
-      ]
-    },
-    {
       "name": "phasetwo-ui",
       "types": [
         "account",
         "admin",
+        "email",
         "login"
       ]
     },

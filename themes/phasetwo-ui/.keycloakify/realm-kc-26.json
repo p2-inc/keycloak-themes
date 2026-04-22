@@ -1686,7 +1686,7 @@
   "loginTheme": "phasetwo-ui",
   "accountTheme": "phasetwo-ui",
   "adminTheme": "phasetwo-ui",
-  "emailTheme": "",
+  "emailTheme": "phasetwo-ui",
   "eventsEnabled": false,
   "eventsListeners": [
     "keycloakify-logging",

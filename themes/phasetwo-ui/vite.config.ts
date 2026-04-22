@@ -1,4 +1,7 @@
+/// <reference types="vitest/config" />
 import react from "@vitejs/plugin-react";
+import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
+import { playwright } from "@vitest/browser-playwright";
 import { keycloakify } from "keycloakify/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
@@ -17,6 +20,9 @@ export default defineConfig({
       accountThemeImplementation: "Single-Page",
       themeName: ["phasetwo-ui"],
       themeVersion: "0.0.1",
+      environmentVariables: [
+        { name: "SHOW_DARK_MODE_TOGGLE", default: "false" },
+      ],
       keycloakifyBuildDirPath: path.resolve(
         dirname,
         "../../target/phasetwo-ui",
@@ -40,5 +46,31 @@ export default defineConfig({
     alias: {
       "@": path.resolve(dirname, "src"),
     },
+  },
+  test: {
+    projects: [
+      {
+        extends: true,
+        plugins: [
+          storybookTest({
+            configDir: path.join(dirname, ".storybook"),
+          }),
+        ],
+        test: {
+          name: "storybook",
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({}),
+            instances: [
+              {
+                browser: "chromium",
+              },
+            ],
+          },
+          setupFiles: [".storybook/vitest.setup.ts"],
+        },
+      },
+    ],
   },
 });

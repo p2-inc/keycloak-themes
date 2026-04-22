@@ -1,0 +1,102 @@
+{
+  "realm": "phasetwo-ui",
+  "enabled": true,
+  "displayName": "Phase Two UI Dev",
+  "loginTheme": "phasetwo-ui",
+  "adminTheme": "phasetwo-ui",
+  "emailTheme": "phasetwo-ui",
+  "accountTheme": "phasetwo-ui",
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": false,
+  "rememberMe": true,
+  "verifyEmail": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "eventsListeners": ["jboss-logging"],
+  "attributes": {
+    "_providerConfig.assets.logo.url": "https://phasetwo.io/img/logo_phase_slash.svg",
+    "_providerConfig.assets.favicon.url": "https://phasetwo.io/img/favicon.svg",
+    "_providerConfig.assets.appicon.url": "https://phasetwo.io/img/logo_phase_slash.svg",
+    "_providerConfig.assets.login.primaryColor": "#3b82f6",
+    "_providerConfig.assets.login.secondaryColor": "#60a5fa",
+    "_providerConfig.assets.login.backgroundColor": "#ffffff"
+  },
+  "roles": {
+    "client": {}
+  },
+  "clients": [
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "clientId": "phasetwo-ui-dev",
+      "name": "Phase Two UI Dev",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "+"
+      ],
+      "attributes": {}
+    }
+  ],
+  "users": [
+    {
+      "id": "11111111-1111-1111-1111-111111111111",
+      "username": "admin",
+      "email": "admin@example.com",
+      "firstName": "Realm",
+      "lastName": "Admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "realm-management": [
+          "realm-admin"
+        ]
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-222222222222",
+      "username": "org-admin",
+      "email": "org-admin@example.com",
+      "firstName": "Org",
+      "lastName": "Admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "33333333-3333-3333-3333-333333333333",
+      "username": "org-member",
+      "email": "org-member@example.com",
+      "firstName": "Org",
+      "lastName": "Member",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

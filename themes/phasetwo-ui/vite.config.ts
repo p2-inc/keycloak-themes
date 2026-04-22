@@ -32,7 +32,7 @@ export default defineConfig({
         "all-other-versions": "phasetwo-ui-theme.jar",
       },
       startKeycloakOptions: {
-        dockerImage: "quay.io/phasetwo/phasetwo-keycloak:26.5.6",
+        dockerImage: "quay.io/phasetwo/phasetwo-keycloak:latest",
         keycloakExtraArgs: [
           "--spi-email-template-provider=freemarker-plus-mustache",
           "--spi-email-template-freemarker-plus-mustache-enabled=true",

@@ -13,7 +13,13 @@
     "preview": "vite preview",
     "start-keycloak": "keycloakify start-keycloak",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:integration": "PLAYWRIGHT_INTEGRATION=true playwright test",
+    "docker:up": "docker compose -f docker/docker-compose.yml up -d",
+    "docker:down": "docker compose -f docker/docker-compose.yml down",
+    "docker:logs": "docker compose -f docker/docker-compose.yml logs -f keycloak"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.8",
@@ -64,6 +70,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.1",
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.49.0",
     "@storybook/addon-a11y": "^10.3.4",
     "@storybook/addon-docs": "^10.3.4",
     "@storybook/addon-onboarding": "^10.3.4",

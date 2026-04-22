@@ -1,0 +1,25 @@
+services:
+  keycloak:
+    image: quay.io/phasetwo/phasetwo-keycloak:latest
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_HTTP_CORS_ALLOWED_ORIGINS: "http://localhost:5173"
+      KC_HTTP_CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+      KC_HTTP_CORS_ALLOWED_HEADERS: "Authorization,Content-Type"
+    command:
+      - start-dev
+      - --import-realm
+      - --spi-email-template-provider=freemarker-plus-mustache
+      - --spi-email-template-freemarker-plus-mustache-enabled=true
+      - --spi-theme-cache-themes=false
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ../../../target/phasetwo-ui/phasetwo-ui-theme.jar:/opt/keycloak/providers/phasetwo-ui-theme.jar
+      - keycloak_data:/opt/keycloak/data
+
+volumes:
+  keycloak_data:

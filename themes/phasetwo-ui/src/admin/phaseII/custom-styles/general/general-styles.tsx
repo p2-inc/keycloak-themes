@@ -54,7 +54,9 @@ const InvalidImageError = () => (
 );
 
 const ImageInstruction = ({ name }: { name: string }) => (
-  <div>Enter a custom URL for the {name} to preview the image.</div>
+  <div className="text-muted-foreground">
+    Enter a custom URL for the {name} to preview the image.
+  </div>
 );
 
 export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
@@ -266,7 +268,6 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
             id="kc-styles-logo-url"
             data-testid="kc-styles-logo-url"
             name="logoUrl"
-            rules={{ required: true }}
           />
           <FormGroup fieldId="kc-styles-logo-url">
             {LogoUrlBrand}
@@ -288,7 +289,6 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
             label={t("faviconUrl")}
             labelIcon={t("formHelpFaviconUrl")}
             data-testid="kc-styles-favicon-url"
-            rules={{ required: true }}
           />
           <FormGroup>
             {FaviconUrlBrand}
@@ -315,7 +315,6 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
             labelIcon={t("formHelpAppIconUrl")}
             data-testid="kc-styles-logo-url"
             name="appIconUrl"
-            rules={{ required: true }}
           />
           <FormGroup>
             {AppIconUrlBrand}

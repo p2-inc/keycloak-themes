@@ -10,6 +10,8 @@ services:
       KC_HTTP_CORS_ALLOWED_HEADERS: "Authorization,Content-Type"
     command:
       - start-dev
+      - --http-enabled=true
+      - --hostname-strict=false
       - --import-realm
       - --spi-email-template-provider=freemarker-plus-mustache
       - --spi-email-template-freemarker-plus-mustache-enabled=true

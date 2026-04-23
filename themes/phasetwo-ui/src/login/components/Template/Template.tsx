@@ -26,7 +26,7 @@ import { FiHome } from "react-icons/fi";
 import { useI18n } from "../../i18n";
 import { useKcContext } from "../../KcContext";
 import { Languages } from "../ui/Langauges";
-import fallbackLogo from "./../../assets/img/phasetwo-logo-light.svg";
+import fallbackLogo from "./../../assets/img/phasetwo-logo.svg";
 import shape from "./../../assets/img/shape.svg";
 import { useInitializeTemplate } from "./useInitializeTemplate";
 import {
@@ -95,7 +95,7 @@ export function Template(props: {
   return (
     <div className="grid min-h-svh lg:grid-cols-2 ">
       {/* Main content */}
-      <div className="flex flex-col gap-4 px-0 py-0 pb-6 lg:p-6 lg:md:p-10 lg:pt-10 min-h-screen lg:min-h-0">
+      <div className="flex flex-col gap-4 px-0 py-0 pb-6 lg:p-6 lg:md:p-10 lg:pt-10 min-h-screen lg:min-h-0 bg-background lg:bg-primary">
         {/*  navigation */}
         <div className="absolute top-4 inset-s-4 z-20 flex gap-2">
           <Button type="button" variant="outline" size="icon" asChild>
@@ -109,15 +109,15 @@ export function Template(props: {
           {enabledLanguages.length > 1 && <Languages />}
         </div>
 
-        <div className="flex flex-1 items-start lg:items-center justify-center flex-col ">
+        <div className="flex flex-1 items-center justify-center flex-col">
           <div className="w-full max-w-xl">
-            <Card className="shadow-none bg-transparent lg:bg-card border-0 lg:rounded-lg lg:border lg:shadow-sm rounded-t-2xl">
+            <Card className="shadow-none bg-transparent sm:bg-card border-0 sm:border sm:shadow-sm">
               <CardHeader>
                 <CardTitle>
                   {/* Mobile header with logo */}
                   <div className="lg:hidden relative mt-8">
                     <div className="flex flex-col items-center justify-center gap-3">
-                      <div className="mb-4 flex items-center gap-3">
+                      <div className="mb-8 flex items-center gap-3">
                         {!logoError ? (
                           <img
                             src={logoUrl}
@@ -261,7 +261,7 @@ export function Template(props: {
         </div>
       </div>
 
-      <div className="bg-primary relative hidden lg:block dark:bg-primary/5">
+      <div className="bg-background relative hidden lg:block dark:bg-primary/5">
         <div className="flex items-center pt-20 h-full justify-center z-1">
           <div className="absolute right-0 top-0 w-full max-w-62.5 xl:max-w-112.5">
             <img src={shape} alt="grid" />
@@ -288,7 +288,7 @@ export function Template(props: {
               )}
             </div>
 
-            <p className="text-center text-primary-foreground/80">
+            <p className="text-center text-foreground">
               {msg("welcomeMessage")}
             </p>
           </div>

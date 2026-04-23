@@ -62,7 +62,6 @@ const ColorFormGroup: React.FC<ColorFormGroupProps> = ({
             data-testid={`kc-styles-${colorKey}-url`}
             pattern={HexColorPattern}
             validated={ValidatedOptions.error}
-            rules={{ required: true }}
           />
           {errors[colorKey] && (
             <FormHelperText>

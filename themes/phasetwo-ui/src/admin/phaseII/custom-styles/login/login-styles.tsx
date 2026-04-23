@@ -214,7 +214,6 @@ export const LoginStyles = ({ refresh, realm }: LoginStylesArgs) => {
                 label={t("primaryColor")}
                 labelIcon={t("primaryColorHelp")}
                 rules={{
-                  required: true,
                   pattern: {
                     value: HexColorPattern,
                     message: t("primaryColorHelp"),

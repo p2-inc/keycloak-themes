@@ -16,7 +16,7 @@ import { TextControl } from "@/shared/keycloak-ui-shared";
 import { SaveReset } from "../components/SaveReset";
 import { useState, ReactElement, useEffect } from "react";
 import RealmRepresentation from "@keycloak/keycloak-admin-client/lib/defs/realmRepresentation";
-import { get, isEqual } from "lodash-es";
+import { get } from "lodash-es";
 import { useAlerts } from "@/shared/keycloak-ui-shared";
 
 import { useAdminClient } from "../../../admin-client";
@@ -78,7 +78,7 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
     setError,
     clearErrors,
     setValue,
-    formState: { errors, isDirty },
+    formState: { isDirty },
   } = form;
 
   async function loadRealm() {
@@ -336,7 +336,7 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
             name="generalStyles"
             save={save}
             reset={reset}
-            isActive={isDirty && isEqual(errors, {})}
+            isActive={isDirty}
           />
         </FormProvider>
       </Form>

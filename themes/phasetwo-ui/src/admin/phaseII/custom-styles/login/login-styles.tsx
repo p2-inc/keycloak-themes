@@ -172,7 +172,7 @@ export const LoginStyles = ({ refresh, realm }: LoginStylesArgs) => {
         className="pf-v5-u-mb-lg"
       >
         <p>
-          Ensure that the <code>attributes.v3</code> theme is selected for the{" "}
+          Ensure that the <code>phasetwo-ui</code> theme is selected for the{" "}
           <strong>Login</strong> theme in Realm Settings &gt; Themes in order
           for these changes to take effect.
         </p>

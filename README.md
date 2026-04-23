@@ -53,13 +53,13 @@ Then open `http://localhost:8080/auth`.
 
 ### Login theme(s)
 
-There are three login themes available.
+There are login themes available.
 
 - `attributes` for patternfly installations v4 and below
 - `attributes-v2` for patternfly installation v5
-- `attributes-v3` for the Keycloakify-based shadcn login theme
+- `phasetwo-ui` for the Keycloakify-based shadcn login, admin, account, and email theme
 
-All three themes assume you will store the values as Realm attributes with the following keys:
+All themes assume you will store the values as Realm attributes with the following keys:
 
 - `_providerConfig.assets.login.css`: CSS you want to be loaded after the standard login.css
 - `_providerConfig.assets.login.backgroundColor`: override for `--pf-v5-global--primary-color--100`.
@@ -68,7 +68,7 @@ All three themes assume you will store the values as Realm attributes with the f
 - `_providerConfig.assets.logo.url`: URL of logo file that will be served as the `div.kc-logo-text.background-image`. Constrained to 150x150.
 - `_providerConfig.assets.favicon.url`: URL of the favicon
 
-The `attributes` and `attributes-v2` themes consume the PatternFly-oriented CSS variables generated from these attributes. The `attributes-v3` theme is built with Keycloakify and shadcn, and consumes additional custom CSS variables emitted by the same `/realms/<realm>/assets/css/login.css` endpoint.
+The `attributes` and `attributes-v2` themes consume the PatternFly-oriented CSS variables generated from these attributes. The `phasetwo-ui` theme is built with Keycloakify and shadcn, and consumes additional custom CSS variables emitted by the same `/realms/<realm>/assets/css/login.css` endpoint.
 
 #### Example CSS overrides
 

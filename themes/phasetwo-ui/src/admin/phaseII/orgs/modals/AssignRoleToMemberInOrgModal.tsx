@@ -128,17 +128,17 @@ export const AssignRoleToMemberModal = ({
       return [];
     }
 
-    setUserOrgRoles(getRolesForUser.data);
+    setUserOrgRoles(getRolesForUser.data ?? []);
 
-    return getRolesForUser.data;
+    return getRolesForUser.data ?? [];
   };
 
   const loader = async () => {
     const getRolesForUser = await getListOrgRolesForUser();
-    const hasRoleIds = getRolesForUser.map((r: { id: string }) => r.id);
+    const hasRoleIds = getRolesForUser.map((r) => r.id);
 
     const roleMap = orgRoles.map((orgRole) => {
-      const isSelected = hasRoleIds.includes(orgRole.id);
+      const isSelected = hasRoleIds.includes(orgRole.id ?? "");
       return {
         ...orgRole,
         selected: isSelected,

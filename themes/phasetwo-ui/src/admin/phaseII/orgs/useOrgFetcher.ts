@@ -8,8 +8,8 @@ import IdentityProviderRepresentation from "@keycloak/keycloak-admin-client/lib/
 import { useAdminClient } from "../../admin-client";
 import { SyncMode } from "./OrgIdentityProviders";
 import { OrgConfigType } from "./modals/ManageOrgSettingsDialog";
-import { useEnvironment } from "@/shared/keycloak-ui-shared";
-import type { Environment } from "../../environment";
+import { usePhaseTwoClient } from "../api/client";
+import type { components } from "../api/client";
 
 export type PhaseTwoOrganizationUserRepresentation = UserRepresentation & {
   organizationMemberAttributes: Record<string, string[]>;
@@ -21,17 +21,10 @@ export type PhaseTwoOrganizationMemberAttributesRepresentation = Record<
   string[]
 >;
 
-export type OrganizationDomainRepresentation = {
-  domain_name: string;
-  verified: boolean;
-  record_key: string;
-  record_value: string;
-  type: string;
-};
+export type OrganizationDomainRepresentation =
+  components["schemas"]["OrganizationDomainRepresentation"];
 
-type OrgResp = Response & { error: string; data?: any[] };
-
-async function getResponseError(response: Response) {
+async function getResponseError(response: Response): Promise<Error> {
   const jsonResponse = response.clone();
   const contentType = response.headers.get("content-type");
   let message = "";
@@ -66,150 +59,66 @@ async function getResponseError(response: Response) {
 }
 
 export default function useOrgFetcher(realm: string) {
-  const { environment } = useEnvironment<Environment>();
   const { adminClient } = useAdminClient();
+  const client = usePhaseTwoClient();
   const [orgs] = useState([]);
   const [org, setOrg] = useState<OrgRepresentation | null>();
 
-  const authUrl = environment.serverBaseUrl;
-  const baseUrl = `${authUrl}/realms/${realm}`;
-  const adminUrl = `${authUrl}/admin/realms/${realm}`;
-
-  async function fetchGet(url: string) {
-    const token = await adminClient.getAccessToken();
-    return await fetch(url, {
-      method: "GET",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      redirect: "follow",
-    });
-  }
-
-  async function fetchModify(url: string, body: any, verb: "POST" | "PUT") {
-    const token = await adminClient.getAccessToken();
-    return await fetch(url, {
-      method: verb,
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-      redirect: "follow",
-    });
-  }
-
-  /*
-  async function fetchPostForm(url: string, data: FormData) {
-    const token = await adminClient.getAccessToken();
-    return await fetch(url, {
-      method: "POST",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${token}`,
-      },
-      body: data,
-      redirect: "follow",
-    });
-  }
-  */
-
-  async function fetchPostRaw(url: string, data: string) {
-    const token = await adminClient.getAccessToken();
-    return await fetch(url, {
-      method: "POST",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${token}`,
-      },
-      body: data,
-      redirect: "follow",
-    });
-  }
-
-  async function fetchDelete(url: string) {
-    const token = await adminClient.getAccessToken();
-    return await fetch(url, {
-      method: "DELETE",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      redirect: "follow",
-    });
-  }
-
-  async function fetchPost(url: string, body: any) {
-    return await fetchModify(url, body, "POST");
-  }
-  async function fetchPut(url: string, body: any) {
-    return await fetchModify(url, body, "PUT");
-  }
-
   async function refreshOrgs(first: number, max: number, search: string) {
-    let query = `first=${first}&max=${max}`;
-    if (search.length > 0) {
-      query = `${query}&search=${search}`;
-    }
-    const resp = await fetchGet(`${baseUrl}/orgs?${query}`);
-    return await resp.json();
+    const { data } = await client.GET("/{realm}/orgs", {
+      params: {
+        path: { realm },
+        query: { first, max, ...(search.length > 0 ? { search } : {}) },
+      },
+    });
+    return data ?? [];
   }
 
   async function createOrg(org: OrgFormSubmission) {
-    let resp = (await fetchPost(`${baseUrl}/orgs`, {
-      ...org,
-      realm,
-    })) as OrgResp;
+    const { response } = await client.POST("/{realm}/orgs", {
+      params: { path: { realm } },
+      body: { ...org, realm },
+    });
 
-    // successful response is just an empty 201
-    if (resp.ok) {
+    if (response.ok) {
       return { success: true, message: "Org created successfully." };
     }
 
-    resp = await resp.json();
-    // @ts-ignore
-    const error = resp.error;
-    return { error: true, message: error };
+    const error = await getResponseError(response);
+    return { error: true, message: error.message };
   }
 
   async function getOrg(orgId: string) {
-    const resp = await fetchGet(`${baseUrl}/orgs/${orgId}`);
-    setOrg(await resp.json());
+    const { data } = await client.GET("/{realm}/orgs/{orgId}", {
+      params: { path: { realm, orgId } },
+    });
+    if (data) setOrg(data as OrgRepresentation);
   }
 
   async function updateOrg(org: OrgRepresentation) {
-    const resp = await fetchPut(`${baseUrl}/orgs/${org.id}`, {
-      ...org,
+    const { response } = await client.PUT("/{realm}/orgs/{orgId}", {
+      params: { path: { realm, orgId: org.id } },
+      body: { ...org },
     });
-    if (resp.ok) {
+
+    if (response.ok) {
       setOrg(org);
       return { success: true, message: "Organization updated." };
     }
-    return { error: true, message: await resp.text() };
+    return { error: true, message: await response.text() };
   }
 
   async function deleteOrg(org: OrgRepresentation) {
-    let resp = (await fetchDelete(`${baseUrl}/orgs/${org.id}`)) as OrgResp;
-    if (resp.ok) {
+    const { response } = await client.DELETE("/{realm}/orgs/{orgId}", {
+      params: { path: { realm, orgId: org.id } },
+    });
+
+    if (response.ok) {
       return { success: true, message: "Organization removed." };
     }
-    resp = await resp.json();
-    return {
-      error: true,
-      // @ts-ignore
-      message: `${org.name} could not be removed. (${resp.error})`,
-    };
+
+    const error = await getResponseError(response);
+    return { error: true, message: `${org.name} could not be removed. (${error.message})` };
   }
 
   type OrgMemberOptions = {
@@ -217,46 +126,42 @@ export default function useOrgFetcher(realm: string) {
     max: number;
     search?: string;
   };
+
   async function getOrgMembers(
     orgId: string,
-    { first, max, search }: OrgMemberOptions = {
-      first: 1,
-      max: 100,
-    },
+    { first, max, search }: OrgMemberOptions = { first: 1, max: 100 },
   ): Promise<PhaseTwoOrganizationUserRepresentation[]> {
-    let query = `first=${first}&max=${max}`;
-    query = search ? `${query}&search=${search}` : query;
-    const resp = await fetchGet(`${baseUrl}/orgs/${orgId}/members?${query}`);
-    const result = await resp.json();
-    return result;
-  }
-  async function addOrgMember(orgId: string, userId: string) {
-    const token = await adminClient.getAccessToken();
-    await fetch(`${baseUrl}/orgs/${orgId}/members/${userId}`, {
-      method: "PUT",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const { data } = await client.GET("/{realm}/orgs/{orgId}/members", {
+      params: {
+        path: { realm, orgId },
+        query: { first, max, ...(search ? { search } : {}) },
       },
-      redirect: "follow",
+    });
+    return (data ?? []) as PhaseTwoOrganizationUserRepresentation[];
+  }
+
+  async function addOrgMember(orgId: string, userId: string) {
+    await client.PUT("/{realm}/orgs/{orgId}/members/{userId}", {
+      params: { path: { realm, orgId, userId } },
     });
   }
 
   async function getOrgsForUser(userId: string): Promise<OrgRepresentation[]> {
-    const resp = await fetchGet(`${baseUrl}/users/${userId}/orgs`);
-    return await resp.json();
+    const { data } = await client.GET("/{realm}/users/{userId}/orgs", {
+      params: { path: { realm, userId } },
+    });
+    return (data ?? []) as OrgRepresentation[];
   }
 
   async function getUserAttributesForOrgMember(
     orgId: string,
     userId: string,
   ): Promise<PhaseTwoOrganizationMemberAttributesRepresentation> {
-    const resp = await fetchGet(
-      `${baseUrl}/orgs/${orgId}/members/${userId}/attributes`,
+    const { data } = await client.GET(
+      "/{realm}/orgs/{orgId}/members/{userId}/attributes",
+      { params: { path: { realm, orgId, userId } } },
     );
-    return await resp.json();
+    return (data?.attributes ?? {}) as PhaseTwoOrganizationMemberAttributesRepresentation;
   }
 
   async function updateAttributesForOrgMember(
@@ -264,24 +169,16 @@ export default function useOrgFetcher(realm: string) {
     userId: string,
     attributes: Record<string, string[]>,
   ) {
-    const token = await adminClient.getAccessToken();
-    await fetch(`${baseUrl}/orgs/${orgId}/members/${userId}/attributes`, {
-      method: "PUT",
-      mode: "cors",
-      cache: "no-cache",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        attributes,
-      }),
-      redirect: "follow",
+    await client.PUT("/{realm}/orgs/{orgId}/members/{userId}/attributes", {
+      params: { path: { realm, orgId, userId } },
+      body: { attributes },
     });
   }
 
   async function removeMemberFromOrg(orgId: string, userId: string) {
-    await fetchDelete(`${baseUrl}/orgs/${orgId}/members/${userId}`);
+    await client.DELETE("/{realm}/orgs/{orgId}/members/{userId}", {
+      params: { path: { realm, orgId, userId } },
+    });
   }
 
   async function createInvitation(
@@ -290,251 +187,206 @@ export default function useOrgFetcher(realm: string) {
     send: boolean,
     redirectUri: string,
   ) {
-    const resp = await fetchPost(`${baseUrl}/orgs/${orgId}/invitations`, {
-      email,
-      send,
-      redirectUri,
+    const { response } = await client.POST("/{realm}/orgs/{orgId}/invitations", {
+      params: { path: { realm, orgId } },
+      body: { email, send, redirectUri },
     });
 
-    if (!resp.ok) {
-      throw await getResponseError(resp);
+    if (!response.ok) {
+      throw await getResponseError(response);
     }
   }
 
   async function getOrgInvitations(orgId: string) {
-    const resp = await fetchGet(`${baseUrl}/orgs/${orgId}/invitations`);
+    const { data, response } = await client.GET(
+      "/{realm}/orgs/{orgId}/invitations",
+      { params: { path: { realm, orgId } } },
+    );
 
-    if (resp.ok) {
-      return await resp.json();
-    }
-    return [];
+    if (response.ok) return (data ?? []) as { id: string; email: string; createdAt?: string }[];
+    return [] as { id: string; email: string; createdAt?: string }[];
   }
 
   async function deleteOrgInvitation(orgId: string, invitationId: string) {
-    const resp = await fetchDelete(
-      `${baseUrl}/orgs/${orgId}/invitations/${invitationId}`,
+    const { response } = await client.DELETE(
+      "/{realm}/orgs/{orgId}/invitations/{invitationId}",
+      { params: { path: { realm, orgId, invitationId } } },
     );
 
-    if (!resp.ok) {
-      throw await getResponseError(resp);
+    if (!response.ok) {
+      throw await getResponseError(response);
     }
   }
 
   async function resendOrgInvitation(orgId: string, invitationId: string) {
-    const resp = await fetchPut(
-      `${baseUrl}/orgs/${orgId}/invitations/${invitationId}/resend-email`,
-      {},
+    const { response } = await client.PUT(
+      "/{realm}/orgs/{orgId}/invitations/{invitationId}/resend-email",
+      { params: { path: { realm, orgId, invitationId } } },
     );
 
-    if (!resp.ok) {
-      throw await getResponseError(resp);
+    if (!response.ok) {
+      throw await getResponseError(response);
     }
   }
 
   async function getRolesForOrg(orgId: string) {
-    const resp = await fetchGet(`${baseUrl}/orgs/${orgId}/roles`);
-    return await resp.json();
+    const { data } = await client.GET("/{realm}/orgs/{orgId}/roles", {
+      params: { path: { realm, orgId } },
+    });
+    return data ?? [];
   }
 
   async function getPortalLink(orgId: string, userId: string = "") {
-    const body = "userId=" + encodeURIComponent(userId);
-
-    const resp = await fetchPostRaw(
-      `${baseUrl}/orgs/${orgId}/portal-link`,
-      body,
-    );
-
-    return await resp.json();
+    const { data } = await client.POST("/{realm}/orgs/{orgId}/portal-link", {
+      params: { path: { realm, orgId } },
+      body: { userId },
+      bodySerializer: (body) =>
+        new URLSearchParams(body as Record<string, string>).toString(),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
+    return data;
   }
 
   async function deleteRoleFromOrg(orgId: string, role: RoleRepresentation) {
-    let resp = (await fetchDelete(
-      `${baseUrl}/orgs/${orgId}/roles/${role.name}`,
-    )) as OrgResp;
-    if (resp.ok) {
-      return {
-        success: true,
-        message: `${role.name} removed from Organization.`,
-      };
+    const { response } = await client.DELETE(
+      "/{realm}/orgs/{orgId}/roles/{name}",
+      { params: { path: { realm, orgId, name: role.name! } } },
+    );
+
+    if (response.ok) {
+      return { success: true, message: `${role.name} removed from Organization.` };
     }
 
-    resp = await resp.json();
-    return {
-      error: true,
-      message: resp.error,
-    };
+    const error = await getResponseError(response);
+    return { error: true, message: error.message };
   }
 
   async function createRoleForOrg(orgId: string, role: RoleRepresentation) {
-    let resp = (await fetchPost(`${baseUrl}/orgs/${orgId}/roles`, {
-      id: "fake-id",
-      name: role.name,
-      description: role.description || "",
-    })) as OrgResp;
+    const { response } = await client.POST("/{realm}/orgs/{orgId}/roles", {
+      params: { path: { realm, orgId } },
+      body: { id: "fake-id", name: role.name, description: role.description ?? "" },
+    });
 
-    if (resp.ok) {
-      return {
-        success: true,
-        message: `${role.name} added to Organization.`,
-      };
+    if (response.ok) {
+      return { success: true, message: `${role.name} added to Organization.` };
     }
 
-    resp = await resp.json();
-    return {
-      error: true,
-      message: resp.error,
-    };
+    const error = await getResponseError(response);
+    return { error: true, message: error.message };
   }
 
   async function updateRoleForOrg(
     orgId: string,
     role: { name: string; description?: string },
   ) {
-    let resp = (await fetchPut(
-      `${baseUrl}/orgs/${orgId}/roles/${role.name}`,
-      role,
-    )) as OrgResp;
-    if (resp.ok) {
-      return {
-        success: true,
-        message: `${role.name} updated.`,
-      };
+    const { response } = await client.PUT(
+      "/{realm}/orgs/{orgId}/roles/{name}",
+      {
+        params: { path: { realm, orgId, name: role.name } },
+        body: role,
+      },
+    );
+
+    if (response.ok) {
+      return { success: true, message: `${role.name} updated.` };
     }
 
-    resp = await resp.json();
-    return {
-      error: true,
-      message: resp.error,
-    };
+    const error = await getResponseError(response);
+    return { error: true, message: error.message };
   }
 
-  // GET /:realm/orgs/:orgId/roles/:name/users/:userId
   async function checkOrgRoleForUser(
     orgId: string,
     role: RoleRepresentation,
     user: UserRepresentation,
   ) {
-    let resp = (await fetchGet(
-      `${baseUrl}/orgs/${orgId}/roles/${role.name}/users/${user.id}`,
-    )) as OrgResp;
+    const { response } = await client.GET(
+      "/{realm}/orgs/{orgId}/roles/{name}/users/{userId}",
+      { params: { path: { realm, orgId, name: role.name!, userId: user.id! } } },
+    );
 
-    if (resp.ok) {
-      return {
-        success: true,
-        message: `User has role: ${role.name}.`,
-      };
+    if (response.ok) {
+      return { success: true, message: `User has role: ${role.name}.` };
     }
 
-    resp = await resp.json();
-    return {
-      error: true,
-      message: resp.error,
-    };
+    const error = await getResponseError(response);
+    return { error: true, message: error.message };
   }
 
-  // GET /:realm/users/:userId/orgs/:orgId/roles
   async function listOrgRolesForUser(orgId: string, user: UserRepresentation) {
-    const resp = (await fetchGet(
-      `${baseUrl}/users/${user.id}/orgs/${orgId}/roles`,
-    )) as OrgResp;
+    const { data, response } = await client.GET(
+      "/{realm}/users/{userId}/orgs/{orgId}/roles",
+      { params: { path: { realm, userId: user.id!, orgId } } },
+    );
 
-    if (resp.ok) {
+    if (response.ok) {
       return {
         success: true,
-        data: await resp.json(),
+        data: (data ?? []) as { id: string; name: string; description?: string }[],
       };
     }
 
-    return {
-      error: true,
-      message: await resp.json(),
-    };
+    return { error: true, message: await response.json() };
   }
 
-  // PUT /:realm/orgs/:orgId/roles/:name/users/:userId
   async function setOrgRoleForUser(
     orgId: string,
     role: RoleRepresentation,
     user: UserRepresentation,
   ) {
-    let resp = (await fetchPut(
-      `${baseUrl}/orgs/${orgId}/roles/${role.name}/users/${user.id}`,
-      {},
-    )) as OrgResp;
+    const { response } = await client.PUT(
+      "/{realm}/orgs/{orgId}/roles/{name}/users/{userId}",
+      { params: { path: { realm, orgId, name: role.name!, userId: user.id! } } },
+    );
 
-    if (resp.ok) {
-      return {
-        success: true,
-        message: `${role.name} assigned to user.`,
-      };
+    if (response.ok) {
+      return { success: true, message: `${role.name} assigned to user.` };
     }
 
-    resp = await resp.json();
-    return {
-      error: true,
-      message: resp.error,
-    };
+    const error = await getResponseError(response);
+    return { error: true, message: error.message };
   }
 
-  // DELETE /:realm/orgs/:orgId/roles/:name/users/:userId
   async function revokeOrgRoleForUser(
     orgId: string,
     role: RoleRepresentation,
     user: UserRepresentation,
   ) {
-    let resp = (await fetchDelete(
-      `${baseUrl}/orgs/${orgId}/roles/${role.name}/users/${user.id}`,
-    )) as OrgResp;
+    const { response } = await client.DELETE(
+      "/{realm}/orgs/{orgId}/roles/{name}/users/{userId}",
+      { params: { path: { realm, orgId, name: role.name!, userId: user.id! } } },
+    );
 
-    if (resp.ok) {
-      return {
-        success: true,
-        message: `${role.name} revoked for user.`,
-      };
+    if (response.ok) {
+      return { success: true, message: `${role.name} revoked for user.` };
     }
 
-    resp = await resp.json();
-    return {
-      error: true,
-      message: resp.error,
-    };
+    const error = await getResponseError(response);
+    return { error: true, message: error.message };
   }
 
-  // PUT /:realm/identity-provider/instances/:alias
   async function updateIdentityProvider(
     idp: IdentityProviderRepresentation,
     alias: string,
   ) {
     try {
       await adminClient.identityProviders.update({ alias }, { ...idp });
-      return {
-        success: true,
-        message: `${idp.displayName} updated for this org.`,
-      };
+      return { success: true, message: `${idp.displayName} updated for this org.` };
     } catch (error) {
-      return {
-        error: true,
-        message: error,
-      };
+      return { error: true, message: error };
     }
   }
 
-  // GET /:realm/identity-provider/instances
   async function getIdpsForOrg(orgId: OrgRepresentation["id"]) {
     try {
-      const resp = await fetchGet(`${baseUrl}/orgs/${orgId}/idps`);
-      if (resp.ok) {
-        return (await resp.json()) as IdentityProviderRepresentation[];
-      }
-      return {
-        error: true,
-        message: "Failed to fetch IDPs for org.",
-      };
+      const { data, response } = await client.GET("/{realm}/orgs/{orgId}/idps", {
+        params: { path: { realm, orgId } },
+      });
+
+      if (response.ok) return data as IdentityProviderRepresentation[];
+      return { error: true, message: "Failed to fetch IDPs for org." };
     } catch (error) {
-      return {
-        error: true,
-        message: error,
-      };
+      return { error: true, message: error };
     }
   }
 
@@ -548,29 +400,17 @@ export default function useOrgFetcher(realm: string) {
     search?: string;
   }) {
     try {
-      let query = `first=${first}&max=${max}`;
-      if (search && search.length > 0) {
-        query = `${query}&search=${search}`;
-      }
-      const resp = await fetchGet(
-        `${adminUrl}/identity-provider/instances?${query}`,
-      );
-      if (resp.ok) {
-        return (await resp.json()) as IdentityProviderRepresentation[];
-      }
-      return {
-        error: true,
-        message: "Failed to fetch IDPs for org.",
-      };
+      const result = await adminClient.identityProviders.find({
+        first,
+        max,
+        ...(search ? { search } : {}),
+      });
+      return result as IdentityProviderRepresentation[];
     } catch (error) {
-      return {
-        error: true,
-        message: error,
-      };
+      return { error: true, message: error };
     }
   }
 
-  // POST /:realm/orgs/:orgId/idps/link
   async function linkIDPtoOrg(
     orgId: OrgRepresentation["id"],
     idpInformation: {
@@ -580,133 +420,107 @@ export default function useOrgFetcher(realm: string) {
     },
   ) {
     try {
-      const resp = await fetchPost(
-        `${baseUrl}/orgs/${orgId}/idps/link`,
-        idpInformation,
-      );
-      if (!resp.ok) {
-        throw new Error("Failed to link IDP to org.");
+      const { response } = await client.POST("/{realm}/orgs/{orgId}/idps/link", {
+        params: { path: { realm, orgId } },
+        body: idpInformation,
+      });
+
+      if (!response.ok) throw new Error("Failed to link IDP to org.");
+
+      if (response.status === 201) {
+        return { success: true, message: `${idpInformation.alias} updated for this org.` };
       }
-      if (resp.status === 201) {
-        return {
-          success: true,
-          message: `${idpInformation.alias} updated for this org.`,
-        };
-      }
-      if (resp.status === 409) {
-        return {
-          error: true,
-          message: "Identity Provider already linked to this org.",
-        };
+
+      if (response.status === 409) {
+        return { error: true, message: "Identity Provider already linked to this org." };
       }
     } catch (error) {
-      return {
-        error: true,
-        message: error,
-      };
+      return { error: true, message: error };
     }
   }
 
-  // POST /:realm/orgs/:orgId/idps/unlink
   async function unlinkIDPtoOrg(
     orgId: OrgRepresentation["id"],
     idpAlias: IdentityProviderRepresentation["alias"],
   ) {
     try {
-      const resp = await fetchPost(
-        `${baseUrl}/orgs/${orgId}/idps/${idpAlias}/unlink`,
-        {},
+      const { response } = await client.POST(
+        "/{realm}/orgs/{orgId}/idps/{alias}/unlink",
+        { params: { path: { realm, orgId, alias: idpAlias! } } },
       );
-      if (!resp.ok) {
-        throw new Error("Failed to unlink Identity Provider.");
-      }
-      if (resp.status === 204) {
-        return {
-          success: true,
-          message: `Unlinked Identity Provider.`,
-        };
+
+      if (!response.ok) throw new Error("Failed to unlink Identity Provider.");
+
+      if (response.status === 204) {
+        return { success: true, message: "Unlinked Identity Provider." };
       }
     } catch (error) {
-      return {
-        error: true,
-        message: error,
-      };
+      return { error: true, message: error };
     }
   }
 
-  // GET /:realm/orgs/config
   async function getOrgsConfig() {
     try {
-      const resp = await fetchGet(`${baseUrl}/orgs/config`);
-      if (resp.ok) {
-        return (await resp.json()) as OrgConfigType;
-      }
-      return {
-        error: true,
-        message: "Failed to fetch orgs config.",
-      };
+      const { data, response } = await client.GET("/{realm}/orgs/config", {
+        params: { path: { realm } },
+      });
+
+      if (response.ok) return data as unknown as OrgConfigType;
+      return { error: true, message: "Failed to fetch orgs config." };
     } catch (error) {
-      return {
-        error: true,
-        message: error,
-      };
+      return { error: true, message: error };
     }
   }
 
   async function updateOrgsConfig(orgsConfig: OrgConfigType) {
     try {
-      const resp = await fetchPut(`${baseUrl}/orgs/config`, orgsConfig);
+      const { response } = await client.PUT("/{realm}/orgs/config", {
+        params: { path: { realm } },
+        body: orgsConfig as components["schemas"]["OrganizationConfigRepresentation"],
+      });
 
-      if (resp.ok) {
-        return {
-          success: true,
-          message: "Organizations config updated.",
-        };
+      if (response.ok) {
+        return { success: true, message: "Organizations config updated." };
       }
       throw new Error("Failed to update organizations config.");
     } catch (error) {
-      return {
-        error: true,
-        message: error,
-      };
+      return { error: true, message: error };
     }
   }
 
-  // GET /:realm/orgs/:orgId/domains
   async function getOrgDomains(
     orgId: string,
   ): Promise<OrganizationDomainRepresentation[]> {
-    const resp = await fetchGet(`${baseUrl}/orgs/${orgId}/domains`);
-    if (resp.ok) {
-      return await resp.json();
-    }
+    const { data, response } = await client.GET(
+      "/{realm}/orgs/{orgId}/domains",
+      { params: { path: { realm, orgId } } },
+    );
+
+    if (response.ok) return data ?? [];
     return [];
   }
 
-  // GET /:realm/orgs/:orgId/domains/:domainName
   async function getOrgDomain(
     orgId: string,
     domainName: string,
   ): Promise<OrganizationDomainRepresentation | null> {
-    const resp = await fetchGet(
-      `${baseUrl}/orgs/${orgId}/domains/${encodeURIComponent(domainName)}`,
+    const { data, response } = await client.GET(
+      "/{realm}/orgs/{orgId}/domains/{domainName}",
+      { params: { path: { realm, orgId, domainName } } },
     );
-    if (resp.ok) {
-      return await resp.json();
-    }
+
+    if (response.ok) return data ?? null;
     return null;
   }
 
-  // POST /:realm/orgs/:orgId/domains/:domainName/verify
   async function verifyDomain(orgId: string, domainName: string) {
-    const resp = await fetchPost(
-      `${baseUrl}/orgs/${orgId}/domains/${encodeURIComponent(domainName)}/verify`,
-      {},
+    const { response } = await client.POST(
+      "/{realm}/orgs/{orgId}/domains/{domainName}/verify",
+      { params: { path: { realm, orgId, domainName } } },
     );
-    if (resp.ok) {
-      return { success: true, message: "Domain verification triggered." };
-    }
-    return { error: true, message: await resp.text() };
+
+    if (response.ok) return { success: true, message: "Domain verification triggered." };
+    return { error: true, message: await response.text() };
   }
 
   return {

@@ -4,8 +4,12 @@
 # account/KcAccountUi.tsx
 # admin/help-urls.ts
 # admin/index.css
+# admin/PageHeader.tsx
 # admin/PageNav.tsx
 # admin/routes.tsx
+# login/i18n.ts
+# login/index.css
+# login/KcContext.ts
 # account/assets/favicon.svg
 # account/assets/logo.svg
 # account/root/Header.tsx
@@ -13,6 +17,7 @@
 # admin/assets/icon.svg
 # admin/assets/img_avatar.svg
 # admin/assets/logo.svg
+# admin/dashboard/Dashboard.tsx
 # admin/identity-providers/IdentityProvidersSection.tsx
 # admin/realm-settings/GeneralTab.tsx
 # admin/realm-settings/RealmSettingsTabs.tsx
@@ -21,14 +26,91 @@
 # components/ui/dropdown-menu.tsx
 # components/ui/select.tsx
 # components/ui/tooltip.tsx
+# login/pages/PageIndex.tsx
 # admin/components/view-header/ViewHeader.tsx
 # admin/context/access/Access.tsx
 # admin/realm-settings/routes/RealmSettings.tsx
 # admin/user/routes/User.tsx
+# login/components/Template/Template.tsx
+# login/pages/delete-account-confirm/Page.tsx
+# login/pages/delete-credential/Page.tsx
+# login/pages/login-config-totp/Page.tsx
+# login/pages/login-idp-link-confirm-override/Page.tsx
+# login/pages/login-idp-link-email/Page.tsx
+# login/pages/login-oauth-grant/Page.tsx
+# login/pages/login-page-expired/Page.tsx
+# login/pages/login-verify-email/Page.tsx
+# login/pages/logout-confirm/Page.tsx
+# login/pages/webauthn-authenticate/Page.tsx
 # shared/@patternfly/react-core/index.tsx
 # shared/keycloak-ui-shared/controls/table/KeycloakDataTable.tsx
 # shared/keycloak-ui-shared/controls/table/PaginatingTableToolbar.tsx
 # === Owned files end =====
+
+# === @keycloakify/email-native v260007.0.0 ===
+/email/theme.properties
+/email/html/email-test.ftl
+/email/html/email-update-confirmation.ftl
+/email/html/email-verification-with-code.ftl
+/email/html/email-verification.ftl
+/email/html/event-login_error.ftl
+/email/html/event-remove_credential.ftl
+/email/html/event-remove_totp.ftl
+/email/html/event-update_credential.ftl
+/email/html/event-update_password.ftl
+/email/html/event-update_totp.ftl
+/email/html/event-user_disabled_by_permanent_lockout.ftl
+/email/html/event-user_disabled_by_temporary_lockout.ftl
+/email/html/executeActions.ftl
+/email/html/identity-provider-link.ftl
+/email/html/org-invite.ftl
+/email/html/password-reset.ftl
+/email/html/template.ftl
+/email/messages/messages_ar.properties
+/email/messages/messages_ca.properties
+/email/messages/messages_cs.properties
+/email/messages/messages_da.properties
+/email/messages/messages_de.properties
+/email/messages/messages_el.properties
+/email/messages/messages_en.properties
+/email/messages/messages_es.properties
+/email/messages/messages_fa.properties
+/email/messages/messages_fi.properties
+/email/messages/messages_fr.properties
+/email/messages/messages_hu.properties
+/email/messages/messages_it.properties
+/email/messages/messages_ja.properties
+/email/messages/messages_ka.properties
+/email/messages/messages_lt.properties
+/email/messages/messages_nl.properties
+/email/messages/messages_no.properties
+/email/messages/messages_pl.properties
+/email/messages/messages_pt_BR.properties
+/email/messages/messages_pt.properties
+/email/messages/messages_ru.properties
+/email/messages/messages_sk.properties
+/email/messages/messages_sv.properties
+/email/messages/messages_th.properties
+/email/messages/messages_tr.properties
+/email/messages/messages_uk.properties
+/email/messages/messages_zh_CN.properties
+/email/messages/messages_zh_TW.properties
+/email/text/email-test.ftl
+/email/text/email-update-confirmation.ftl
+/email/text/email-verification-with-code.ftl
+/email/text/email-verification.ftl
+/email/text/event-login_error.ftl
+/email/text/event-remove_credential.ftl
+/email/text/event-remove_totp.ftl
+/email/text/event-update_credential.ftl
+/email/text/event-update_password.ftl
+/email/text/event-update_totp.ftl
+/email/text/event-user_disabled_by_permanent_lockout.ftl
+/email/text/event-user_disabled_by_temporary_lockout.ftl
+/email/text/executeActions.ftl
+/email/text/identity-provider-link.ftl
+/email/text/org-invite.ftl
+/email/text/password-reset.ftl
 
 # === @keycloakify/keycloak-admin-ui v260502.0.0 ===
 /admin/admin-client.ts
@@ -43,7 +125,6 @@
 /admin/KcContext.ts
 /admin/KcPage.tsx
 /admin/page-nav.css
-/admin/PageHeader.tsx
 /admin/PageHeaderClearCachesModal.tsx
 /admin/PageNotFoundSection.tsx
 /admin/Root.tsx
@@ -78,7 +159,6 @@
 /admin/components/SwitchControl.tsx
 /admin/context/RecentRealms.tsx
 /admin/dashboard/dashboard.css
-/admin/dashboard/Dashboard.tsx
 /admin/dashboard/ProviderInfo.tsx
 /admin/dashboard/routes.ts
 /admin/events/AdminEvents.tsx
@@ -825,9 +905,6 @@
 
 # === @oussemasahbeni/keycloakify-login-shadcn v250004.0.20 ===
 /components/ThemeProvider.tsx
-/login/i18n.ts
-/login/index.css
-/login/KcContext.ts
 /login/KcPage.tsx
 /login/styleLevelCustomization.tsx
 /components/lib/utils.ts
@@ -846,13 +923,11 @@
 /login/components/PasswordVisibilityButton.tsx
 /login/mocks/getKcContextMock.ts
 /login/mocks/KcPageStory.tsx
-/login/pages/PageIndex.tsx
 /login/shared/getColorScheme.ts
 /login/shared/redirectUrlOrigin.ts
 /login/assets/img/auth-logo.svg
 /login/assets/img/shape.svg
 /login/components/Template/index.ts
-/login/components/Template/Template.tsx
 /login/components/Template/useAuthChecker.ts
 /login/components/Template/useInitializeTemplate.ts
 /login/components/ui/Langauges.tsx
@@ -877,10 +952,8 @@
 /login/pages/code/Page.tsx
 /login/pages/delete-account-confirm/index.ts
 /login/pages/delete-account-confirm/Page.stories.tsx
-/login/pages/delete-account-confirm/Page.tsx
 /login/pages/delete-credential/index.ts
 /login/pages/delete-credential/Page.stories.tsx
-/login/pages/delete-credential/Page.tsx
 /login/pages/error/index.ts
 /login/pages/error/Page.stories.tsx
 /login/pages/error/Page.tsx
@@ -905,19 +978,15 @@
 /login/pages/login/useProviderLogos.tsx
 /login/pages/login-config-totp/index.ts
 /login/pages/login-config-totp/Page.stories.tsx
-/login/pages/login-config-totp/Page.tsx
 /login/pages/login-idp-link-confirm/index.ts
 /login/pages/login-idp-link-confirm/Page.stories.tsx
 /login/pages/login-idp-link-confirm/Page.tsx
 /login/pages/login-idp-link-confirm-override/index.ts
 /login/pages/login-idp-link-confirm-override/Page.stories.tsx
-/login/pages/login-idp-link-confirm-override/Page.tsx
 /login/pages/login-idp-link-email/index.ts
 /login/pages/login-idp-link-email/Page.stories.tsx
-/login/pages/login-idp-link-email/Page.tsx
 /login/pages/login-oauth-grant/index.ts
 /login/pages/login-oauth-grant/Page.stories.tsx
-/login/pages/login-oauth-grant/Page.tsx
 /login/pages/login-oauth2-device-verify-user-code/index.ts
 /login/pages/login-oauth2-device-verify-user-code/Page.stories.tsx
 /login/pages/login-oauth2-device-verify-user-code/Page.tsx
@@ -926,7 +995,6 @@
 /login/pages/login-otp/Page.tsx
 /login/pages/login-page-expired/index.ts
 /login/pages/login-page-expired/Page.stories.tsx
-/login/pages/login-page-expired/Page.tsx
 /login/pages/login-passkeys-conditional-authenticate/index.ts
 /login/pages/login-passkeys-conditional-authenticate/Page.stories.tsx
 /login/pages/login-passkeys-conditional-authenticate/Page.tsx
@@ -959,13 +1027,11 @@
 /login/pages/login-username/Page.tsx
 /login/pages/login-verify-email/index.ts
 /login/pages/login-verify-email/Page.stories.tsx
-/login/pages/login-verify-email/Page.tsx
 /login/pages/login-x509-info/index.ts
 /login/pages/login-x509-info/Page.stories.tsx
 /login/pages/login-x509-info/Page.tsx
 /login/pages/logout-confirm/index.ts
 /login/pages/logout-confirm/Page.stories.tsx
-/login/pages/logout-confirm/Page.tsx
 /login/pages/register/Form.tsx
 /login/pages/register/index.ts
 /login/pages/register/Page.stories.tsx
@@ -988,7 +1054,6 @@
 /login/pages/update-email/Page.tsx
 /login/pages/webauthn-authenticate/index.ts
 /login/pages/webauthn-authenticate/Page.stories.tsx
-/login/pages/webauthn-authenticate/Page.tsx
 /login/pages/webauthn-error/index.ts
 /login/pages/webauthn-error/Page.stories.tsx
 /login/pages/webauthn-error/Page.tsx

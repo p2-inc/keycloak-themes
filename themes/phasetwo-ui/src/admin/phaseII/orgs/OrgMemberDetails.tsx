@@ -97,11 +97,11 @@ export default function OrgMemberDetails() {
     if (!user) return;
     const result = await listOrgRolesForUser(orgId!, user);
     if (!result.error) {
-      setUserOrgRoles(result.data);
-      const hasRoleIds = result.data.map((r: { id: string }) => r.id);
+      setUserOrgRoles(result.data ?? []);
+      const hasRoleIds = (result.data ?? []).map((r) => r.id);
       const roleMap = orgRoles.map((orgRole) => ({
         ...orgRole,
-        selected: hasRoleIds.includes(orgRole.id),
+        selected: hasRoleIds.includes(orgRole.id ?? ""),
       }));
       // @ts-ignore
       setTableRows(roleMap);

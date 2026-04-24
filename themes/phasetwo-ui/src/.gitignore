@@ -31,6 +31,7 @@
 # admin/components/view-header/ViewHeader.tsx
 # admin/context/access/Access.tsx
 # admin/realm-settings/routes/RealmSettings.tsx
+# admin/realm-settings/themes/ThemeSettings.tsx
 # admin/user/routes/User.tsx
 # login/components/Template/Template.tsx
 # login/pages/delete-account-confirm/Page.tsx
@@ -667,7 +668,6 @@
 /admin/realm-settings/themes/PatternflyVars.ts
 /admin/realm-settings/themes/PreviewWindow.tsx
 /admin/realm-settings/themes/ThemeColors.tsx
-/admin/realm-settings/themes/ThemeSettings.tsx
 /admin/realm-settings/themes/ThemesTab.tsx
 /admin/realm-settings/themes/UploadJar.tsx
 /admin/realm-settings/user-profile/AttributesGroupDetails.tsx

@@ -164,9 +164,9 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
 
     Session session = Session.getInstance(buildEmailProperties(config, from));
 
-    Message message =
-        buildMessage(
-            session, address, from, subject, config, buildMultipartBody(textBody, htmlBody));
+    Multipart multipart = buildMultipartBody(textBody, htmlBody);
+    Message message = buildMessage(session, address, from, subject, config, multipart);
+    runMessageBuilder(message, multipart);
 
     try (Transport transport = session.getTransport("smtp")) {
 

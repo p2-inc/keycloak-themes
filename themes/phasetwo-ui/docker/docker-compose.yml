@@ -13,6 +13,7 @@ services:
       - --http-enabled=true
       - --hostname-strict=false
       - --import-realm
+      - --spi-email-sender-provider=ext-email-override
       - --spi-email-template-provider=freemarker-plus-mustache
       - --spi-email-template-freemarker-plus-mustache-enabled=true
       - --spi-theme-cache-themes=false
@@ -21,6 +22,7 @@ services:
     volumes:
       - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
       - ../../../target/phasetwo-ui/phasetwo-ui-theme.jar:/opt/keycloak/providers/phasetwo-ui-theme.jar
+      - ../../../target/keycloak-themes-0.52-SNAPSHOT.jar:/opt/keycloak/providers/io.phasetwo.keycloak-keycloak-themes-0.56.jar
       - keycloak_data:/opt/keycloak/data
 
 volumes:

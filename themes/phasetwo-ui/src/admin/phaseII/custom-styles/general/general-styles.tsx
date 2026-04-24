@@ -12,14 +12,17 @@ import {
 } from "@patternfly/react-core";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { TextControl } from "@/shared/keycloak-ui-shared";
 import { SaveReset } from "../components/SaveReset";
 import { useState, ReactElement, useEffect } from "react";
 import RealmRepresentation from "@keycloak/keycloak-admin-client/lib/defs/realmRepresentation";
 import { get } from "lodash-es";
 import { useAlerts } from "@/shared/keycloak-ui-shared";
+import { toStyles } from "../routes/Styles";
 
 import { useAdminClient } from "../../../admin-client";
+import { useRealm } from "../../../context/realm-context/RealmContext";
 
 type GeneralStylesType = {
   logoUrl: string;
@@ -62,6 +65,7 @@ const ImageInstruction = ({ name }: { name: string }) => (
 export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
   const { t } = useTranslation();
   const { adminClient } = useAdminClient();
+  const { realm: realmName } = useRealm();
   const { addAlert, addError } = useAlerts();
   const form = useForm<GeneralStylesType>({
     defaultValues: {
@@ -122,18 +126,9 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
     }
   };
 
-  useWatch({
-    name: "logoUrl",
-    control,
-  });
-  useWatch({
-    name: "faviconUrl",
-    control,
-  });
-  useWatch({
-    name: "appIconUrl",
-    control,
-  });
+  useWatch({ name: "logoUrl", control });
+  useWatch({ name: "faviconUrl", control });
+  useWatch({ name: "appIconUrl", control });
 
   const logoUrl = getValues("logoUrl");
   const faviconUrl = getValues("faviconUrl");
@@ -156,7 +151,6 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
   }, [logoUrl, faviconUrl, appIconUrl]);
 
   const save = async () => {
-    // update realm with new attributes
     const updatedRealm = {
       ...realm,
       attributes: {
@@ -180,7 +174,6 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
       delete updatedRealm["attributes"]["_providerConfig.assets.appicon.url"];
     }
 
-    // save values
     try {
       await adminClient.realms.update(
         { realm: realm.realm as string },
@@ -260,7 +253,6 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
       </Alert>
       <Form isHorizontal id="general-styles">
         <FormProvider {...form}>
-          {/* Logo Url */}
           <TextControl
             type="url"
             label={t("logoUrl")}
@@ -279,9 +271,16 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
                 onLoad={() => isValidUrl(true, "logoUrl", setLogoUrlError)}
               ></img>
             )}
+            <span style={{ fontSize: 13 }} className="pf-v5-u-color-400">
+              This logo is used for login and account pages. To set a separate
+              logo for emails, go to{" "}
+              <Link to={toStyles({ realm: realmName, tab: "email" })}>
+                Styles &rsaquo; Email
+              </Link>
+              .
+            </span>
           </FormGroup>
 
-          {/* Favicon Url */}
           <TextControl
             type="url"
             id="kc-styles-favicon-url"
@@ -306,14 +305,12 @@ export const GeneralStyles = ({ refresh, realm }: GeneralStylesArgs) => {
             )}
           </FormGroup>
 
-          {/* App Icon Url */}
-
           <TextControl
             type="url"
-            id="kc-styles-logo-url"
+            id="kc-styles-appicon-url"
             label={t("appIconUrl")}
             labelIcon={t("formHelpAppIconUrl")}
-            data-testid="kc-styles-logo-url"
+            data-testid="kc-styles-appicon-url"
             name="appIconUrl"
           />
           <FormGroup>

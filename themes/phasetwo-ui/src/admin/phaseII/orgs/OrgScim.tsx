@@ -3,6 +3,7 @@ import {
   ActionGroup,
   AlertVariant,
   Button,
+  ClipboardCopy,
   Form,
   FormGroup,
   FormHelperText,
@@ -17,9 +18,10 @@ import {
 } from "@patternfly/react-core";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useAlerts } from "@/shared/keycloak-ui-shared";
+import { useAlerts, useEnvironment } from "@/shared/keycloak-ui-shared";
 
 import { useRealm } from "../../context/realm-context/RealmContext";
+import type { Environment } from "../../environment";
 import useOrgFetcher, {
   type OrganizationScimRepresentation,
 } from "./useOrgFetcher";
@@ -79,12 +81,12 @@ function representationToForm(
       values.issuer = auth.issuer ?? "";
       values.audience = auth.audience ?? "";
       values.jwksUri = auth.jwks_uri ?? "";
-    } else if (auth.type === "EXTERNAL_SECRET") {
-      values.sharedSecret = auth.shared_secret ?? "";
     } else if (auth.type === "EXTERNAL_BASIC") {
       values.basicUsername = auth.username ?? "";
-      values.basicPassword = auth.password ?? "";
+      // basicPassword stays blank -- the existing hash is shown read-only
+      // separately, and a blank input preserves it server-side
     }
+    // sharedSecret stays blank for the same reason as basicPassword above
   }
 
   return values;
@@ -146,12 +148,15 @@ export default function OrgScim({ org, refresh }: OrgScimProps) {
   const { t } = useTranslation();
   const { realm } = useRealm();
   const { addAlert } = useAlerts();
+  const { environment } = useEnvironment<Environment>();
   const {
     getScimConfig,
     createScimConfig,
     updateScimConfig,
     deleteScimConfig,
   } = useOrgFetcher(realm);
+
+  const scimUrl = `${environment.serverBaseUrl}/realms/${realm}/scim/v2/organizations/${org.id}/`;
 
   const [existingConfig, setExistingConfig] =
     useState<OrganizationScimRepresentation | null>(null);
@@ -243,6 +248,31 @@ export default function OrgScim({ org, refresh }: OrgScimProps) {
               />
             </FormGroup>
 
+            {existingConfig && (
+              <>
+                <FormGroup label="ID" fieldId="scim-id">
+                  <ClipboardCopy
+                    id="scim-id"
+                    isReadOnly
+                    hoverTip="Copy"
+                    clickTip="Copied"
+                  >
+                    {org.id}
+                  </ClipboardCopy>
+                </FormGroup>
+                <FormGroup label="SCIM URL" fieldId="scim-url">
+                  <ClipboardCopy
+                    id="scim-url"
+                    isReadOnly
+                    hoverTip="Copy"
+                    clickTip="Copied"
+                  >
+                    {scimUrl}
+                  </ClipboardCopy>
+                </FormGroup>
+              </>
+            )}
+
             <FormGroup label="Use email as username" fieldId="emailAsUsername">
               <Controller
                 name="emailAsUsername"
@@ -306,7 +336,6 @@ export default function OrgScim({ org, refresh }: OrgScimProps) {
                         id="issuer"
                         value={field.value}
                         onChange={(_e, value) => field.onChange(value)}
-                        placeholder="https://sts.windows.net/<tenant-id>/"
                       />
                     )}
                   />

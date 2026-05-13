@@ -11,7 +11,8 @@ export type OrgTab =
   | "members"
   | "invitations"
   | "roles"
-  | "identityproviders";
+  | "identityproviders"
+  | "scim";
 
 export type OrgParams = {
   realm: string;

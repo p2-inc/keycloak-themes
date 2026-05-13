@@ -820,6 +820,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/{realm}/orgs/{orgId}/scim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description realm name (not id!) */
+                realm: string;
+                /** @description organization id */
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        /** Get the SCIM configuration for this organization */
+        get: operations["getScimConfig"];
+        /** Update the SCIM configuration for this organization */
+        put: operations["updateScimConfig"];
+        /** Create a new SCIM configuration for this organization */
+        post: operations["createScimConfig"];
+        /** Delete the SCIM configuration for this organization */
+        delete: operations["deleteScimConfig"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/{realm}/users/{userId}/orgs": {
         parameters: {
             query?: never;
@@ -1633,6 +1658,35 @@ export interface components {
             user_id?: string;
             link?: string;
             sent?: boolean;
+        };
+        OrganizationScimRepresentation: {
+            enabled?: boolean;
+            email_as_username?: boolean;
+            link_idp?: boolean;
+            auth?: components["schemas"]["OrganizationScimAuth"];
+        };
+        OrganizationScimAuth:
+            | components["schemas"]["KeycloakScimAuth"]
+            | components["schemas"]["JwtScimAuth"]
+            | components["schemas"]["SharedSecretScimAuth"]
+            | components["schemas"]["BasicAuthScimAuth"];
+        KeycloakScimAuth: {
+            type: "KEYCLOAK";
+        };
+        JwtScimAuth: {
+            type: "EXTERNAL_JWT";
+            issuer?: string;
+            audience?: string;
+            jwks_uri?: string;
+        };
+        SharedSecretScimAuth: {
+            type: "EXTERNAL_SECRET";
+            shared_secret?: string;
+        };
+        BasicAuthScimAuth: {
+            type: "EXTERNAL_BASIC";
+            username?: string;
+            password?: string;
         };
     };
     responses: never;
@@ -3168,6 +3222,112 @@ export interface operations {
                 alias: string;
                 /** @description Mapper id */
                 id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getScimConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description realm name (not id!) */
+                realm: string;
+                /** @description organization id */
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationScimRepresentation"];
+                };
+            };
+        };
+    };
+    createScimConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description realm name (not id!) */
+                realm: string;
+                /** @description organization id */
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationScimRepresentation"];
+            };
+        };
+        responses: {
+            /** @description success */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationScimRepresentation"];
+                };
+            };
+        };
+    };
+    updateScimConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description realm name (not id!) */
+                realm: string;
+                /** @description organization id */
+                orgId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrganizationScimRepresentation"];
+            };
+        };
+        responses: {
+            /** @description success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationScimRepresentation"];
+                };
+            };
+        };
+    };
+    deleteScimConfig: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description realm name (not id!) */
+                realm: string;
+                /** @description organization id */
+                orgId: string;
             };
             cookie?: never;
         };

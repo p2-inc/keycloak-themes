@@ -21,6 +21,7 @@ import { PortalLink } from "./components/portal-link/PortalLink";
 import useToggle from "../../utils/useToggle";
 import OrgIdentityProviders from "./OrgIdentityProviders";
 import OrgSettings from "./OrgSettings";
+import OrgScim from "./OrgScim";
 import OrgAttributes from "./OrgAttributes";
 import OrgDomains from "./OrgDomains";
 import {
@@ -37,6 +38,7 @@ const tabHelpUrls: Record<OrgTab, string> = {
   invitations: helpUrls.orgInvitationsUrl,
   roles: helpUrls.orgRolesUrl,
   identityproviders: helpUrls.orgIdpsUrl,
+  scim: helpUrls.orgsUrl,
 };
 
 export default function OrgDetails() {
@@ -73,6 +75,7 @@ export default function OrgDetails() {
   const invitationsTab = useTab("invitations");
   const rolesTab = useTab("roles");
   const identityProvidersTab = useTab("identityproviders");
+  const scimTab = useTab("scim");
 
   if (!org) return <div></div>;
 
@@ -145,6 +148,13 @@ export default function OrgDetails() {
             {...identityProvidersTab}
           >
             <OrgIdentityProviders org={org} refresh={refresh} />
+          </Tab>
+          <Tab
+            id="scim"
+            title={<TabTitleText>SCIM</TabTitleText>}
+            {...scimTab}
+          >
+            <OrgScim org={org} refresh={refresh} />
           </Tab>
         </RoutableTabs>
       </PageSection>

@@ -248,30 +248,26 @@ export default function OrgScim({ org, refresh }: OrgScimProps) {
               />
             </FormGroup>
 
-            {existingConfig && (
-              <>
-                <FormGroup label="ID" fieldId="scim-id">
-                  <ClipboardCopy
-                    id="scim-id"
-                    isReadOnly
-                    hoverTip="Copy"
-                    clickTip="Copied"
-                  >
-                    {org.id}
-                  </ClipboardCopy>
-                </FormGroup>
-                <FormGroup label="SCIM URL" fieldId="scim-url">
-                  <ClipboardCopy
-                    id="scim-url"
-                    isReadOnly
-                    hoverTip="Copy"
-                    clickTip="Copied"
-                  >
-                    {scimUrl}
-                  </ClipboardCopy>
-                </FormGroup>
-              </>
-            )}
+            <FormGroup label="ID" fieldId="scim-id">
+              <ClipboardCopy
+                id="scim-id"
+                isReadOnly
+                hoverTip="Copy"
+                clickTip="Copied"
+              >
+                {org.id}
+              </ClipboardCopy>
+            </FormGroup>
+            <FormGroup label="SCIM URL" fieldId="scim-url">
+              <ClipboardCopy
+                id="scim-url"
+                isReadOnly
+                hoverTip="Copy"
+                clickTip="Copied"
+              >
+                {scimUrl}
+              </ClipboardCopy>
+            </FormGroup>
 
             <FormGroup label="Use email as username" fieldId="emailAsUsername">
               <Controller

@@ -35,7 +35,7 @@ export const AttributesForm = ({
 
   return (
     <FormAccess
-      role="manage-realm"
+      role="manage-organizations"
       onSubmit={save ? handleSubmit(save) : undefined}
       fineGrainedAccess={fineGrainedAccess}
     >

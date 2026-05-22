@@ -7,6 +7,7 @@
 # admin/PageHeader.tsx
 # admin/PageNav.tsx
 # admin/routes.tsx
+# email/theme.properties
 # login/i18n.ts
 # login/index.css
 # login/KcContext.ts
@@ -52,7 +53,6 @@
 # === Owned files end =====
 
 # === @keycloakify/email-native v260007.0.0 ===
-/email/theme.properties
 /email/html/email-test.ftl
 /email/html/email-update-confirmation.ftl
 /email/html/email-verification-with-code.ftl

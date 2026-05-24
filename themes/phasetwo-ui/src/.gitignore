@@ -7,6 +7,7 @@
 # admin/PageHeader.tsx
 # admin/PageNav.tsx
 # admin/routes.tsx
+# email/theme.properties
 # login/i18n.ts
 # login/index.css
 # login/KcContext.ts
@@ -28,12 +29,14 @@
 # components/ui/tooltip.tsx
 # email/html/template.ftl
 # login/pages/PageIndex.tsx
+# admin/components/form/FormAccess.tsx
 # admin/components/view-header/ViewHeader.tsx
 # admin/context/access/Access.tsx
 # admin/realm-settings/routes/RealmSettings.tsx
 # admin/realm-settings/themes/ThemeSettings.tsx
 # admin/user/routes/User.tsx
 # login/components/Template/Template.tsx
+# login/components/UserProfileFormFields/SelectTag.tsx
 # login/pages/delete-account-confirm/Page.tsx
 # login/pages/delete-credential/Page.tsx
 # login/pages/login-config-totp/Page.tsx
@@ -50,7 +53,6 @@
 # === Owned files end =====
 
 # === @keycloakify/email-native v260007.0.0 ===
-/email/theme.properties
 /email/html/email-test.ftl
 /email/html/email-update-confirmation.ftl
 /email/html/email-verification-with-code.ftl
@@ -497,7 +499,6 @@
 /admin/components/form/CodeEditor.tsx
 /admin/components/form/fixed-buttons.module.css
 /admin/components/form/FixedButtonGroup.tsx
-/admin/components/form/FormAccess.tsx
 /admin/components/group/group-picker-dialog.css
 /admin/components/group/GroupPath.tsx
 /admin/components/group/GroupPickerDialog.tsx
@@ -941,7 +942,6 @@
 /login/components/UserProfileFormFields/InputLabel.tsx
 /login/components/UserProfileFormFields/InputTag.tsx
 /login/components/UserProfileFormFields/InputTagSelects.tsx
-/login/components/UserProfileFormFields/SelectTag.tsx
 /login/components/UserProfileFormFields/TextareaTag.tsx
 /login/components/UserProfileFormFields/UserProfileFormFields.tsx
 /login/components/WebAuthnConditionalUi/index.ts

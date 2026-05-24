@@ -47,9 +47,10 @@ export default function OrgDetails() {
   const { addError } = useAlerts();
   const [portalLinkOpen, togglePortalLinkOpen] = useToggle(false);
   const [key, setKey] = useState(0);
+  const [scimEnabled, setScimEnabled] = useState(false);
 
   const { realm } = useRealm();
-  const { getOrg, org } = useOrgFetcher(realm);
+  const { getOrg, org, getOrgsConfig } = useOrgFetcher(realm);
 
   const refresh = () => {
     setKey(key + 1);
@@ -57,6 +58,13 @@ export default function OrgDetails() {
 
   useEffect(() => {
     getOrg(orgId!).catch((e) => addError(t("errorFetching"), e));
+    getOrgsConfig()
+      .then((cfg) => {
+        if (cfg && !("error" in cfg)) {
+          setScimEnabled(!!cfg.scimEnabled);
+        }
+      })
+      .catch(() => setScimEnabled(false));
   }, [key]);
 
   const useTab = (tab: OrgTab) =>
@@ -149,13 +157,15 @@ export default function OrgDetails() {
           >
             <OrgIdentityProviders org={org} refresh={refresh} />
           </Tab>
-          <Tab
-            id="scim"
-            title={<TabTitleText>SCIM</TabTitleText>}
-            {...scimTab}
-          >
-            <OrgScim org={org} refresh={refresh} />
-          </Tab>
+          {scimEnabled && (
+            <Tab
+              id="scim"
+              title={<TabTitleText>SCIM</TabTitleText>}
+              {...scimTab}
+            >
+              <OrgScim org={org} refresh={refresh} />
+            </Tab>
+          )}
         </RoutableTabs>
       </PageSection>
     </>

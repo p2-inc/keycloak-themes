@@ -1481,6 +1481,8 @@ export interface components {
             createAdminUserEnabled?: boolean;
             /** @description Whether identity providers can be shared across organizations */
             sharedIdpsEnabled?: boolean;
+            /** @description Whether SCIM provisioning is enabled for organizations in this realm */
+            scimEnabled?: boolean;
         };
         SwitchOrganizationRepresentation: {
             /** @description The ID of the organization to switch to */

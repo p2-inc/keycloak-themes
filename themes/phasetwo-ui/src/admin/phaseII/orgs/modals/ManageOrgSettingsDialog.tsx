@@ -29,6 +29,7 @@ export type OrgConfigType = {
   sharedIdpsEnabled: boolean;
   multipleIdpsEnabled: boolean;
   validateIdpEnabled: boolean;
+  scimEnabled: boolean;
   expirationInSecs?: number;
 };
 
@@ -205,6 +206,32 @@ export const ManageOrgSettingsDialog = ({
                 variant={AlertVariant.warning}
                 isInline
                 title={t("orgSettingsValidateIdpEnabledWarning")}
+                className="pf-v5-u-mt-lg"
+              />
+            )}
+        </FormGroup>
+        <FormGroup
+          label={t("scimEnabled")}
+          fieldId="scimEnabled"
+          disabled={isNil(orgConfig)}
+        >
+          <Checkbox
+            label={t("scimEnabled")}
+            aria-label={t("scimEnabled")}
+            id="scimEnabled"
+            description={t("scimEnabledExplainer")}
+            isChecked={orgConfig?.scimEnabled}
+            isDisabled={isNil(orgConfig)}
+            onChange={(_evt, checked) =>
+              setOrgConfig({ ...orgConfig!, scimEnabled: checked })
+            }
+          />
+          {currentOrgConfig?.scimEnabled === true &&
+            orgConfig?.scimEnabled === false && (
+              <Alert
+                variant={AlertVariant.warning}
+                isInline
+                title={t("orgSettingsScimEnabledWarning")}
                 className="pf-v5-u-mt-lg"
               />
             )}

@@ -24,6 +24,12 @@ export type PhaseTwoOrganizationMemberAttributesRepresentation = Record<
 export type OrganizationDomainRepresentation =
   components["schemas"]["OrganizationDomainRepresentation"];
 
+export type OrganizationScimRepresentation =
+  components["schemas"]["OrganizationScimRepresentation"];
+
+export type OrganizationScimAuth =
+  components["schemas"]["OrganizationScimAuth"];
+
 async function getResponseError(response: Response): Promise<Error> {
   const jsonResponse = response.clone();
   const contentType = response.headers.get("content-type");
@@ -513,6 +519,52 @@ export default function useOrgFetcher(realm: string) {
     return null;
   }
 
+  async function getScimConfig(
+    orgId: string,
+  ): Promise<OrganizationScimRepresentation | null> {
+    const { data, response } = await client.GET(
+      "/{realm}/orgs/{orgId}/scim",
+      { params: { path: { realm, orgId } } },
+    );
+    if (response.ok) return data ?? null;
+    return null;
+  }
+
+  async function createScimConfig(
+    orgId: string,
+    config: OrganizationScimRepresentation,
+  ) {
+    const { response } = await client.POST("/{realm}/orgs/{orgId}/scim", {
+      params: { path: { realm, orgId } },
+      body: config,
+    });
+    if (response.ok) return { success: true, message: "SCIM configuration created." };
+    const error = await getResponseError(response);
+    return { error: true, message: error.message };
+  }
+
+  async function updateScimConfig(
+    orgId: string,
+    config: OrganizationScimRepresentation,
+  ) {
+    const { response } = await client.PUT("/{realm}/orgs/{orgId}/scim", {
+      params: { path: { realm, orgId } },
+      body: config,
+    });
+    if (response.ok) return { success: true, message: "SCIM configuration updated." };
+    const error = await getResponseError(response);
+    return { error: true, message: error.message };
+  }
+
+  async function deleteScimConfig(orgId: string) {
+    const { response } = await client.DELETE("/{realm}/orgs/{orgId}/scim", {
+      params: { path: { realm, orgId } },
+    });
+    if (response.ok) return { success: true, message: "SCIM configuration removed." };
+    const error = await getResponseError(response);
+    return { error: true, message: error.message };
+  }
+
   async function verifyDomain(orgId: string, domainName: string) {
     const { response } = await client.POST(
       "/{realm}/orgs/{orgId}/domains/{domainName}/verify",
@@ -560,5 +612,9 @@ export default function useOrgFetcher(realm: string) {
     updateOrg,
     updateOrgsConfig,
     updateRoleForOrg,
+    getScimConfig,
+    createScimConfig,
+    updateScimConfig,
+    deleteScimConfig,
   };
 }

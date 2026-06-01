@@ -30,30 +30,24 @@ export type OrganizationScimRepresentation =
 export type OrganizationScimAuth =
   components["schemas"]["OrganizationScimAuth"];
 
-async function getResponseError(response: Response): Promise<Error> {
-  const jsonResponse = response.clone();
-  const contentType = response.headers.get("content-type");
+// openapi-fetch has already consumed the response body to populate `error` /
+// `data` by the time these handlers run; calling `response.clone()` or
+// `response.text()` on it throws "Response body is already used". Use the
+// pre-parsed `error` payload instead.
+function getResponseError(error: unknown, response: Response): Error {
   let message = "";
 
-  if (contentType?.includes("application/json")) {
-    const data = await jsonResponse.json().catch(() => undefined);
-
-    if (typeof data === "object" && data !== null) {
-      const errorFields = ["error", "errorMessage", "message"];
-
-      for (const field of errorFields) {
-        const value = (data as Record<string, unknown>)[field];
-
-        if (typeof value === "string" && value.trim().length > 0) {
-          message = value;
-          break;
-        }
+  if (typeof error === "object" && error !== null) {
+    const errorFields = ["error", "errorMessage", "message"];
+    for (const field of errorFields) {
+      const value = (error as Record<string, unknown>)[field];
+      if (typeof value === "string" && value.trim().length > 0) {
+        message = value;
+        break;
       }
     }
-  }
-
-  if (!message) {
-    message = (await response.text().catch(() => "")).trim();
+  } else if (typeof error === "string" && error.trim().length > 0) {
+    message = error;
   }
 
   if (!message) {
@@ -81,7 +75,7 @@ export default function useOrgFetcher(realm: string) {
   }
 
   async function createOrg(org: OrgFormSubmission) {
-    const { response } = await client.POST("/{realm}/orgs", {
+    const { error, response } = await client.POST("/{realm}/orgs", {
       params: { path: { realm } },
       body: { ...org, realm },
     });
@@ -90,8 +84,7 @@ export default function useOrgFetcher(realm: string) {
       return { success: true, message: "Org created successfully." };
     }
 
-    const error = await getResponseError(response);
-    return { error: true, message: error.message };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function getOrg(orgId: string) {
@@ -102,7 +95,7 @@ export default function useOrgFetcher(realm: string) {
   }
 
   async function updateOrg(org: OrgRepresentation) {
-    const { response } = await client.PUT("/{realm}/orgs/{orgId}", {
+    const { error, response } = await client.PUT("/{realm}/orgs/{orgId}", {
       params: { path: { realm, orgId: org.id } },
       body: { ...org },
     });
@@ -111,11 +104,11 @@ export default function useOrgFetcher(realm: string) {
       setOrg(org);
       return { success: true, message: "Organization updated." };
     }
-    return { error: true, message: await response.text() };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function deleteOrg(org: OrgRepresentation) {
-    const { response } = await client.DELETE("/{realm}/orgs/{orgId}", {
+    const { error, response } = await client.DELETE("/{realm}/orgs/{orgId}", {
       params: { path: { realm, orgId: org.id } },
     });
 
@@ -123,8 +116,8 @@ export default function useOrgFetcher(realm: string) {
       return { success: true, message: "Organization removed." };
     }
 
-    const error = await getResponseError(response);
-    return { error: true, message: `${org.name} could not be removed. (${error.message})` };
+    const err = getResponseError(error, response);
+    return { error: true, message: `${org.name} could not be removed. (${err.message})` };
   }
 
   type OrgMemberOptions = {
@@ -193,13 +186,13 @@ export default function useOrgFetcher(realm: string) {
     send: boolean,
     redirectUri: string,
   ) {
-    const { response } = await client.POST("/{realm}/orgs/{orgId}/invitations", {
+    const { error, response } = await client.POST("/{realm}/orgs/{orgId}/invitations", {
       params: { path: { realm, orgId } },
       body: { email, send, redirectUri },
     });
 
     if (!response.ok) {
-      throw await getResponseError(response);
+      throw getResponseError(error, response);
     }
   }
 
@@ -214,24 +207,24 @@ export default function useOrgFetcher(realm: string) {
   }
 
   async function deleteOrgInvitation(orgId: string, invitationId: string) {
-    const { response } = await client.DELETE(
+    const { error, response } = await client.DELETE(
       "/{realm}/orgs/{orgId}/invitations/{invitationId}",
       { params: { path: { realm, orgId, invitationId } } },
     );
 
     if (!response.ok) {
-      throw await getResponseError(response);
+      throw getResponseError(error, response);
     }
   }
 
   async function resendOrgInvitation(orgId: string, invitationId: string) {
-    const { response } = await client.PUT(
+    const { error, response } = await client.PUT(
       "/{realm}/orgs/{orgId}/invitations/{invitationId}/resend-email",
       { params: { path: { realm, orgId, invitationId } } },
     );
 
     if (!response.ok) {
-      throw await getResponseError(response);
+      throw getResponseError(error, response);
     }
   }
 
@@ -254,7 +247,7 @@ export default function useOrgFetcher(realm: string) {
   }
 
   async function deleteRoleFromOrg(orgId: string, role: RoleRepresentation) {
-    const { response } = await client.DELETE(
+    const { error, response } = await client.DELETE(
       "/{realm}/orgs/{orgId}/roles/{name}",
       { params: { path: { realm, orgId, name: role.name! } } },
     );
@@ -263,12 +256,11 @@ export default function useOrgFetcher(realm: string) {
       return { success: true, message: `${role.name} removed from Organization.` };
     }
 
-    const error = await getResponseError(response);
-    return { error: true, message: error.message };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function createRoleForOrg(orgId: string, role: RoleRepresentation) {
-    const { response } = await client.POST("/{realm}/orgs/{orgId}/roles", {
+    const { error, response } = await client.POST("/{realm}/orgs/{orgId}/roles", {
       params: { path: { realm, orgId } },
       body: { id: "fake-id", name: role.name, description: role.description ?? "" },
     });
@@ -277,15 +269,14 @@ export default function useOrgFetcher(realm: string) {
       return { success: true, message: `${role.name} added to Organization.` };
     }
 
-    const error = await getResponseError(response);
-    return { error: true, message: error.message };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function updateRoleForOrg(
     orgId: string,
     role: { name: string; description?: string },
   ) {
-    const { response } = await client.PUT(
+    const { error, response } = await client.PUT(
       "/{realm}/orgs/{orgId}/roles/{name}",
       {
         params: { path: { realm, orgId, name: role.name } },
@@ -297,8 +288,7 @@ export default function useOrgFetcher(realm: string) {
       return { success: true, message: `${role.name} updated.` };
     }
 
-    const error = await getResponseError(response);
-    return { error: true, message: error.message };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function checkOrgRoleForUser(
@@ -306,7 +296,7 @@ export default function useOrgFetcher(realm: string) {
     role: RoleRepresentation,
     user: UserRepresentation,
   ) {
-    const { response } = await client.GET(
+    const { error, response } = await client.GET(
       "/{realm}/orgs/{orgId}/roles/{name}/users/{userId}",
       { params: { path: { realm, orgId, name: role.name!, userId: user.id! } } },
     );
@@ -315,12 +305,11 @@ export default function useOrgFetcher(realm: string) {
       return { success: true, message: `User has role: ${role.name}.` };
     }
 
-    const error = await getResponseError(response);
-    return { error: true, message: error.message };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function listOrgRolesForUser(orgId: string, user: UserRepresentation) {
-    const { data, response } = await client.GET(
+    const { data, error, response } = await client.GET(
       "/{realm}/users/{userId}/orgs/{orgId}/roles",
       { params: { path: { realm, userId: user.id!, orgId } } },
     );
@@ -332,7 +321,7 @@ export default function useOrgFetcher(realm: string) {
       };
     }
 
-    return { error: true, message: await response.json() };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function setOrgRoleForUser(
@@ -340,7 +329,7 @@ export default function useOrgFetcher(realm: string) {
     role: RoleRepresentation,
     user: UserRepresentation,
   ) {
-    const { response } = await client.PUT(
+    const { error, response } = await client.PUT(
       "/{realm}/orgs/{orgId}/roles/{name}/users/{userId}",
       { params: { path: { realm, orgId, name: role.name!, userId: user.id! } } },
     );
@@ -349,8 +338,7 @@ export default function useOrgFetcher(realm: string) {
       return { success: true, message: `${role.name} assigned to user.` };
     }
 
-    const error = await getResponseError(response);
-    return { error: true, message: error.message };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function revokeOrgRoleForUser(
@@ -358,7 +346,7 @@ export default function useOrgFetcher(realm: string) {
     role: RoleRepresentation,
     user: UserRepresentation,
   ) {
-    const { response } = await client.DELETE(
+    const { error, response } = await client.DELETE(
       "/{realm}/orgs/{orgId}/roles/{name}/users/{userId}",
       { params: { path: { realm, orgId, name: role.name!, userId: user.id! } } },
     );
@@ -367,8 +355,7 @@ export default function useOrgFetcher(realm: string) {
       return { success: true, message: `${role.name} revoked for user.` };
     }
 
-    const error = await getResponseError(response);
-    return { error: true, message: error.message };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function updateIdentityProvider(
@@ -467,12 +454,15 @@ export default function useOrgFetcher(realm: string) {
 
   async function getOrgsConfig() {
     try {
-      const { data, response } = await client.GET("/{realm}/orgs/config", {
+      const { data, error, response } = await client.GET("/{realm}/orgs/config", {
         params: { path: { realm } },
       });
 
       if (response.ok) return data as unknown as OrgConfigType;
-      return { error: true, message: "Failed to fetch orgs config." };
+      return {
+        error: true,
+        message: getResponseError(error, response).message,
+      };
     } catch (error) {
       return { error: true, message: error };
     }
@@ -480,7 +470,7 @@ export default function useOrgFetcher(realm: string) {
 
   async function updateOrgsConfig(orgsConfig: OrgConfigType) {
     try {
-      const { response } = await client.PUT("/{realm}/orgs/config", {
+      const { error, response } = await client.PUT("/{realm}/orgs/config", {
         params: { path: { realm } },
         body: orgsConfig as components["schemas"]["OrganizationConfigRepresentation"],
       });
@@ -488,7 +478,10 @@ export default function useOrgFetcher(realm: string) {
       if (response.ok) {
         return { success: true, message: "Organizations config updated." };
       }
-      throw new Error("Failed to update organizations config.");
+      return {
+        error: true,
+        message: getResponseError(error, response).message,
+      };
     } catch (error) {
       return { error: true, message: error };
     }
@@ -534,45 +527,42 @@ export default function useOrgFetcher(realm: string) {
     orgId: string,
     config: OrganizationScimRepresentation,
   ) {
-    const { response } = await client.POST("/{realm}/orgs/{orgId}/scim", {
+    const { error, response } = await client.POST("/{realm}/orgs/{orgId}/scim", {
       params: { path: { realm, orgId } },
       body: config,
     });
     if (response.ok) return { success: true, message: "SCIM configuration created." };
-    const error = await getResponseError(response);
-    return { error: true, message: error.message };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function updateScimConfig(
     orgId: string,
     config: OrganizationScimRepresentation,
   ) {
-    const { response } = await client.PUT("/{realm}/orgs/{orgId}/scim", {
+    const { error, response } = await client.PUT("/{realm}/orgs/{orgId}/scim", {
       params: { path: { realm, orgId } },
       body: config,
     });
     if (response.ok) return { success: true, message: "SCIM configuration updated." };
-    const error = await getResponseError(response);
-    return { error: true, message: error.message };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function deleteScimConfig(orgId: string) {
-    const { response } = await client.DELETE("/{realm}/orgs/{orgId}/scim", {
+    const { error, response } = await client.DELETE("/{realm}/orgs/{orgId}/scim", {
       params: { path: { realm, orgId } },
     });
     if (response.ok) return { success: true, message: "SCIM configuration removed." };
-    const error = await getResponseError(response);
-    return { error: true, message: error.message };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   async function verifyDomain(orgId: string, domainName: string) {
-    const { response } = await client.POST(
+    const { error, response } = await client.POST(
       "/{realm}/orgs/{orgId}/domains/{domainName}/verify",
       { params: { path: { realm, orgId, domainName } } },
     );
 
     if (response.ok) return { success: true, message: "Domain verification triggered." };
-    return { error: true, message: await response.text() };
+    return { error: true, message: getResponseError(error, response).message };
   }
 
   return {

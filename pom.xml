@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.phasetwo.keycloak</groupId>
   <artifactId>keycloak-themes</artifactId>
@@ -10,11 +11,11 @@
   <url>https://github.com/p2-inc/keycloak-themes</url>
 
   <parent>
-    <groupId>com.github.xgp</groupId>
+    <groupId>io.phasetwo</groupId>
     <artifactId>oss-parent</artifactId>
-    <version>0.7</version>
+    <version>0.13</version>
   </parent>
-  
+
   <developers>
     <developer>
       <name>Phase Two, Inc.</name>
@@ -28,7 +29,7 @@
       <url>https://raw.githubusercontent.com/elastic/elasticsearch/main/licenses/ELASTIC-LICENSE-2.0.txt</url>
     </license>
   </licenses>
-  
+
   <properties>
     <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -56,7 +57,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-	<version>3.5.1</version>
+        <version>3.5.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -66,31 +67,30 @@
           </execution>
         </executions>
         <configuration>
-	  <filters>
+          <filters>
             <filter>
               <artifact>*:*</artifact>
               <excludes>
                 <exclude>META-INF/MANIFEST.MF</exclude>
               </excludes>
-	    </filter>
+            </filter>
           </filters>
-	</configuration>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
-	  <compilerArgument>-Xlint:unchecked</compilerArgument>
-	  <compilerArgument>-Xlint:deprecation</compilerArgument>
+          <compilerArgument>-Xlint:unchecked</compilerArgument>
+          <compilerArgument>-Xlint:deprecation</compilerArgument>
           <useIncrementalCompilation>false</useIncrementalCompilation>
-	  <annotationProcessorPaths>
+          <annotationProcessorPaths>
             <path>
-	      <groupId>com.google.auto.service</groupId>
-	      <artifactId>auto-service</artifactId>
-	      <version>${auto-service.version}</version>
+              <groupId>com.google.auto.service</groupId>
+              <artifactId>auto-service</artifactId>
+              <version>${auto-service.version}</version>
             </path>
             <path>
               <groupId>org.projectlombok</groupId>
@@ -103,7 +103,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>1.4</version>
         <executions>
           <execution>
             <id>detect-scm-revision</id>
@@ -138,21 +137,16 @@
           <versionCommit>${buildNumber}</versionCommit>
         </configuration>
       </plugin>
-      <plugin> <!-- pretty up the code using google java standards `mvn fmt:format` -->
-        <groupId>com.spotify.fmt</groupId>
-        <artifactId>fmt-maven-plugin</artifactId>
-        <version>2.25</version>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.2.2</version>
-	<configuration>
+        <configuration>
           <argLine>
             --illegal-access=permit
           </argLine>
           <systemPropertyVariables>
-	    <keycloak-version>${keycloak.version}</keycloak-version>
+            <keycloak-version>${keycloak.version}</keycloak-version>
           </systemPropertyVariables>
           <!-- Integration tests requiring Docker are excluded by default; use -Pintegration-tests to run them -->
           <excludes>
@@ -183,7 +177,7 @@
             <goals>
               <goal>corepack</goal>
             </goals>
-            <configuration> 
+            <configuration>
               <workingDirectory>${phasetwo.ui.dir}</workingDirectory>
               <arguments>pnpm install --frozen-lockfile</arguments>
             </configuration>
@@ -215,7 +209,7 @@
               <target>
                 <unzip src="${phasetwo.ui.jar}" dest="${project.build.outputDirectory}" overwrite="true">
                   <patternset>
-                    <exclude name="META-INF/**" />
+                    <exclude name="META-INF/**"/>
                   </patternset>
                 </unzip>
               </target>
@@ -322,7 +316,7 @@
       <artifactId>compiler</artifactId>
       <version>0.9.10</version>
     </dependency>
-    
+
     <!-- testing -->
     <dependency>
       <groupId>org.mockito</groupId>

@@ -49,6 +49,18 @@ docker compose up
 
 Then open `http://localhost:8080/auth`.
 
+### Code formatting
+
+The build enforces Google Java formatting standards via [Spotless](https://github.com/diffplug/spotless). Use `mvn spotless:check` to verify formatting and `mvn spotless:apply` to fix it.
+
+To enforce formatting automatically before every push, install the provided git pre-push hook:
+
+```
+mvn spotless:install-git-pre-push-hook
+```
+
+When you push, the hook runs `spotless:check`. If violations are found, it automatically runs `spotless:apply`, aborts the push, and lets you review and commit the formatted files before retrying.
+
 ## Overview
 
 ### Login theme(s)

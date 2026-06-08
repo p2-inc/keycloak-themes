@@ -48,7 +48,7 @@ export const RealmStatCards = ({ stats }: RealmStatCardsProps) => {
       capped: stats.clientsCapped,
       path: "/clients",
     },
-    { label: "Active Sessions", value: stats.activeSessions, path: "/sessions" },
+    { label: "Sessions", value: stats.sessions, path: "/sessions" },
     { label: "Organizations", value: stats.orgs, path: "/ext-organizations" },
     {
       label: "Identity Providers",

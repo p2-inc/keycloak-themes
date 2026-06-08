@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
-import { UserIcon, OutlinedClockIcon, UsersIcon } from "@patternfly/react-icons";
+import {
+  UserIcon,
+  UsersIcon,
+  OutlinedClockIcon,
+} from "@patternfly/react-icons";
 import { useRealm } from "../../context/realm-context/RealmContext";
 import { useDashboardStats } from "./useDashboardStats";
 import "./dashboard-stats.css";
@@ -23,7 +27,7 @@ export const MastheadStats = () => {
     },
     {
       icon: <OutlinedClockIcon />,
-      value: stats.activeSessions,
+      value: stats.sessions,
       label: "Sessions",
       path: `/${r}/sessions`,
     },

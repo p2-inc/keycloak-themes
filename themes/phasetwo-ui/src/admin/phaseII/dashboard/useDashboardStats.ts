@@ -1,22 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAdminClient } from "../../admin-client";
 import { useRealm } from "../../context/realm-context/RealmContext";
-import { fetchAdminUI } from "../../context/auth/admin-ui-endpoint";
 import { usePhaseTwoClient } from "../api/client";
-
-type SessionStats = {
-  active: number;
-  offline: number;
-  clientSessions: number;
-  offlineClientSessions: number;
-};
 
 export type DashboardStats = {
   users: number | null;
   clients: number | null;
   clientsCapped: boolean;
-  activeSessions: number | null;
-  offlineSessions: number | null;
+  sessions: number | null;
   orgs: number | null;
   idps: number | null;
   groups: number | null;
@@ -26,8 +17,7 @@ const INITIAL: DashboardStats = {
   users: null,
   clients: null,
   clientsCapped: false,
-  activeSessions: null,
-  offlineSessions: null,
+  sessions: null,
   orgs: null,
   idps: null,
   groups: null,
@@ -52,7 +42,7 @@ export function useDashboardStats(): {
     Promise.allSettled([
       adminClient.users.count(),
       adminClient.clients.find({ briefRepresentation: true, max: CLIENT_CAP + 1 } as Parameters<typeof adminClient.clients.find>[0]),
-      fetchAdminUI<SessionStats>(adminClient, "sessions/stats"),
+      adminClient.realms.getClientSessionStats({ realm }),
       phaseTwoClient.GET("/{realm}/orgs/count", { params: { path: { realm } } }),
       adminClient.identityProviders.find({ first: 0, max: 100 }),
       adminClient.groups.count(),
@@ -66,10 +56,16 @@ export function useDashboardStats(): {
         clientsCapped:
           clients.status === "fulfilled" &&
           clients.value.length > CLIENT_CAP,
-        activeSessions:
-          sessions.status === "fulfilled" ? sessions.value.active : null,
-        offlineSessions:
-          sessions.status === "fulfilled" ? sessions.value.offline : null,
+        // Matches dash.phasetwo.io: sum active + offline across all clients
+        // from client-session-stats (no realm-wide endpoint exists).
+        sessions:
+          sessions.status === "fulfilled"
+            ? sessions.value.reduce(
+                (total, stat) =>
+                  total + Number(stat.active ?? 0) + Number(stat.offline ?? 0),
+                0,
+              )
+            : null,
         orgs:
           orgs.status === "fulfilled" && typeof orgs.value.data === "number"
             ? orgs.value.data

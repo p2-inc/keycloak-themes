@@ -16,7 +16,6 @@ export const SidebarStatsBox = () => {
 
   const items = [
     { label: "Users", value: stats.users, path: `/${r}/users` },
-    { label: "Sessions", value: stats.activeSessions, path: `/${r}/sessions` },
     { label: "Organizations", value: stats.orgs, path: `/${r}/ext-organizations` },
     {
       label: "Clients",
@@ -24,6 +23,7 @@ export const SidebarStatsBox = () => {
       capped: stats.clientsCapped,
       path: `/${r}/clients`,
     },
+    { label: "Sessions", value: stats.sessions, path: `/${r}/sessions` },
   ];
 
   return (

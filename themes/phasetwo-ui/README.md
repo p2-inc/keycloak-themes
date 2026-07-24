@@ -78,7 +78,7 @@ This produces `../../target/phasetwo-ui/phasetwo-ui-theme.jar`.
 **Step 2 — start Keycloak:**
 
 ```bash
-pnpm docker:start
+pnpm docker:up
 ```
 
 Keycloak starts at [http://localhost:8080/auth](http://localhost:8080/auth). On first run it imports `docker/realm-export.json`.
@@ -90,12 +90,12 @@ pnpm docker:stop   # shut down (add --volumes to also wipe data)
 
 #### Test credentials
 
-| URL | Username | Password | Notes |
-|-----|----------|----------|-------|
-| [Admin console (master)](http://localhost:8080/auth/admin) | `admin` | `admin` | Master realm superadmin |
-| [Admin console (phasetwo-ui realm)](http://localhost:8080/auth/admin/phasetwo-ui/console) | `admin` | `admin` | Realm admin |
-| Login page | `org-admin` | `password` | Org admin test user |
-| Login page | `org-member` | `password` | Org member test user |
+| URL                                                                                       | Username     | Password   | Notes                   |
+| ----------------------------------------------------------------------------------------- | ------------ | ---------- | ----------------------- |
+| [Admin console (master)](http://localhost:8080/auth/admin)                                | `admin`      | `admin`    | Master realm superadmin |
+| [Admin console (phasetwo-ui realm)](http://localhost:8080/auth/admin/phasetwo-ui/console) | `admin`      | `admin`    | Realm admin             |
+| Login page                                                                                | `org-admin`  | `password` | Org admin test user     |
+| Login page                                                                                | `org-member` | `password` | Org member test user    |
 
 #### Seeding organizations
 
@@ -152,13 +152,13 @@ Opens the Playwright UI for step-by-step debugging with timeline and snapshots.
 
 ### Environment variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `KC_BASE_URL` | `http://localhost:8080/auth` | Keycloak base URL |
-| `KC_REALM` | `phasetwo-ui` | Realm under test |
-| `KC_ADMIN_USER` | `admin` | Admin username for API calls |
-| `KC_ADMIN_PASSWORD` | `admin` | Admin password |
-| `PLAYWRIGHT_INTEGRATION` | — | Set to `true` to enable browser projects |
+| Variable                 | Default                      | Description                              |
+| ------------------------ | ---------------------------- | ---------------------------------------- |
+| `KC_BASE_URL`            | `http://localhost:8080/auth` | Keycloak base URL                        |
+| `KC_REALM`               | `phasetwo-ui`                | Realm under test                         |
+| `KC_ADMIN_USER`          | `admin`                      | Admin username for API calls             |
+| `KC_ADMIN_PASSWORD`      | `admin`                      | Admin password                           |
+| `PLAYWRIGHT_INTEGRATION` | —                            | Set to `true` to enable browser projects |
 
 ### Test layout
 
@@ -201,12 +201,12 @@ pnpm build-storybook
 
 In Keycloak Admin → Realm Settings → Themes, set:
 
-| Theme type | Value |
-|------------|-------|
-| Login | `phasetwo-ui` |
-| Admin | `phasetwo-ui` |
-| Account | `phasetwo-ui` |
-| Email | `phasetwo-ui` |
+| Theme type | Value         |
+| ---------- | ------------- |
+| Login      | `phasetwo-ui` |
+| Admin      | `phasetwo-ui` |
+| Account    | `phasetwo-ui` |
+| Email      | `phasetwo-ui` |
 
 ### Runtime style attributes
 
@@ -214,20 +214,20 @@ Colors, logos, and custom CSS are stored as Realm attributes and applied without
 
 #### General
 
-| Attribute key | Description |
-|---------------|-------------|
-| `_providerConfig.assets.logo.url` | Logo shown in the login panel and admin UI |
-| `_providerConfig.assets.favicon.url` | Browser favicon |
-| `_providerConfig.assets.appicon.url` | App icon (e.g. mobile/PWA) |
+| Attribute key                        | Description                                |
+| ------------------------------------ | ------------------------------------------ |
+| `_providerConfig.assets.logo.url`    | Logo shown in the login panel and admin UI |
+| `_providerConfig.assets.favicon.url` | Browser favicon                            |
+| `_providerConfig.assets.appicon.url` | App icon (e.g. mobile/PWA)                 |
 
 #### Login theme
 
-| Attribute key | Description | Default |
-|---------------|-------------|---------|
-| `_providerConfig.assets.login.primaryColor` | Brand primary color (buttons, links, sidebar) | `#3b82f6` |
-| `_providerConfig.assets.login.secondaryColor` | Secondary accent color | `#60a5fa` |
-| `_providerConfig.assets.login.backgroundColor` | Page background | `#ffffff` |
-| `_providerConfig.assets.login.css` | Arbitrary CSS injected after theme styles | — |
+| Attribute key                                  | Description                                   | Default   |
+| ---------------------------------------------- | --------------------------------------------- | --------- |
+| `_providerConfig.assets.login.primaryColor`    | Brand primary color (buttons, links, sidebar) | `#3b82f6` |
+| `_providerConfig.assets.login.secondaryColor`  | Secondary accent color                        | `#60a5fa` |
+| `_providerConfig.assets.login.backgroundColor` | Page background                               | `#ffffff` |
+| `_providerConfig.assets.login.css`             | Arbitrary CSS injected after theme styles     | —         |
 
 The `docker/realm-export.json` seeds these defaults on first import:
 

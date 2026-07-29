@@ -548,7 +548,7 @@ export function KeycloakDataTable<T>({
         } else {
           setFirst(0);
         }
-        setPaginationCount(data.length);
+        setPaginationCount(getPaginatedItemCount(first, max, data.length));
       } else {
         setPaginationCount(paginationCount);
       }

@@ -22,4 +22,15 @@ describe("pagination utils", () => {
     expect(getPaginatedItemCount(0, 10, 11)).toBeUndefined();
     expect(getPaginatedItemCount(20, 10, 5)).toBe(25);
   });
+
+  it("keeps the count unknown past the second page while more rows remain", () => {
+    // Unpaginated tables slice a window of up to max + 1 rows per page.
+    // A full window (> max) must report an unknown total so the pager can
+    // advance beyond page 2, instead of stopping at ceil((max + 1) / max).
+    expect(getPaginatedItemCount(0, 10, 11)).toBeUndefined();
+    expect(getPaginatedItemCount(10, 10, 11)).toBeUndefined();
+    expect(getPaginatedItemCount(20, 10, 11)).toBeUndefined();
+    // Exact total is only revealed once a short (last) window is reached.
+    expect(getPaginatedItemCount(240, 10, 10)).toBe(250);
+  });
 });

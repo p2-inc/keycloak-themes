@@ -85,7 +85,7 @@ Keycloak starts at [http://localhost:8080/auth](http://localhost:8080/auth). On 
 
 ```bash
 pnpm docker:logs   # tail Keycloak output
-pnpm docker:stop   # shut down (add --volumes to also wipe data)
+pnpm docker:down   # shut down (add --volumes to also wipe data)
 ```
 
 #### Test credentials

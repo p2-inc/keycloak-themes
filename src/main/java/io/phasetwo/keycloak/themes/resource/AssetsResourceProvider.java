@@ -2,7 +2,10 @@ package io.phasetwo.keycloak.themes.resource;
 
 import com.google.common.base.Strings;
 import com.google.common.io.CharSource;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
@@ -13,6 +16,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
 import org.keycloak.services.Urls;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.theme.Theme;
@@ -130,11 +134,16 @@ public class AssetsResourceProvider implements RealmResourceProvider {
   @Produces("text/css")
   public Response cssLogin(@Context HttpHeaders headers, @Context UriInfo uriInfo)
       throws IOException {
-    String customCss = session.getContext().getRealm().getAttribute(ASSETS_LOGIN_CSS);
+    RealmModel realm = session.getContext().getRealm();
+    String customCss = realm.getAttribute(ASSETS_LOGIN_CSS);
     StringBuilder o = new StringBuilder("/* custom login css */\n");
     o.append(":root {\n");
     setColors(o);
     o.append("}\n");
+    // Shared theme.v2.* brand tokens expanded to shadcn variables for the login
+    // surface. Emitted after the legacy --p2-login-* block and before any custom
+    // CSS, so hand-written CSS still wins.
+    o.append("\n").append(LoginThemeCss.render(realm::getAttribute));
     if (!Strings.isNullOrEmpty(customCss)) {
       o.append("\n").append(customCss);
     }

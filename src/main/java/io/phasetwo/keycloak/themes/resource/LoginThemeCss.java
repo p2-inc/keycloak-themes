@@ -8,21 +8,19 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
- * Builds the shadcn CSS-variable block for a realm's login theme from the shared
- * {@code _providerConfig.assets.theme.v2.*} brand tokens.
+ * Builds the shadcn CSS-variable block for a realm's login theme from its
+ * {@code _providerConfig.assets.theme.v2.*} brand-token attributes.
  *
- * <p>This is the login surface's side of the cross-surface token contract — see
- * {@code docs/theme-editor/design-and-execution.md} §7.1 (the canonical output) and
- * the dashboard's {@code expandThemeTokens}. Each of the editable tokens is resolved
- * {@code v2 -> legacy -> default}, validated, foregrounds auto-contrast when unset,
- * and the result is expanded to the full shadcn variable set emitted as {@code :root}
- * (light) and {@code .dark} (dark).
+ * <p>Each editable token is resolved {@code v2 -> legacy -> default}, validated, and
+ * (for the primary/secondary foregrounds) auto-contrasted when unset. The resolved
+ * values are expanded into the full set of shadcn CSS variables, emitted as
+ * {@code :root} (light) and {@code .dark} (dark).
  *
- * <p>The emitted block is appended to {@code /assets/css/login.css} after the legacy
- * {@code --p2-login-*} block, and loads after the theme's compiled stylesheet, so the
- * standard shadcn variables here win over the theme's built-in defaults. Realms that
- * set no {@code theme.v2.*} attribute fall back to legacy attributes and then these
- * defaults, so the output is unchanged for them.
+ * <p>The block is appended to {@code /assets/css/login.css} after the legacy
+ * {@code --p2-login-*} variables and loads after the theme's compiled stylesheet, so
+ * these variables take precedence over the theme's built-in defaults. A realm that
+ * sets no {@code theme.v2.*} attribute falls back to legacy attributes and then these
+ * defaults, leaving its output unchanged.
  */
 public final class LoginThemeCss {
 
@@ -33,7 +31,7 @@ public final class LoginThemeCss {
 
   /**
    * The base color tokens — the ones with a static default. Every other emitted
-   * variable derives from one of these (see {@link #DERIVED_FROM} and §7.1).
+   * variable derives from one of these (see {@link #DERIVED_FROM}).
    */
   static final List<String> BASE_TOKENS =
       List.of(
@@ -50,8 +48,8 @@ public final class LoginThemeCss {
   /**
    * Tokens with no static default: when the realm sets none, they fall back to the
    * resolved value of a base token, so a lone custom primary also moves the ring, a
-   * lone custom background the card surface, etc. (§7.1 "…else X"). Editor-authored
-   * themes set all of these explicitly, so this only affects partial/legacy realms.
+   * lone custom background the card surface, etc. A theme that sets every token
+   * explicitly is unaffected; this only matters for realms that set a subset.
    */
   static final Map<String, String> DERIVED_FROM =
       Map.of(
@@ -62,7 +60,7 @@ public final class LoginThemeCss {
           "input", "border",
           "ring", "primary");
 
-  /** Base-token light defaults — the login palette (mirror of DEFAULT_LIGHT_TOKENS, O-4). */
+  /** Base-token light defaults (the default login palette). */
   static final Map<String, String> LIGHT_DEFAULTS =
       Map.ofEntries(
           Map.entry("background", "#ffffff"),
@@ -75,7 +73,7 @@ public final class LoginThemeCss {
           Map.entry("mutedForeground", "#71717a"),
           Map.entry("border", "#e4e4e7"));
 
-  /** Base-token dark defaults (mirror of DEFAULT_DARK_TOKENS). */
+  /** Base-token dark defaults. */
   static final Map<String, String> DARK_DEFAULTS =
       Map.ofEntries(
           Map.entry("background", "#0a0a0a"),
@@ -101,7 +99,7 @@ public final class LoginThemeCss {
           "primaryForeground", "primaryForegroundColor");
 
   // Value validation — these strings are interpolated verbatim into a <style>, so an
-  // unchecked `red}` would terminate the rule early. Mirrors the portal resolver.
+  // unchecked value like `red}` would terminate the rule early.
   private static final Pattern HEX =
       Pattern.compile("^#(?:[0-9a-f]{3}|[0-9a-f]{6})$", Pattern.CASE_INSENSITIVE);
   private static final Pattern KEYWORD = Pattern.compile("^[a-z]+$", Pattern.CASE_INSENSITIVE);
@@ -216,7 +214,7 @@ public final class LoginThemeCss {
     return o.toString();
   }
 
-  /** Emit the shadcn variables for one resolved mode (§7.1). */
+  /** Emit the shadcn variables for one resolved mode. */
   private static void expand(StringBuilder o, Map<String, String> t) {
     v(o, "--background", t.get("background"));
     v(o, "--foreground", t.get("foreground"));

@@ -140,9 +140,8 @@ public class AssetsResourceProvider implements RealmResourceProvider {
     o.append(":root {\n");
     setColors(o);
     o.append("}\n");
-    // Shared theme.v2.* brand tokens expanded to shadcn variables for the login
-    // surface. Emitted after the legacy --p2-login-* block and before any custom
-    // CSS, so hand-written CSS still wins.
+    // theme.v2.* brand tokens expanded to shadcn variables. Emitted after the legacy
+    // --p2-login-* block and before any custom CSS, so hand-written CSS still wins.
     o.append("\n").append(LoginThemeCss.render(realm::getAttribute));
     if (!Strings.isNullOrEmpty(customCss)) {
       o.append("\n").append(customCss);

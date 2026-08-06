@@ -16,7 +16,7 @@ export const StylesRoute: AppRouteObject = {
   path: "/:realm/ext-styles",
   element: <StylesSection />,
   handle: {
-    access: "query-clients",
+    access: "view-realm",
   },
   breadcrumb: (t) => t("styles"),
 };

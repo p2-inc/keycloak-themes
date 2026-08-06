@@ -32,6 +32,7 @@ import { toRealmSettings } from "../../../realm-settings/routes/RealmSettings";
 
 import { TextAreaControl } from "@/shared/keycloak-ui-shared";
 import { useRealm } from "../../../context/realm-context/RealmContext";
+import { useAccess } from "../../../context/access/Access";
 import { SaveReset } from "../components/SaveReset";
 import useStylesFetcher from "../useStylesFetcher";
 import { useAdminClient } from "../../../admin-client";
@@ -177,6 +178,11 @@ export const EmailTemplate = ({ realm, refresh }: EmailTemplateTabProps) => {
   const { adminClient } = useAdminClient();
   const { t } = useTranslation();
   const { addAlert, addError } = useAlerts();
+  const { hasAccess } = useAccess();
+  // Every save on this tab writes realm attributes or email templates, both of
+  // which the server authorizes with manage-realm. The route only requires
+  // view-realm, so gate the mutating controls for view-only admins.
+  const canManageRealm = hasAccess("manage-realm");
   const { getEmailTemplates, getEmailTemplateValue, updateEmailTemplateValue } =
     useStylesFetcher();
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -404,7 +410,7 @@ export const EmailTemplate = ({ realm, refresh }: EmailTemplateTabProps) => {
             className="pf-v5-u-mt-sm"
             onClick={() => updateRealmTheme()}
             isLoading={updatingEmailTheme}
-            isDisabled={updatingEmailTheme}
+            isDisabled={updatingEmailTheme || !canManageRealm}
           >
             {updatingEmailTheme ? "Activating..." : "Activate"}
           </Button>
@@ -426,7 +432,7 @@ export const EmailTemplate = ({ realm, refresh }: EmailTemplateTabProps) => {
             className="pf-v5-u-mt-sm"
             onClick={() => updateRealmTheme()}
             isLoading={updatingEmailTheme}
-            isDisabled={updatingEmailTheme}
+            isDisabled={updatingEmailTheme || !canManageRealm}
           >
             {updatingEmailTheme ? "Upgrading..." : "Upgrade to phasetwo-ui"}
           </Button>
@@ -511,7 +517,7 @@ export const EmailTemplate = ({ realm, refresh }: EmailTemplateTabProps) => {
           <Button
             variant="primary"
             onClick={saveBranding}
-            isDisabled={!brandingDirty || isSavingBranding}
+            isDisabled={!brandingDirty || isSavingBranding || !canManageRealm}
             isLoading={isSavingBranding}
           >
             Save

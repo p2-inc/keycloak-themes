@@ -2,6 +2,7 @@
 
 # === Owned files start ===
 # account/KcAccountUi.tsx
+# admin/ForbiddenSection.tsx
 # admin/help-urls.ts
 # admin/index.css
 # admin/PageHeader.tsx
@@ -122,7 +123,6 @@
 /admin/Banners.tsx
 /admin/colorScheme.ts
 /admin/environment.ts
-/admin/ForbiddenSection.tsx
 /admin/i18next.d.ts
 /admin/KcAdminUi.tsx
 /admin/KcContext.ts

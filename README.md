@@ -74,13 +74,66 @@ There are login themes available.
 All themes assume you will store the values as Realm attributes with the following keys:
 
 - `_providerConfig.assets.login.css`: CSS you want to be loaded after the standard login.css
-- `_providerConfig.assets.login.backgroundColor`: override for `--pf-v5-global--primary-color--100`.
-- `_providerConfig.assets.login.primaryColor`: override for `--pf-v5-global--secondary-color--100`.
-- `_providerConfig.assets.login.secondaryColor`: override for `--pf-v5-global--BackgroundColor--100`.
+- `_providerConfig.assets.login.primaryColor`: override for `--pf-v5-global--primary-color--100` (also drives `--active-color--100`, `--primary-color--dark-100`, `--link--Color`, `--link--Color--dark` and `--keycloak-card-top-color`).
+- `_providerConfig.assets.login.secondaryColor`: override for `--pf-v5-global--primary-color--200` (also drives `--link--Color--hover` and `--link--Color--dark--hover`).
+- `_providerConfig.assets.login.backgroundColor`: override for `--pf-v5-global--BackgroundColor--100`.
 - `_providerConfig.assets.logo.url`: URL of logo file that will be served as the `div.kc-logo-text.background-image`. Constrained to 150x150.
 - `_providerConfig.assets.favicon.url`: URL of the favicon
 
 The `attributes` and `attributes-v2` themes consume the PatternFly-oriented CSS variables generated from these attributes. The `phasetwo-ui` theme is built with Keycloakify and shadcn, and consumes additional custom CSS variables emitted by the same `/realms/<realm>/assets/css/login.css` endpoint.
+
+#### Brand tokens (`phasetwo-ui`, since 0.73)
+
+`phasetwo-ui` is themed with a set of **brand tokens** stored one per Realm attribute
+under `_providerConfig.assets.theme.v2.`. The `/realms/<realm>/assets/css/login.css`
+endpoint resolves them and emits the full shadcn variable set as `:root` (light) and
+`.dark` (dark), after the legacy `--p2-login-*` block and before your custom CSS — so
+`_providerConfig.assets.login.css` still wins over everything.
+
+Editable tokens (append to the prefix above):
+
+| Token | Notes |
+| --- | --- |
+| `background`, `foreground` | page surface and body text |
+| `primary`, `primaryForeground` | brand color and text on it |
+| `secondary`, `secondaryForeground` | secondary brand color and text on it |
+| `muted`, `mutedForeground` | de-emphasized surface and text |
+| `border` | default border color |
+| `card`, `cardForeground` | derived from `background`/`foreground` when unset |
+| `accent`, `accentForeground` | derived from `muted`/`foreground` when unset |
+| `input` | derived from `border` when unset |
+| `ring` | focus ring; derived from `primary` when unset |
+| `radius` | a CSS length, e.g. `0.625rem` |
+| `fontFamily` | emitted as `--font-sans` |
+
+Each color token takes an optional dark override named `dark<Token>` — e.g.
+`_providerConfig.assets.theme.v2.darkBackground`.
+
+Resolution, per token, first valid value wins:
+
+1. `_providerConfig.assets.theme.v2.<token>` (or `dark<Token>` in dark mode)
+2. the legacy attribute, where one exists — `primary` ← `login.primaryColor`,
+   `secondary` ← `login.secondaryColor`, `background` ← `login.backgroundColor`,
+   `primaryForeground` ← `login.primaryForegroundColor` (dark reads the `-dark`
+   suffixed form, e.g. `login.primaryColor-dark`). The neutrals have no legacy
+   equivalent and go straight to the default.
+3. the built-in default for that mode
+
+Three behaviors worth knowing:
+
+- **Brand color is mode-independent.** If you set `primary` or `secondary` and leave the
+  dark override unset, dark mode inherits your light value rather than reverting to the
+  default palette. Surface and neutral tokens do not inherit — a light `background` will
+  never light up dark mode.
+- **Foregrounds auto-contrast.** Set `primary` without `primaryForeground` and a readable
+  near-black or near-white is chosen from the background's WCAG luminance.
+- **Values are validated.** A hex color, a bare CSS color keyword, a single
+  `rgb()`/`hsl()`/`hwb()`/`lab()`/`lch()`/`oklab()`/`oklch()` function, or (for `radius`)
+  a CSS length. Anything else is ignored and the next candidate applies.
+
+A realm that sets no `theme.v2.*` attribute renders exactly as it did before, via the
+legacy fallback. These tokens are consumed by `phasetwo-ui` only — the PatternFly
+`attributes` and `attributes-v2` themes are unaffected.
 
 #### Example CSS overrides
 

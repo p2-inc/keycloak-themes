@@ -77,6 +77,67 @@ public class LoginThemeCssTest {
   }
 
   @Test
+  public void darkBrandTokensInheritTheLightValueWhenUnset() {
+    // Brand color is mode-independent (O-5): a realm that sets only the light brand
+    // color must not revert to the stock blue/navy in dark mode.
+    String css =
+        LoginThemeCss.render(
+            attrs(
+                map(
+                    LoginThemeCss.V2_PREFIX + "primary", "#7c3aed",
+                    LoginThemeCss.V2_PREFIX + "secondary", "#c4b5fd")));
+    int darkIdx = css.indexOf(".dark {");
+    assertTrue(darkIdx > 0);
+    String dark = css.substring(darkIdx);
+    assertTrue(dark.contains("--primary: #7c3aed;"), css);
+    assertTrue(dark.contains("--secondary: #c4b5fd;"), css);
+    // The stock dark brand defaults must not appear.
+    assertFalse(dark.contains("--primary: #3b82f6;"), css);
+    assertFalse(dark.contains("--secondary: #1e3a5f;"), css);
+  }
+
+  @Test
+  public void explicitDarkBrandOverrideBeatsTheLightValue() {
+    String css =
+        LoginThemeCss.render(
+            attrs(
+                map(
+                    LoginThemeCss.V2_PREFIX + "primary", "#7c3aed",
+                    LoginThemeCss.V2_PREFIX + "darkPrimary", "#a78bfa")));
+    int darkIdx = css.indexOf(".dark {");
+    assertTrue(css.substring(0, darkIdx).contains("--primary: #7c3aed;"), css);
+    assertTrue(css.substring(darkIdx).contains("--primary: #a78bfa;"), css);
+  }
+
+  @Test
+  public void darkSurfaceTokensDoNotInheritTheLightValue() {
+    // Only brand tokens are mode-independent — a light background must never light up
+    // dark mode. Regression guard for the O-5 carve-out.
+    String css =
+        LoginThemeCss.render(attrs(map(LoginThemeCss.V2_PREFIX + "background", "#fef9c3")));
+    int darkIdx = css.indexOf(".dark {");
+    assertTrue(css.substring(0, darkIdx).contains("--background: #fef9c3;"), css);
+    assertTrue(css.substring(darkIdx).contains("--background: #0a0a0a;"), css);
+  }
+
+  @Test
+  public void darkForegroundAutoContrastsAgainstAnInheritedBrandColor() {
+    // The inherited light brand color drives the dark foreground too, so a pale brand
+    // does not end up with white-on-pale text in dark mode.
+    String css = LoginThemeCss.render(attrs(map(LoginThemeCss.V2_PREFIX + "primary", "#eeeeee")));
+    int darkIdx = css.indexOf(".dark {");
+    assertTrue(css.substring(darkIdx).contains("--primary-foreground: #18181b;"), css);
+  }
+
+  @Test
+  public void allDefaultsKeepTheDarkPaletteForBrandTokens() {
+    // Nothing set: dark brand tokens stay on the dark defaults rather than inheriting.
+    String css = LoginThemeCss.render(attrs(map()));
+    int darkIdx = css.indexOf(".dark {");
+    assertTrue(css.substring(darkIdx).contains("--secondary: #1e3a5f;"), css);
+  }
+
+  @Test
   public void autoContrastsForegroundWhenBaseSetButForegroundUnset() {
     // A light primary with no explicit primary-foreground -> dark, readable text.
     String css = LoginThemeCss.render(attrs(map(LoginThemeCss.V2_PREFIX + "primary", "#eeeeee")));

@@ -46,6 +46,14 @@ public final class LoginThemeCss {
           "border");
 
   /**
+   * The brand tokens. Brand color is mode-independent (O-5): when a realm sets one of
+   * these for light and leaves the dark override unset, dark mode inherits the light
+   * value instead of dropping back to the stock dark palette — otherwise a custom
+   * brand color would silently revert to the default blue in dark mode.
+   */
+  static final List<String> BRAND_TOKENS = List.of("primary", "secondary");
+
+  /**
    * Tokens with no static default: when the realm sets none, they fall back to the
    * resolved value of a base token, so a lone custom primary also moves the ring, a
    * lone custom background the card surface, etc. A theme that sets every token
@@ -154,13 +162,37 @@ public final class LoginThemeCss {
     return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
   }
 
+  /**
+   * One mode's resolution: the final value of every token, plus which of them the realm
+   * actually set (as opposed to inherited or defaulted). The latter is what drives
+   * foreground auto-contrast and dark brand inheritance.
+   */
+  static final class Resolution {
+    final Map<String, String> resolved;
+    final Map<String, String> explicit;
+
+    Resolution(Map<String, String> resolved, Map<String, String> explicit) {
+      this.resolved = resolved;
+      this.explicit = explicit;
+    }
+  }
+
   /** Resolve every token for one mode: base tokens then derived. */
   static Map<String, String> resolve(Function<String, String> attr, boolean dark) {
+    Resolution light = resolveMode(attr, false, null);
+    return dark ? resolveMode(attr, true, light).resolved : light.resolved;
+  }
+
+  /**
+   * Resolve one mode. {@code light} is the already-resolved light mode when resolving
+   * dark, so unset dark brand tokens can inherit it (O-5); null when resolving light.
+   */
+  static Resolution resolveMode(Function<String, String> attr, boolean dark, Resolution light) {
     Map<String, String> defaults = dark ? DARK_DEFAULTS : LIGHT_DEFAULTS;
     Map<String, String> out = new LinkedHashMap<>();
     Map<String, String> explicit = new LinkedHashMap<>(); // v2/legacy only, pre-default
 
-    // Base tokens: v2 -> legacy -> static default.
+    // Base tokens: v2 -> legacy -> (dark brand only) the light value -> static default.
     for (String token : BASE_TOKENS) {
       String v2 = attr.apply(V2_PREFIX + (dark ? "dark" + capitalize(token) : token));
       String legacy = null;
@@ -169,6 +201,13 @@ public final class LoginThemeCss {
         legacy = attr.apply(LEGACY_PREFIX + suffix + (dark ? "-dark" : ""));
       }
       String set = pickColor(v2, legacy);
+      // A dark brand token the realm left unset inherits the light value it *did* set.
+      // Reading light.explicit (not light.resolved) keeps the all-default case on the
+      // dark palette, and treating the inherited value as explicit here lets the
+      // foreground below auto-contrast against it.
+      if (set == null && dark && light != null && BRAND_TOKENS.contains(token)) {
+        set = light.explicit.get(token);
+      }
       explicit.put(token, set);
       out.put(token, set != null ? set : defaults.get(token));
     }
@@ -185,7 +224,7 @@ public final class LoginThemeCss {
       String set = pickColor(v2);
       out.put(token, set != null ? set : out.get(e.getValue()));
     }
-    return out;
+    return new Resolution(out, explicit);
   }
 
   private static void autoContrast(
@@ -197,19 +236,19 @@ public final class LoginThemeCss {
 
   /** Render the full {@code :root} + {@code .dark} shadcn block for a realm. */
   public static String render(Function<String, String> attr) {
-    Map<String, String> light = resolve(attr, false);
-    Map<String, String> dark = resolve(attr, true);
+    Resolution light = resolveMode(attr, false, null);
+    Resolution dark = resolveMode(attr, true, light);
 
     String radius = attr.apply(V2_PREFIX + "radius");
     String font = attr.apply(V2_PREFIX + "fontFamily");
 
     StringBuilder o = new StringBuilder();
     o.append("/* phase-two theme tokens */\n:root {\n");
-    expand(o, light);
+    expand(o, light.resolved);
     if (isLength(radius)) o.append("  --radius: ").append(radius.trim()).append(";\n");
     if (!Strings.isNullOrEmpty(font)) o.append("  --font-sans: ").append(font.trim()).append(";\n");
     o.append("}\n.dark {\n");
-    expand(o, dark);
+    expand(o, dark.resolved);
     o.append("}\n");
     return o.toString();
   }

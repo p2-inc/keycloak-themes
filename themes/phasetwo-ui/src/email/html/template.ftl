@@ -9,23 +9,37 @@
     _providerConfig.assets.logo.base64  → branding.logoLight  (data URI; also drives CID attachment)
     _providerConfig.assets.email.footer.line1 → branding.footerLine1
     _providerConfig.assets.email.footer.line2 → branding.footerLine2
-  All color values use hardcoded defaults for now (background, card, text, etc.).
+
+  Colors come from branding.theme, the shared brand tokens under
+  _providerConfig.assets.theme.v2.* resolved by LoginThemeCss -- the same code the login
+  page uses, so the two cannot drift. Email clients do not support CSS variables, so the
+  values are interpolated into inline styles here.
+
+  Only tokens the realm has explicitly set are passed, so the defaults below stand for
+  an unbranded realm. They deliberately differ from the login palette (a near-black
+  button rather than the login blue), which is why the resolved defaults are not used.
+
+  Light only: dark-mode support across email clients is too inconsistent to target, so
+  no dark<Token> override is read here and the template carries no dark variant.
+
+  Each lookup is parenthesised -- (branding.theme.primary)!'#171717' -- so a realm with
+  no tokens at all does not error on the missing intermediate map.
   -->
   <#assign branding=branding!{}>
     <#macro emailLayout>
       <html>
 
-      <body style="background-color:#f2f2f2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Ubuntu,sans-serif;color:#1a1a1a">
+      <body style="background-color:${(branding.theme.muted)!'#f2f2f2'};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Ubuntu,sans-serif;color:${(branding.theme.foreground)!'#1a1a1a'}">
         <style>
         a.btn {
-          color: #fafafa;
+          color: ${(branding.theme.primaryForeground)!'#fafafa'};
           padding: 8px 20px;
           font-size: 14px;
           line-height: 20px;
           font-weight: 500;
           text-decoration: none;
-          border-radius: 0.65rem;
-          background-color: #171717;
+          border-radius: ${(branding.theme.radius)!'0.65rem'};
+          background-color: ${(branding.theme.primary)!'#171717'};
           display: inline-block;
         }
         </style>
@@ -35,7 +49,7 @@
 ><table align="center" width="600" style="border-spacing:0;width:600px;" role="presentation"><tr><td><![endif]
 -->
             <table align="center" width="100%" role="presentation" cellspacing="0" cellpadding="0" border="0"
-              style="max-width:576px;background-color:#ffffff;border-radius:0.65rem;color:#1a1a1a;margin:0 auto;margin-bottom:64px;padding:48px 0 16px;width:100%;box-shadow:0 0 #0000,0 0 #0000,0 1px 3px 0 rgb(0 0 0/0.1),0 1px 2px -1px rgb(0 0 0/0.1);"
+              style="max-width:576px;background-color:${(branding.theme.background)!'#ffffff'};border-radius:${(branding.theme.radius)!'0.65rem'};color:${(branding.theme.foreground)!'#1a1a1a'};margin:0 auto;margin-bottom:64px;padding:48px 0 16px;width:100%;box-shadow:0 0 #0000,0 0 #0000,0 1px 3px 0 rgb(0 0 0/0.1),0 1px 2px -1px rgb(0 0 0/0.1);"
               id="emailContainer">
               <tbody>
                 <tr style="width:100%">
@@ -43,10 +57,10 @@
                     <table align="center" width="100%" style="padding:0 48px" border="0" cellpadding="0" cellspacing="0" role="presentation">
                       <tbody>
                         <tr>
-                          <td style="color:#1a1a1a;">
+                          <td style="color:${(branding.theme.foreground)!'#1a1a1a'};">
                             <img alt="Logo" src="cid:logoLight" style="border:none;display:block;outline:none;text-decoration:none;max-width:160px;max-height:60px;width:auto;height:auto;margin:0 auto;margin-bottom:24px;">
                             <#nested>
-                              <p style="font-size:13px;line-height:22px;margin:16px 0;text-align:center;opacity:0.7;padding-top:24px;margin-top:24px;border-top:solid 1px #e8e8e8;color:#1a1a1a;">
+                              <p style="font-size:13px;line-height:22px;margin:16px 0;text-align:center;opacity:0.7;padding-top:24px;margin-top:24px;border-top:solid 1px ${(branding.theme.border)!'#e8e8e8'};color:${(branding.theme.foreground)!'#1a1a1a'};">
                                 <#if branding.footerLine1?has_content>
                                   ${branding.footerLine1}
                                 <#else>

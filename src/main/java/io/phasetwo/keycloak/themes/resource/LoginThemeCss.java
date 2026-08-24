@@ -234,6 +234,32 @@ public final class LoginThemeCss {
     }
   }
 
+  /**
+   * The light brand tokens the realm has actually set, for surfaces that cannot use CSS
+   * variables and must have values interpolated server-side — the email theme.
+   *
+   * Deliberately only the tokens with an explicit {@code v2} or legacy value, never a
+   * resolved default: the email templates carry their own defaults, which differ from
+   * the login palette (a near-black button rather than the login blue). Returning
+   * defaults here would silently restyle every unbranded realm's email.
+   *
+   * Base tokens only. The email templates need nothing that derives, and light only —
+   * dark-mode support across email clients is too inconsistent to target.
+   */
+  public static Map<String, String> explicitLightTokens(Function<String, String> attr) {
+    Map<String, String> out = new LinkedHashMap<>();
+    for (String token : BASE_TOKENS) {
+      String v2 = attr.apply(V2_PREFIX + token);
+      String suffix = LEGACY_SUFFIX.get(token);
+      String legacy = suffix == null ? null : attr.apply(LEGACY_PREFIX + suffix);
+      String set = pickColor(v2, legacy);
+      if (set != null) out.put(token, set);
+    }
+    String radius = attr.apply(V2_PREFIX + "radius");
+    if (isLength(radius)) out.put("radius", radius.trim());
+    return out;
+  }
+
   /** Render the full {@code :root} + {@code .dark} shadcn block for a realm. */
   public static String render(Function<String, String> attr) {
     Resolution light = resolveMode(attr, false, null);

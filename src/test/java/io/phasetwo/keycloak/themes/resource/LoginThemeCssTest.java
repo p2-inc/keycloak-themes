@@ -1,5 +1,6 @@
 package io.phasetwo.keycloak.themes.resource;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -150,6 +151,57 @@ public class LoginThemeCssTest {
     String css = LoginThemeCss.render(attrs(map(LoginThemeCss.V2_PREFIX + "primary", "red}; }")));
     assertTrue(css.contains("--primary: #3b82f6;"), css);
     assertFalse(css.contains("red}"), css);
+  }
+
+  @Test
+  public void explicitLightTokensIsEmptyForAnUnbrandedRealm() {
+    // The email templates carry their own defaults, which differ from the login
+    // palette. Returning resolved defaults here would restyle every unbranded email.
+    assertTrue(LoginThemeCss.explicitLightTokens(attrs(map())).isEmpty());
+  }
+
+  @Test
+  public void explicitLightTokensReturnsOnlyWhatTheRealmSet() {
+    Map<String, String> t =
+        LoginThemeCss.explicitLightTokens(
+            attrs(
+                map(
+                    LoginThemeCss.V2_PREFIX + "primary", "#7c3aed",
+                    LoginThemeCss.V2_PREFIX + "radius", "1rem")));
+    assertEquals("#7c3aed", t.get("primary"));
+    assertEquals("1rem", t.get("radius"));
+    // Untouched tokens are absent, not defaulted.
+    assertFalse(t.containsKey("background"));
+    assertFalse(t.containsKey("foreground"));
+    assertFalse(t.containsKey("primaryForeground"));
+  }
+
+  @Test
+  public void explicitLightTokensFallsBackToLegacy() {
+    Map<String, String> t =
+        LoginThemeCss.explicitLightTokens(
+            attrs(map(LoginThemeCss.LEGACY_PREFIX + "primaryColor", "#ff6600")));
+    assertEquals("#ff6600", t.get("primary"));
+  }
+
+  @Test
+  public void explicitLightTokensRejectsInvalidValues() {
+    Map<String, String> t =
+        LoginThemeCss.explicitLightTokens(
+            attrs(
+                map(
+                    LoginThemeCss.V2_PREFIX + "primary", "red}; }",
+                    LoginThemeCss.V2_PREFIX + "radius", "huge")));
+    assertTrue(t.isEmpty());
+  }
+
+  @Test
+  public void explicitLightTokensIgnoresDarkOverrides() {
+    // Email is light-only, so a dark-only realm contributes nothing.
+    Map<String, String> t =
+        LoginThemeCss.explicitLightTokens(
+            attrs(map(LoginThemeCss.V2_PREFIX + "darkPrimary", "#a78bfa")));
+    assertTrue(t.isEmpty());
   }
 
   @Test

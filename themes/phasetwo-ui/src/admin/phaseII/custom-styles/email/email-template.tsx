@@ -47,7 +47,11 @@ type EmailTemplateFormType = {
   textEmail: string;
 };
 
-const PHASETWO_EMAIL_THEMES = ["attributes", "attributes-v2", "phasetwo-ui"];
+// Template overrides are stored as mustache and rendered by the mustache email
+// template provider, so they only take effect on a mustache-based email theme.
+// phasetwo-ui is the current one; the attributes-* names are legacy but still
+// supported. A FreeMarker-only theme (e.g. stock keycloak) cannot render them.
+const PHASETWO_EMAIL_THEMES = ["phasetwo-ui", "attributes", "attributes-v2"];
 const RECOMMENDED_EMAIL_THEME = "phasetwo-ui";
 
 const LOGO_BASE64_ATTR = "_providerConfig.assets.logo.base64";
@@ -402,8 +406,9 @@ export const EmailTemplate = ({ realm, refresh }: EmailTemplateTabProps) => {
           className="pf-v5-u-mb-lg"
         >
           <p>
-            Your email theme must be set to <code>phasetwo-ui</code> for these
-            changes to take effect.
+            Your email theme must be set to <code>phasetwo-ui</code> for
+            template overrides to take effect. You are currently using{" "}
+            <code>{realm.emailTheme || "the server default"}</code>.
           </p>
           <Button
             size="sm"
@@ -423,8 +428,9 @@ export const EmailTemplate = ({ realm, refresh }: EmailTemplateTabProps) => {
           className="pf-v5-u-mb-lg"
         >
           <p>
-            You are using <code>{realm.emailTheme}</code>. We recommend
-            upgrading to <code>phasetwo-ui</code> for the latest features.
+            You are using <code>{realm.emailTheme}</code>, a legacy email theme.
+            Template overrides work here, but we recommend upgrading to{" "}
+            <code>phasetwo-ui</code> for the latest templates and branding.
           </p>
           <Button
             size="sm"
@@ -565,8 +571,11 @@ export const EmailTemplate = ({ realm, refresh }: EmailTemplateTabProps) => {
         Template Overrides
       </h2>
       <p className="pf-v5-u-mb-lg pf-v5-u-color-400">
-        Override the default content of individual email templates. Select a
-        template below to customize its HTML and plain-text versions.
+        Override the content of individual email templates. You are editing what
+        goes <em>inside</em> the email &mdash; the logo, footer and colours
+        above are applied around it automatically, so there is no need to repeat
+        them here. Select a template below to customize its HTML and plain-text
+        versions.
       </p>
 
       <Form className="pf-v5-u-mb-lg">

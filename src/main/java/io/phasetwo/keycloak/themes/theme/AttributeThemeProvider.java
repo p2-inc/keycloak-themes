@@ -39,7 +39,17 @@ public class AttributeThemeProvider implements ThemeProvider {
   }
 
   public static final String ATTRIBUTE_THEME_NAME = "attributes";
-  public static final Set<String> ATTRIBUTE_NAME_SET = ImmutableSet.of(ATTRIBUTE_THEME_NAME);
+
+  /**
+   * Legacy attribute theme names. Neither ships a packaged email theme, so claiming them here
+   * shadows nothing -- realms still selecting them get attribute-backed templates instead of
+   * silently falling back to the stock Keycloak email theme. Themes that do ship email templates
+   * (e.g. phasetwo-ui) must NOT be listed: this provider outranks the folder/jar providers, so it
+   * would hide the real theme and its parent chain. Those get their overrides from
+   * AttributeOverlayTheme instead.
+   */
+  public static final Set<String> ATTRIBUTE_NAME_SET =
+      ImmutableSet.of(ATTRIBUTE_THEME_NAME, "attributes-v2");
 
   @Override
   public Set<String> nameSet(Theme.Type type) {

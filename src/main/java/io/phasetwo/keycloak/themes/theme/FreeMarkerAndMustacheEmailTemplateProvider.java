@@ -29,6 +29,18 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
     super(session);
   }
 
+  /**
+   * Layer realm-attribute template overrides on top of whatever email theme the realm selected.
+   *
+   * <p>{@code FreeMarkerEmailTemplateProvider} resolves the theme through this method on every
+   * templating path, so the override applies to both the mustache branch below and the inherited
+   * FreeMarker branch. Without this, overrides only took effect for the {@code attributes} theme.
+   */
+  @Override
+  protected Theme getTheme() throws IOException {
+    return AttributeOverlayTheme.wrap(session, super.getTheme());
+  }
+
   @Override
   protected EmailTemplate processTemplate(
       String subjectKey,
@@ -55,8 +67,7 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
         log.warn("Error running attributes builder", e);
       }
 
-      if (MustacheProvider.isMustacheTheme(theme)
-          && MustacheProvider.hasMustacheTemplates(theme, template)) {
+      if (MustacheProvider.rendersWithMustache(theme, template)) {
         log.debugf("Using mustache template for %s in theme %s", template, theme.getName());
         return processMustacheTemplate(subjectKey, subjAttr, template, attr);
       } else {

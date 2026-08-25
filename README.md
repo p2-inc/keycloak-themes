@@ -145,11 +145,20 @@ There are 3 examples of CSS themes that can be loaded using the property above. 
 
 ### Email theme
 
-The custom `ThemeProvider` installs one email theme called `attributes` which allows you to override any .ftl template (from base) using Realm attributes with the following key format:
+Email templates can be overridden per-realm using Realm attributes with the following key format:
 
 ```
 _providerConfig.theme.email.templates.<some-template.ftl>
 ```
+
+These overrides are layered on top of whichever email theme the Realm has selected, so they work with `phasetwo-ui` (recommended) as well as the legacy `attributes` and `attributes-v2` theme names. A template that has no override still comes from the selected theme.
+
+What an override contains depends on how the selected theme is rendered:
+
+- **`phasetwo-ui` (and any other FreeMarker theme)** — the override is the **action content**, keyed on `.ftl`. The theme's own `email/html/template.ftl` shell still supplies the logo, footer and brand colours, and the override is placed inside it, so an overridden template keeps its branding. Brand elements are set separately, under **Styles** → **Emails**; overrides are for the content within them. Use `${link}`, `${realmName}` and the shell's `class="btn"` in the content.
+- **Legacy `attributes*` themes** — rendered with mustache, where the override is the whole document, keyed on `.mustache`. Unchanged from previous releases.
+
+The legacy `attributes` theme names are served by a `ThemeProvider` that supplies the attribute-backed templates directly, with `mustache` as the default base theme. Which engine renders a given template is decided by the theme's `templateType` property, with a per-template fallback to mustache for templates a FreeMarker theme does not ship.
 
 Messages can be overridden with the following key format:
 
@@ -165,7 +174,7 @@ _providerConfig.theme.email.parent
 
 Note that the current base theme is `mustache` which requires the use of the custom `EmailTemplateProvider` below. If you switch it back to `base` by setting the realm attribute, you can override the .ftl templates.
 
-In order to run the email theme, you must turn theme caching off. This is because themes are cached in Keycloak with a common `KeycloakSession`, which will contain the incorrect Realm in the context for lookup of attributes. In practice, we have not noticed a significant performance impact of this. This requires setting the following command line flag for `start` or `start-dev`:
+Overrides layered on a packaged email theme (e.g. `phasetwo-ui`) work with theme caching left enabled. In order to run the legacy `attributes*` email themes, you must turn theme caching off. This is because themes are cached in Keycloak with a common `KeycloakSession`, which will contain the incorrect Realm in the context for lookup of attributes. In practice, we have not noticed a significant performance impact of this. This requires setting the following command line flag for `start` or `start-dev`:
 
 ```
 --spi-theme-cache-themes=false

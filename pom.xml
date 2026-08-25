@@ -200,7 +200,12 @@
         <executions>
           <execution>
             <id>phasetwo-ui-unpack</id>
-            <phase>prepare-package</phase>
+            <!-- Before test, not prepare-package: the integration tests mount target/classes into
+                 the Keycloak container as its provider classes, so the phasetwo-ui theme has to be
+                 unpacked there by then. Unpacking at prepare-package meant a clean checkout ran the
+                 tests without that theme (a 404 for every phasetwo-ui template) and only passed on
+                 a working tree where an earlier package had left it behind. -->
+            <phase>process-classes</phase>
             <goals>
               <goal>run</goal>
             </goals>

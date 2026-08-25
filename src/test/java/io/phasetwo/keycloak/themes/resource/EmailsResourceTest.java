@@ -1,10 +1,9 @@
 package io.phasetwo.keycloak.themes.resource;
 
-import static io.phasetwo.keycloak.Helpers.*;
+import static io.phasetwo.keycloak.Helpers.updateRealmAttribute;
 import static io.phasetwo.keycloak.themes.theme.AttributeTheme.EMAIL_TEMPLATE_ATTRIBUTE_PREFIX;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -65,26 +64,57 @@ public class EmailsResourceTest extends AbstractResourceTest {
     assertThat(response.getStatus(), is(404));
   }
 
+  /** Mustache themes: the override is a whole document, keyed on .mustache. */
   @Test
   public void testGetUpdateTemplateMaster() throws Exception {
-    testGetUpdateTemplate("master");
+    testGetUpdateTemplate("master", "attributes", "mustache", "Someone has created");
   }
 
   @Test
   public void testGetUpdateTemplateNonMaster() throws Exception {
-    String realmName = "test";
+    testGetUpdateTemplate(createRealm("test"), "attributes", "mustache", "Someone has created");
+  }
+
+  /** Legacy attribute theme name, kept working for backwards compatibility. */
+  @Test
+  public void testGetUpdateTemplateLegacyAttributesV2Theme() throws Exception {
+    testGetUpdateTemplate(
+        createRealm("test-attributes-v2"), "attributes-v2", "mustache", "Someone has created");
+  }
+
+  /**
+   * phasetwo-ui renders with FreeMarker, so its overrides are keyed on .ftl and carry the action
+   * content only -- the branded template.ftl shell stays the theme's. Before this the PUT stored a
+   * .mustache attribute that nothing ever read back.
+   */
+  @Test
+  public void testGetUpdateTemplatePhaseTwoUiTheme() throws Exception {
+    testGetUpdateTemplate(
+        createRealm("test-phasetwo-ui"), "phasetwo-ui", "ftl", "emailVerificationBody");
+  }
+
+  /** Any other FreeMarker theme is keyed the same way, including the stock Keycloak one. */
+  @Test
+  public void testGetUpdateTemplateStockKeycloakTheme() throws Exception {
+    testGetUpdateTemplate(
+        createRealm("test-keycloak-theme"), "keycloak", "ftl", "emailVerificationBody");
+  }
+
+  String createRealm(String realmName) {
     Keycloak keycloak = getKeycloak();
     RealmRepresentation r = new RealmRepresentation();
     r.setRealm(realmName);
     r.setEnabled(true);
     keycloak.realms().create(r);
-    testGetUpdateTemplate(realmName);
+    return realmName;
   }
 
-  void testGetUpdateTemplate(String realmName) throws Exception {
+  void testGetUpdateTemplate(
+      String realmName, String emailTheme, String expectedExtension, String expectedDefaultContent)
+      throws Exception {
     Keycloak keycloak = getKeycloak();
     RealmRepresentation r = keycloak.realm(realmName).toRepresentation();
-    r.setEmailTheme("attributes");
+    r.setEmailTheme(emailTheme);
     keycloak.realm(realmName).update(r);
 
     // GET /templates/text/email-verification
@@ -95,7 +125,7 @@ public class EmailsResourceTest extends AbstractResourceTest {
             .asResponse();
     assertThat(response.getStatus(), is(200));
     String template = response.asString();
-    assertThat(template, containsString("Someone has created"));
+    assertThat(template, containsString(expectedDefaultContent));
 
     // PUT /templates/text/email-verification
     String templatePlus = template + "\n\nfoo bar";
@@ -126,7 +156,8 @@ public class EmailsResourceTest extends AbstractResourceTest {
         getKeycloak(),
         realmName,
         String.format(
-            "%s.%s/%s", EMAIL_TEMPLATE_ATTRIBUTE_PREFIX, "text", "email-verification.mustache"),
+            "%s.%s/%s.%s",
+            EMAIL_TEMPLATE_ATTRIBUTE_PREFIX, "text", "email-verification", expectedExtension),
         templatePlus);
 
     // GET /templates/text/email-verification

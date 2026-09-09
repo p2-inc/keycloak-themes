@@ -1,6 +1,9 @@
 services:
   keycloak:
-    image: quay.io/phasetwo/phasetwo-keycloak:latest
+    build:
+      # Repo root, so the Dockerfile can pick up target/ artifacts.
+      context: ../../..
+      dockerfile: themes/phasetwo-ui/docker/Dockerfile
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -22,7 +25,6 @@ services:
     volumes:
       - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
       - ../../../target/phasetwo-ui/phasetwo-ui-theme.jar:/opt/keycloak/providers/phasetwo-ui-theme.jar
-      - ../../../target/keycloak-themes-0.52-SNAPSHOT.jar:/opt/keycloak/providers/io.phasetwo.keycloak-keycloak-themes-0.56.jar
       - keycloak_data:/opt/keycloak/data
 
 volumes:

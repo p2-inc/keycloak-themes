@@ -65,15 +65,16 @@ pnpm start-keycloak
 
 #### Option B: Stable Docker Compose mode (integration tests / demos)
 
-The `docker/` directory contains a `docker-compose.yml` that mounts the pre-built theme JAR. Use this when you want a stable environment for running the E2E test suite or demoing the theme.
+The `docker/` directory contains a `docker-compose.yml` that builds a dev image from `docker/Dockerfile`: the base image's bundled `keycloak-themes` jar is removed and the locally built one is copied in, so you are never running a mix of the released extension and your local one.
 
-**Step 1 — build the theme JAR:**
+**Step 1 — build the theme JAR and the extension JAR:**
 
 ```bash
-pnpm build
+pnpm build                     # -> ../../target/phasetwo-ui/phasetwo-ui-theme.jar
+(cd ../.. && mvn package)      # -> ../../target/keycloak-themes-<version>-SNAPSHOT.jar
 ```
 
-This produces `../../target/phasetwo-ui/phasetwo-ui-theme.jar`.
+Both are required. Skipping `mvn package` leaves a stale (or missing) extension jar, which typically surfaces as a `NoSuchMethodError` against a Keycloak API the old jar was not built against.
 
 **Step 2 — start Keycloak:**
 

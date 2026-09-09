@@ -17,7 +17,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:integration": "PLAYWRIGHT_INTEGRATION=true playwright test",
-    "docker:up": "docker compose -f docker/docker-compose.yml up -d",
+    "docker:up": "docker compose -f docker/docker-compose.yml up -d --build",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
     "docker:logs": "docker compose -f docker/docker-compose.yml logs -f keycloak"
   },

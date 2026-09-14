@@ -1,5 +1,6 @@
 import { generateEncodedPath } from "../../../utils/generateEncodedPath";
 import type { AppRouteObject } from "../../../routes";
+import { hasOrganizationsAccess } from "../../access/access";
 
 import { lazy } from "react";
 import { Path } from "react-router-dom";
@@ -20,7 +21,7 @@ export const OrgMemberRoute: AppRouteObject = {
   element: <OrgMemberDetails />,
   breadcrumb: (t) => t("orgMemberDetails"),
   handle: {
-    access: "view-clients",
+    access: hasOrganizationsAccess,
   },
 };
 

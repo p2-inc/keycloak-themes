@@ -48,7 +48,7 @@
     "keycloakify": "^11.15.3",
     "lodash-es": "^4.17.22",
     "lucide-react": "^0.473.0",
-    "oidc-spa": "^10.2.13",
+    "oidc-spa": "~10.0.5",
     "openapi-fetch": "^0.17.0",
     "p-debounce": "^5.1.0",
     "radix-ui": "latest",

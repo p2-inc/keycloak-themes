@@ -15,14 +15,27 @@ import org.keycloak.theme.ThemeProvider;
 public class AttributeThemeProvider implements ThemeProvider {
 
   private final KeycloakSession session;
-  private final File tmpdir;
+  private File tmpdir;
 
   public AttributeThemeProvider(KeycloakSession session) {
     this.session = session;
-    this.tmpdir = Files.createTempDir();
   }
 
-  public File getTmpDir() {
+  /**
+   * Lazily creates the scratch directory backing {@link AttributeTheme}.
+   *
+   * <p>Keycloak instantiates every registered {@link ThemeProvider} on each theme resolution, then
+   * asks each one whether it has the theme. This provider only ever answers yes for {@link
+   * Theme.Type#EMAIL}, so creating the directory in the constructor meant one uniquely-named
+   * directory per page render -- login and account renders included, which this provider never
+   * serves. Every distinct name costs a dentry and an inode in the kernel cache, and because the
+   * names never repeat that cache grows without bound. Creating it here instead means it is only
+   * created when a theme is actually served.
+   */
+  public synchronized File getTmpDir() {
+    if (tmpdir == null) {
+      tmpdir = Files.createTempDir();
+    }
     return this.tmpdir;
   }
 
@@ -35,7 +48,7 @@ public class AttributeThemeProvider implements ThemeProvider {
   public Theme getTheme(String name, Theme.Type type) throws IOException {
     if (!hasTheme(name, type)) return null;
     log.debugf("Creating AttributeTheme for %s", session.getContext().getRealm().getName());
-    return new AttributeTheme(session, tmpdir, name, type);
+    return new AttributeTheme(session, getTmpDir(), name, type);
   }
 
   public static final String ATTRIBUTE_THEME_NAME = "attributes";
@@ -63,7 +76,11 @@ public class AttributeThemeProvider implements ThemeProvider {
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
+    if (tmpdir == null) {
+      // Nothing was ever served, so no directory was created.
+      return;
+    }
     log.trace("Attempting to recursively delete tmpdir");
     try {
       AttributeThemeProviderFactory.deleteRecursively(tmpdir);

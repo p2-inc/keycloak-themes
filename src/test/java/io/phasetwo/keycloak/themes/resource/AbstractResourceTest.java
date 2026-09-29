@@ -45,6 +45,10 @@ public abstract class AbstractResourceTest {
           .withEnv("KC_SPI_EMAIL_TEMPLATE_PROVIDER", "freemarker-plus-mustache")
           .withEnv("KC_SPI_EMAIL_TEMPLATE_FREEMARKER_PLUS_MUSTACHE_ENABLED", "true")
           .withDisabledCaching()
+          // Themes stay uncached, but parsed templates are cached, as in a server that follows the
+          // README and sets only --spi-theme-cache-themes=false.
+          .withEnv("KC_SPI_THEME__CACHE_TEMPLATES", "true")
+          .withAccessToHost(true)
           .withProviderLibsFrom(getDeps());
 
   @BeforeAll

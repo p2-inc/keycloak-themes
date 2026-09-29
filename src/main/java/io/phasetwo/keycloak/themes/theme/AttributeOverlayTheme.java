@@ -16,12 +16,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.theme.Theme;
+import org.keycloak.utils.KeycloakSessionUtil;
 
 /**
  * Overlays realm-attribute email overrides on top of an already resolved {@link Theme}.
@@ -34,6 +36,10 @@ import org.keycloak.theme.Theme;
  *
  * <p>The attribute keys are unchanged, so realms already using the {@code attributes} theme keep
  * working exactly as before.
+ *
+ * <p>The overlay holds no session or realm: Keycloak's template cache keeps the theme a template
+ * was first parsed with, and renders later emails, from any request, through it. Both are looked up
+ * from the current session on every call.
  */
 @JBossLog
 public class AttributeOverlayTheme implements Theme {
@@ -42,23 +48,21 @@ public class AttributeOverlayTheme implements Theme {
 
   private static volatile Path tmpdir;
 
-  private final KeycloakSession session;
-  private final String realmName;
+  private final Supplier<KeycloakSession> session;
   private final Theme delegate;
 
   /**
    * Wraps {@code delegate} so that realm-attribute overrides take precedence over it. Returns the
    * delegate untouched when there is nothing to wrap, or when it is already wrapped.
    */
-  public static Theme wrap(KeycloakSession session, Theme delegate) {
+  public static Theme wrap(Theme delegate) {
     if (delegate == null || delegate instanceof AttributeOverlayTheme) return delegate;
-    return new AttributeOverlayTheme(session, delegate);
+    return new AttributeOverlayTheme(KeycloakSessionUtil::getKeycloakSession, delegate);
   }
 
-  public AttributeOverlayTheme(KeycloakSession session, Theme delegate) {
+  AttributeOverlayTheme(Supplier<KeycloakSession> session, Theme delegate) {
     this.session = session;
     this.delegate = delegate;
-    this.realmName = resolveRealmName(session);
   }
 
   /**
@@ -72,8 +76,12 @@ public class AttributeOverlayTheme implements Theme {
     return session.getContext().getRealm().getName();
   }
 
+  private String realmName() {
+    return resolveRealmName(session.get());
+  }
+
   private Map<String, String> getAttributes() {
-    RealmModel realm = session.realms().getRealmByName(realmName);
+    RealmModel realm = session.get().realms().getRealmByName(realmName());
     return realm == null ? Map.of() : realm.getAttributes();
   }
 
@@ -97,6 +105,7 @@ public class AttributeOverlayTheme implements Theme {
    * email, while never rewriting would serve a stale override after an edit.
    */
   private URL writeOverride(String name, String content) throws IOException {
+    String realmName = realmName();
     Path p = getTmpDir().resolve(realmName).resolve(name);
     byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
     if (Files.exists(p) && Arrays.equals(Files.readAllBytes(p), bytes)) {
@@ -123,7 +132,7 @@ public class AttributeOverlayTheme implements Theme {
   public URL getTemplate(String name) throws IOException {
     Optional<String> override = getAttribute(templateKey(name));
     if (override.isEmpty()) return delegate.getTemplate(name);
-    log.debugf("using email template override for %s in realm %s", name, realmName);
+    log.debugf("using email template override for %s in realm %s", name, realmName());
     return writeOverride(name, applyShell(name, override.get()));
   }
 

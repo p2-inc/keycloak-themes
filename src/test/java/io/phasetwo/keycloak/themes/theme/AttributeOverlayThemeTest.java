@@ -81,7 +81,7 @@ class AttributeOverlayThemeTest {
     URL packaged = fileUrl("html/password-reset.ftl", "the packaged template");
     when(delegate.getTemplate("html/password-reset.ftl")).thenReturn(packaged);
 
-    Theme overlay = AttributeOverlayTheme.wrap(session, delegate);
+    Theme overlay = new AttributeOverlayTheme(() -> session, delegate);
 
     assertThat(read(overlay.getTemplate("html/password-reset.ftl")), is("the packaged template"));
   }
@@ -92,7 +92,7 @@ class AttributeOverlayThemeTest {
         .thenReturn(fileUrl("html/template.ftl", "the shell"));
     attributes.put(templateKey("html/password-reset.ftl"), "<p>my content</p>");
 
-    Theme overlay = AttributeOverlayTheme.wrap(session, delegate);
+    Theme overlay = new AttributeOverlayTheme(() -> session, delegate);
     String rendered = read(overlay.getTemplate("html/password-reset.ftl"));
 
     assertThat(rendered, containsString("<#import \"template.ftl\" as layout>"));
@@ -121,7 +121,7 @@ class AttributeOverlayThemeTest {
     attributes.put(
         templateKey("html/executeActions.ftl"), "<p>You must: ${requiredActionsText}</p>");
 
-    Theme overlay = AttributeOverlayTheme.wrap(session, delegate);
+    Theme overlay = new AttributeOverlayTheme(() -> session, delegate);
     String rendered = read(overlay.getTemplate("html/executeActions.ftl"));
 
     assertThat(rendered, containsString("<#assign requiredActionsText>"));
@@ -136,7 +136,7 @@ class AttributeOverlayThemeTest {
         .thenReturn(fileUrl("html/template.ftl", "the shell"));
     attributes.put(templateKey("text/password-reset.ftl"), "my text content");
 
-    Theme overlay = AttributeOverlayTheme.wrap(session, delegate);
+    Theme overlay = new AttributeOverlayTheme(() -> session, delegate);
 
     assertThat(read(overlay.getTemplate("text/password-reset.ftl")), is("my text content"));
   }
@@ -146,7 +146,7 @@ class AttributeOverlayThemeTest {
   void mustacheOverride_isNotWrapped() throws Exception {
     attributes.put(templateKey("html/password-reset.mustache"), "<html><body>legacy</body></html>");
 
-    Theme overlay = AttributeOverlayTheme.wrap(session, delegate);
+    Theme overlay = new AttributeOverlayTheme(() -> session, delegate);
     String rendered = read(overlay.getTemplate("html/password-reset.mustache"));
 
     assertThat(rendered, is("<html><body>legacy</body></html>"));
@@ -159,7 +159,7 @@ class AttributeOverlayThemeTest {
     when(delegate.getTemplate("html/template.ftl")).thenReturn(null);
     attributes.put(templateKey("html/password-reset.ftl"), "<p>my content</p>");
 
-    Theme overlay = AttributeOverlayTheme.wrap(session, delegate);
+    Theme overlay = new AttributeOverlayTheme(() -> session, delegate);
 
     assertThat(read(overlay.getTemplate("html/password-reset.ftl")), is("<p>my content</p>"));
   }
@@ -173,7 +173,7 @@ class AttributeOverlayThemeTest {
         "<#import \"template.ftl\" as layout>\n<@layout.emailLayout>mine</@layout.emailLayout>";
     attributes.put(templateKey("html/password-reset.ftl"), own);
 
-    Theme overlay = AttributeOverlayTheme.wrap(session, delegate);
+    Theme overlay = new AttributeOverlayTheme(() -> session, delegate);
 
     assertThat(read(overlay.getTemplate("html/password-reset.ftl")), is(own));
   }
@@ -184,7 +184,7 @@ class AttributeOverlayThemeTest {
     when(delegate.getTemplate("html/template.ftl")).thenReturn(null);
     attributes.put(templateKey("html/password-reset.ftl"), "first");
 
-    Theme overlay = AttributeOverlayTheme.wrap(session, delegate);
+    Theme overlay = new AttributeOverlayTheme(() -> session, delegate);
     assertThat(read(overlay.getTemplate("html/password-reset.ftl")), is("first"));
 
     attributes.put(templateKey("html/password-reset.ftl"), "second");
@@ -209,7 +209,7 @@ class AttributeOverlayThemeTest {
     attributes.put(EMAIL_MESSAGE_ATTRIBUTE_PREFIX + ".attributeKey", "from the attribute");
     attributes.put(EMAIL_MESSAGE_ATTRIBUTE_PREFIX + ".bothKey", "from the attribute");
 
-    Theme overlay = AttributeOverlayTheme.wrap(session, delegate);
+    Theme overlay = new AttributeOverlayTheme(() -> session, delegate);
     Properties messages = overlay.getEnhancedMessages(realm, Locale.ENGLISH);
 
     assertThat(messages.getProperty("packagedKey"), is("from the theme"));
@@ -221,7 +221,7 @@ class AttributeOverlayThemeTest {
   void missingTemplateWithNoOverride_staysMissing() throws Exception {
     when(delegate.getTemplate("html/nope.ftl")).thenReturn(null);
 
-    Theme overlay = AttributeOverlayTheme.wrap(session, delegate);
+    Theme overlay = new AttributeOverlayTheme(() -> session, delegate);
 
     assertThat(overlay.getTemplate("html/nope.ftl"), is(nullValue()));
   }

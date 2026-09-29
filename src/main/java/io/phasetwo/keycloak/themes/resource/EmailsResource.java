@@ -122,7 +122,7 @@ public class EmailsResource extends AbstractAdminResource {
             : session.theme().getTheme(emailTheme, Theme.Type.EMAIL);
     // Overlay the realm-attribute overrides so a saved template reads back as saved, whatever
     // email theme the realm is on.
-    return AttributeOverlayTheme.wrap(session, theme);
+    return AttributeOverlayTheme.wrap(theme);
   }
 
   @GET

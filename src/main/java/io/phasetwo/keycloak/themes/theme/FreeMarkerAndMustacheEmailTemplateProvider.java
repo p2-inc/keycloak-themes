@@ -38,7 +38,7 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
    */
   @Override
   protected Theme getTheme() throws IOException {
-    return AttributeOverlayTheme.wrap(session, super.getTheme());
+    return AttributeOverlayTheme.wrap(super.getTheme());
   }
 
   @Override

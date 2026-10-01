@@ -42,6 +42,7 @@
     <phasetwo.ui.dir>${project.basedir}/themes/phasetwo-ui</phasetwo.ui.dir>
     <phasetwo.ui.build.dir>${project.build.directory}/phasetwo-ui</phasetwo.ui.build.dir>
     <phasetwo.ui.jar>${phasetwo.ui.build.dir}/phasetwo-ui-theme.jar</phasetwo.ui.jar>
+    <jacoco.version>0.8.14</jacoco.version>
   </properties>
 
   <scm>
@@ -141,8 +142,12 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.2.2</version>
         <configuration>
+          <!--
+            @{argLine} carries whatever jacoco's prepare-agent set. Without it this explicit
+            argLine replaces the property outright and the unit tests are silently uninstrumented.
+          -->
           <argLine>
-            --illegal-access=permit
+            @{argLine} --illegal-access=permit
           </argLine>
           <systemPropertyVariables>
             <keycloak-version>${keycloak.version}</keycloak-version>
@@ -217,6 +222,90 @@
                   </patternset>
                 </unzip>
               </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+        Stage the JaCoCo agent where AbstractResourceTest can mount it into the Keycloak
+        container. The resource tests exercise the extension inside the server, so that half
+        of the coverage is invisible to an agent running only in the test JVM.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.8.1</version>
+        <executions>
+          <execution>
+            <id>copy-jacoco-agent</id>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <phase>compile</phase>
+            <configuration>
+              <includeArtifactIds>org.jacoco.agent</includeArtifactIds>
+              <includeClassifiers>runtime</includeClassifiers>
+              <outputDirectory>${project.build.directory}/jacoco-agent</outputDirectory>
+              <stripVersion>true</stripVersion>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!--
+        Coverage comes from two places here: the unit tests, which run in the surefire JVM, and
+        the resource tests, which run against the extension inside a Keycloak container. Both
+        write into jacoco-report/ and are merged before reporting, so the figure covers the whole
+        suite rather than whichever half happened to be instrumented.
+
+        Declared after surefire so the test-phase merge and report run once the tests are done.
+        Output goes to site/jacoco, which .github/workflows/ci.yml uploads and
+        jacoco-pr-comment.yml reads jacoco.xml from.
+      -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <destFile>${project.build.directory}/jacoco-report/jacoco-unit.exec</destFile>
+            </configuration>
+          </execution>
+          <execution>
+            <id>merge</id>
+            <phase>test</phase>
+            <goals>
+              <goal>merge</goal>
+            </goals>
+            <configuration>
+              <fileSets>
+                <fileSet>
+                  <directory>${project.build.directory}/jacoco-report/</directory>
+                  <includes>
+                    <include>*.exec</include>
+                  </includes>
+                  <excludes>
+                    <exclude>jacoco-all.exec</exclude>
+                  </excludes>
+                </fileSet>
+              </fileSets>
+              <destFile>${project.build.directory}/jacoco-report/jacoco-all.exec</destFile>
+            </configuration>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <dataFile>${project.build.directory}/jacoco-report/jacoco-all.exec</dataFile>
             </configuration>
           </execution>
         </executions>
@@ -386,6 +475,14 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
       <version>4.5.14</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Resolved so maven-dependency-plugin can stage it for the container; not on any classpath. -->
+    <dependency>
+      <groupId>org.jacoco</groupId>
+      <artifactId>org.jacoco.agent</artifactId>
+      <version>${jacoco.version}</version>
+      <classifier>runtime</classifier>
       <scope>test</scope>
     </dependency>
   </dependencies>

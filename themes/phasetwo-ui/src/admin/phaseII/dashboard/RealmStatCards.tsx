@@ -2,6 +2,7 @@ import { Card, CardBody, Grid, GridItem } from "@patternfly/react-core";
 import { Link } from "react-router-dom";
 import { useRealm } from "../../context/realm-context/RealmContext";
 import type { DashboardStats } from "./useDashboardStats";
+import { exactStatValue, formatStatValue } from "./stat-format";
 
 type StatCardProps = {
   label: string;
@@ -11,27 +12,27 @@ type StatCardProps = {
   realm: string;
 };
 
-function formatValue(value: number | null, capped?: boolean): string {
-  if (value === null) return "—";
-  if (capped) return `${value}+`;
-  return value.toLocaleString();
-}
-
-const StatCard = ({ label, value, capped, path, realm }: StatCardProps) => (
-  <Card isFullHeight>
-    <CardBody>
-      <Link
-        to={`/${encodeURIComponent(realm)}${path}`}
-        style={{ textDecoration: "none", color: "inherit" }}
-      >
-        <div className="p2-stat-card">
-          <span className="p2-stat-number">{formatValue(value, capped)}</span>
-          <span className="p2-stat-label">{label}</span>
-        </div>
-      </Link>
-    </CardBody>
-  </Card>
-);
+const StatCard = ({ label, value, capped, path, realm }: StatCardProps) => {
+  const exact = exactStatValue(value, capped);
+  return (
+    <Card isFullHeight>
+      <CardBody>
+        <Link
+          to={`/${encodeURIComponent(realm)}${path}`}
+          style={{ textDecoration: "none", color: "inherit" }}
+          aria-label={exact ? `${exact} ${label}` : undefined}
+        >
+          <div className="p2-stat-card">
+            <span className="p2-stat-number" title={exact}>
+              {formatStatValue(value, capped)}
+            </span>
+            <span className="p2-stat-label">{label}</span>
+          </div>
+        </Link>
+      </CardBody>
+    </Card>
+  );
+};
 
 type RealmStatCardsProps = {
   stats: DashboardStats;

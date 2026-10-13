@@ -5,13 +5,23 @@
   justify-content: center;
   padding: var(--pf-v5-global--spacer--md) 0;
   gap: var(--pf-v5-global--spacer--xs);
+  /* Lets the number size itself against the card's width (cqi below). */
+  container-type: inline-size;
 }
 
+/* Compact formatting (stat-format.ts) bounds the text length; the clamp shrinks it
+   on narrow cards, and the overflow rules keep anything left over inside the card
+   instead of spilling into its neighbors. */
 .p2-stat-number {
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 20cqi, 2.5rem);
   font-weight: var(--pf-v5-global--FontWeight--bold);
+  font-variant-numeric: tabular-nums;
   line-height: 1;
   color: var(--pf-v5-global--Color--100);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .p2-stat-label {

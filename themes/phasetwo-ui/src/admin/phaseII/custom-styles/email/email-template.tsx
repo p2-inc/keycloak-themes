@@ -36,6 +36,12 @@ import { useAccess } from "../../../context/access/Access";
 import { SaveReset } from "../components/SaveReset";
 import useStylesFetcher from "../useStylesFetcher";
 import { useAdminClient } from "../../../admin-client";
+import {
+  isValidLength,
+  RADIUS_ATTR_KEY,
+  readToken,
+  type BaseToken,
+} from "../login/theme-tokens";
 
 type EmailTemplateTabProps = {
   realm: RealmRepresentation;
@@ -60,11 +66,52 @@ const FOOTER_LINE2_ATTR = "_providerConfig.assets.email.footer.line2";
 
 // ─── Email preview ────────────────────────────────────────────────────────────
 
+// The fallbacks email/html/template.ftl uses for tokens the realm has not set.
+// They deliberately differ from the login defaults (a near-black button rather
+// than the login blue), so an unbranded realm previews what it actually sends.
+const EMAIL_THEME_DEFAULTS = {
+  muted: "#f2f2f2",
+  background: "#ffffff",
+  foreground: "#1a1a1a",
+  primary: "#171717",
+  primaryForeground: "#fafafa",
+  border: "#e8e8e8",
+  radius: "0.65rem",
+};
+
+type EmailTheme = typeof EMAIL_THEME_DEFAULTS;
+type EmailColorToken = Exclude<keyof EmailTheme, "radius"> & BaseToken;
+
+/**
+ * The brand tokens a sent email renders with: the light tokens the realm has
+ * explicitly set (resolved like `LoginThemeCss.explicitLightTokens`, legacy
+ * fallback included), else the email defaults. Dark tokens are not read; the
+ * email template is light only.
+ */
+const resolveEmailTheme = (
+  attributes: Record<string, string> | undefined,
+): EmailTheme => {
+  const color = (token: EmailColorToken) =>
+    readToken(attributes, token, false) || EMAIL_THEME_DEFAULTS[token];
+  const radius = attributes?.[RADIUS_ATTR_KEY]?.trim();
+  return {
+    muted: color("muted"),
+    background: color("background"),
+    foreground: color("foreground"),
+    primary: color("primary"),
+    primaryForeground: color("primaryForeground"),
+    border: color("border"),
+    radius:
+      radius && isValidLength(radius) ? radius : EMAIL_THEME_DEFAULTS.radius,
+  };
+};
+
 type EmailPreviewProps = {
   logoBase64: string;
   footerLine1: string;
   footerLine2: string;
   realmDisplayName: string;
+  theme: EmailTheme;
 };
 
 const EmailPreview = ({
@@ -72,10 +119,11 @@ const EmailPreview = ({
   footerLine1,
   footerLine2,
   realmDisplayName,
+  theme,
 }: EmailPreviewProps) => (
   <div
     style={{
-      background: "#f2f2f2",
+      background: theme.muted,
       padding: "24px 16px",
       borderRadius: "0.5rem",
       border: "1px solid #e0e0e0",
@@ -85,14 +133,14 @@ const EmailPreview = ({
       style={{
         maxWidth: 480,
         margin: "0 auto",
-        background: "#ffffff",
-        borderRadius: "0.65rem",
+        background: theme.background,
+        borderRadius: theme.radius,
         boxShadow:
           "0 1px 3px 0 rgb(0 0 0/0.1), 0 1px 2px -1px rgb(0 0 0/0.1)",
         padding: "32px 40px 16px",
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-        color: "#1a1a1a",
+        color: theme.foreground,
         fontSize: 14,
       }}
     >
@@ -121,10 +169,10 @@ const EmailPreview = ({
         <span
           style={{
             display: "inline-block",
-            background: "#171717",
-            color: "#fafafa",
+            background: theme.primary,
+            color: theme.primaryForeground,
             padding: "8px 20px",
-            borderRadius: "0.65rem",
+            borderRadius: theme.radius,
             fontSize: 14,
             fontWeight: 500,
             textDecoration: "none",
@@ -143,7 +191,7 @@ const EmailPreview = ({
           textAlign: "center",
           opacity: 0.6,
           paddingTop: 16,
-          borderTop: "1px solid #e8e8e8",
+          borderTop: `1px solid ${theme.border}`,
         }}
       >
         {footerLine1 || realmDisplayName}
@@ -561,6 +609,9 @@ export const EmailTemplate = ({ realm, refresh }: EmailTemplateTabProps) => {
           footerLine1={footerLine1}
           footerLine2={footerLine2}
           realmDisplayName={realmDisplayName}
+          theme={resolveEmailTheme(
+            realm?.attributes as Record<string, string> | undefined,
+          )}
         />
       </div>
 

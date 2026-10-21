@@ -62,4 +62,12 @@ public class OverridableEmailSenderProviderFactory extends DefaultEmailSenderPro
   public String getId() {
     return "ext-email-override";
   }
+
+  // Win the default over Keycloak's "default" sender (order 0) without --spi-email-sender-provider.
+  // This sender runs the MessageBuilderProvider that attaches the email logo as the cid:logoLight
+  // part; under the built-in sender the template's logo <img> has nothing to resolve to.
+  @Override
+  public int order() {
+    return 1;
+  }
 }

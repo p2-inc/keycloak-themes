@@ -63,7 +63,7 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
       this.counterCache =
           session.getProvider(InfinispanConnectionProvider.class).getCache("counterCache", true);
     } catch (Exception e) {
-      log.warnf("Error loading counterCache %s", e);
+      log.debugf("Error loading counterCache %s", e);
     }
   }
 
@@ -93,7 +93,7 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
   }
 
   private boolean canSend() {
-    if (cacheKey == null) return true;
+    if (cacheKey == null || counterCache == null) return true;
     Integer count = counterCache.get(cacheKey);
     log.infof("Count for %s is %d / %d", cacheKey, count, maxEmails);
     if (count == null || count <= maxEmails) return true;
@@ -101,7 +101,7 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
   }
 
   private Integer increment() {
-    if (cacheKey == null) return 0;
+    if (cacheKey == null || counterCache == null) return 0;
     else
       return counterCache.compute(
           cacheKey, (key, value) -> (value == null) ? 1 : value + 1, 1, TimeUnit.DAYS);

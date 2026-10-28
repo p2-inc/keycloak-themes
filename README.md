@@ -160,6 +160,18 @@ There are 3 examples of CSS themes that can be loaded using the property above. 
 - Enterprise
 - SaaS
 
+### Welcome theme
+
+Once an administrative user exists, Keycloak's stock welcome theme redirects the server's root URL to the Administration Console, so anyone who visits the bare hostname lands on the `master` realm's login page. The `phasetwo-ui` welcome theme shows a neutral page there instead, telling the visitor to return to the application they came from. It has no admin console link and no product branding. While no administrative user exists, it behaves like the stock theme and offers the create-user form to local requests.
+
+The welcome theme is server-wide rather than per realm, so select it with a server option:
+
+```
+--spi-theme--welcome-theme=phasetwo-ui
+```
+
+or the equivalent environment variable `KC_SPI_THEME__WELCOME_THEME=phasetwo-ui`.
+
 ### Email theme
 
 Email templates can be overridden per-realm using Realm attributes with the following key format:

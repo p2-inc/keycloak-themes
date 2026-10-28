@@ -18,7 +18,8 @@
         "account",
         "admin",
         "email",
-        "login"
+        "login",
+        "welcome"
       ]
     },
     {

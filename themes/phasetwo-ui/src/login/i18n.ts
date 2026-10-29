@@ -60,6 +60,10 @@ const { I18nProvider, useI18n } = i18nBuilder
       validationSuccessTitle: "Successful Identity Provider Validation!",
       validationCloseWindow:
         "You may now close this window and return to the application.",
+      // Bot protection (defaults match keycloak-bot-protection's own messages)
+      bpCaptchaTitle: "Verify you are human",
+      bpCaptchaInstruction: "Complete the check below to continue.",
+      bpContinue: "Continue",
     },
   })
   .build();

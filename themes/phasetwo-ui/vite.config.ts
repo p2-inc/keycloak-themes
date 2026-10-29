@@ -58,6 +58,9 @@ export default defineConfig({
         <@addToXKeycloakifyMessagesIfMessageKey str="viewEmailTitle" />
         <@addToXKeycloakifyMessagesIfMessageKey str="invitationTitle" />
         <@addToXKeycloakifyMessagesIfMessageKey str="invitationBody" />
+        <@addToXKeycloakifyMessagesIfMessageKey str="bpCaptchaTitle" />
+        <@addToXKeycloakifyMessagesIfMessageKey str="bpCaptchaInstruction" />
+        <@addToXKeycloakifyMessagesIfMessageKey str="bpContinue" />
         <@addToXKeycloakifyMessagesIfMessageKey str="selectOrgTitle" />
         <@addToXKeycloakifyMessagesIfMessageKey str="selectOrgHeader" />
         <@addToXKeycloakifyMessagesIfMessageKey str="selectOrganization" />

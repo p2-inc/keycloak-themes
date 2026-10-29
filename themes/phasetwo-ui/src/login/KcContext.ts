@@ -78,6 +78,8 @@ export type KcContextExtensionPerPage = {
     };
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     "idp-validation.ftl": {};
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    "bp-captcha.ftl": {};
     "login-recaptcha.ftl": {
         auth: {
             attemptedUsername: string;

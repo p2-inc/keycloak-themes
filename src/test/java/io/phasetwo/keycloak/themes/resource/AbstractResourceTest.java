@@ -54,6 +54,7 @@ public abstract class AbstractResourceTest {
             // Themes stay uncached, but parsed templates are cached, as in a server that follows
             // the README and sets only --spi-theme-cache-themes=false.
             .withEnv("KC_SPI_THEME__CACHE_TEMPLATES", "true")
+            .withEnv("KC_SPI_THEME__WELCOME_THEME", "phasetwo-ui")
             .withAccessToHost(true)
             .withProviderLibsFrom(getDeps());
 

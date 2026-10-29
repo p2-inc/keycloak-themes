@@ -64,6 +64,9 @@ const Page_idp_validation = lazy(() => import("./extensions/orgs/idp-validation"
 // Extension pages — recaptcha
 const Page_login_recaptcha = lazy(() => import("./extensions/login-recaptcha"));
 
+// Extension pages — bot-protection
+const Page_bp_captcha = lazy(() => import("./extensions/bot-protection/bp-captcha"));
+
 export function PageIndex() {
     const { kcContext } = useKcContext();
 
@@ -172,6 +175,9 @@ export function PageIndex() {
                     // Extension pages — recaptcha
                     case "login-recaptcha.ftl":
                         return <Page_login_recaptcha />;
+                    // Extension pages — bot-protection
+                    case "bp-captcha.ftl":
+                        return <Page_bp_captcha />;
                 }
             })()}
         </Suspense>

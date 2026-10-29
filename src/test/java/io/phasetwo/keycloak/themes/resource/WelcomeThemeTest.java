@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -29,6 +31,20 @@ public class WelcomeThemeTest extends AbstractResourceTest {
       assertTrue(html.contains("This is a sign-in service"), html);
       assertFalse(html.contains("Administration Console"), html);
       assertFalse(html.contains("logo.svg"), html);
+      assertTrue(html.contains("class=\"p2-welcome\""), html);
+
+      // The page is styled by the theme's own stylesheet, which must actually be served. The
+      // template links it relative to the root.
+      Matcher stylesheet =
+          Pattern.compile("href=\"([^\"]*/welcome/phasetwo-ui/css/phasetwo-welcome\\.css)\"")
+              .matcher(html);
+      assertTrue(stylesheet.find(), html);
+      String cssUrl =
+          container.getAuthServerUrl() + "/" + stylesheet.group(1).replaceFirst("^/", "");
+      try (CloseableHttpResponse css = client.execute(new HttpGet(cssUrl))) {
+        assertEquals(200, css.getStatusLine().getStatusCode());
+        assertTrue(EntityUtils.toString(css.getEntity()).contains(".p2-welcome"));
+      }
     }
   }
 }

@@ -48,19 +48,18 @@
     </#if>
   </head>
   <body data-page-id="welcome">
-    <div class="pf-v5-c-background-image" style="--pf-v5-c-background-image--BackgroundImage: url(${baseUrl}${resourcesPath}/background.svg)"></div>
-    <div class="pf-v5-c-login">
-      <div class="pf-v5-c-login__container">
-        <#-- The logo is shown only while bootstrapping. Afterwards this page is what a visitor
-             to the server's bare hostname sees, so it carries no product branding. -->
-        <#if bootstrap>
-          <header class="pf-v5-c-login__header">
-            <div class="pf-v5-c-brand">
-              <img src="${resourcesPath}/logo.svg" alt="${productName} Logo" class="kc-brand">
-            </div>
-          </header>
-        </#if>
-        <#if adminConsoleEnabled && (bootstrap || successMessage?has_content)>
+    <#if adminConsoleEnabled && (bootstrap || successMessage?has_content)>
+      <#-- Bootstrapping: the stock PatternFly form for creating the first administrative user. -->
+      <div class="pf-v5-c-background-image" style="--pf-v5-c-background-image--BackgroundImage: url(${baseUrl}${resourcesPath}/background.svg)"></div>
+      <div class="pf-v5-c-login">
+        <div class="pf-v5-c-login__container">
+          <#if bootstrap>
+            <header class="pf-v5-c-login__header">
+              <div class="pf-v5-c-brand">
+                <img src="${resourcesPath}/logo.svg" alt="${productName} Logo" class="kc-brand">
+              </div>
+            </header>
+          </#if>
           <main class="pf-v5-c-login__main">
             <header class="pf-v5-c-login__main-header">
               <#if localUser>
@@ -187,20 +186,28 @@
               </#if>
             </div>
           </main>
-        <#else>
-          <#-- Not bootstrapping: a neutral page in place of the stock redirect to the
-               Administration Console (redirectToAdmin=false in theme.properties). End users who
-               land on the bare hostname have no business with the admin console. -->
-          <main class="pf-v5-c-login__main">
-            <header class="pf-v5-c-login__main-header">
-              <h1 class="pf-v5-c-title pf-m-2xl">This is a sign-in service</h1>
-            </header>
-            <div class="pf-v5-c-login__main-body">
-              <p>There is nothing to see at this address. Return to the application you came from and sign in from there.</p>
-            </div>
-          </main>
-        </#if>
+        </div>
       </div>
-    </div>
+    <#else>
+      <#-- Not bootstrapping: a neutral page in place of the stock redirect to the Administration
+           Console (redirectToAdmin=false in theme.properties). This is what a visitor to the bare
+           hostname sees, so it has no admin console link and no product branding. Styled after
+           the phasetwo-ui login theme by css/phasetwo-welcome.css. -->
+      <div class="p2-welcome">
+        <main class="p2-welcome__main">
+          <section class="p2-welcome__card">
+            <div class="p2-welcome__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <h1 class="p2-welcome__title">This is a sign-in service</h1>
+            <p class="p2-welcome__text">There is nothing to see at this address. Return to the application you came from and sign in from there.</p>
+          </section>
+        </main>
+        <div class="p2-welcome__aside" aria-hidden="true"></div>
+      </div>
+    </#if>
   </body>
 </html>

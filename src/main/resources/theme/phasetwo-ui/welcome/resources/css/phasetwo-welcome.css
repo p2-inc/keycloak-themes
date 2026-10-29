@@ -1,0 +1,128 @@
+/*
+ * The neutral page that the server's bare hostname shows once an administrative user exists.
+ * It follows the default look of the phasetwo-ui login theme (themes/phasetwo-ui/src/login):
+ * its colors, card, radius and type, and its split layout with the brand-colored panel on the
+ * left. There is no realm on this page, so the login theme's defaults apply, never a realm's
+ * brand tokens. Dark mode follows the parent theme's dark-mode class (kcDarkModeClass).
+ */
+
+.p2-welcome {
+  --p2-radius: 0.625rem;
+  --p2-background: oklch(0.97 0 0);
+  --p2-foreground: oklch(0.145 0 0);
+  --p2-card: oklch(1 0 0 / 88%);
+  --p2-muted-foreground: oklch(0.556 0 0);
+  --p2-border: oklch(0.922 0 0);
+  --p2-primary: #3b82f6;
+  --p2-primary-foreground: #ffffff;
+  --p2-aside: var(--p2-background);
+  --p2-grid-line: oklch(0.145 0 0 / 6%);
+
+  display: grid;
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0;
+  background: var(--p2-background);
+  color: var(--p2-foreground);
+  font-family: "Inter var", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.pf-v5-theme-dark .p2-welcome {
+  --p2-background: oklch(0.145 0 0);
+  --p2-foreground: oklch(0.985 0 0);
+  --p2-card: oklch(0.205 0 0);
+  --p2-muted-foreground: oklch(0.708 0 0);
+  --p2-border: oklch(1 0 0 / 10%);
+  --p2-primary: oklch(0.922 0 0);
+  --p2-primary-foreground: oklch(0.205 0 0);
+  --p2-aside: color-mix(in oklch, var(--p2-primary) 5%, var(--p2-background));
+  --p2-grid-line: oklch(1 0 0 / 6%);
+}
+
+.p2-welcome__main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+}
+
+.p2-welcome__card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 36rem;
+  padding: 1.5rem;
+}
+
+.p2-welcome__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 1rem;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--p2-primary) 12%, transparent);
+  color: var(--p2-primary);
+}
+
+.p2-welcome__icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.p2-welcome__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  letter-spacing: -0.01em;
+  color: var(--p2-foreground);
+}
+
+.p2-welcome__text {
+  margin: 0;
+  color: var(--p2-muted-foreground);
+}
+
+.p2-welcome__aside {
+  display: none;
+}
+
+/* Like the login theme's sm: breakpoint: the card gets its surface and border. */
+@media (min-width: 640px) {
+  .p2-welcome__card {
+    padding: 2rem;
+    border: 1px solid var(--p2-border);
+    border-radius: calc(var(--p2-radius) + 4px);
+    background: var(--p2-card);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+}
+
+/* Like the login theme's lg: breakpoint: brand-colored left panel, quiet grid on the right. */
+@media (min-width: 1024px) {
+  .p2-welcome {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .p2-welcome__main {
+    padding: 2.5rem;
+    background: var(--p2-primary);
+  }
+
+  .p2-welcome__aside {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--p2-aside);
+    background-image: linear-gradient(var(--p2-grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--p2-grid-line) 1px, transparent 1px);
+    background-size: 2.5rem 2.5rem;
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
+  }
+}

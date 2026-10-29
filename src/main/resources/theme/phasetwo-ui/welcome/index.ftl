@@ -206,7 +206,6 @@
             <p class="p2-welcome__text">There is nothing to see at this address. Return to the application you came from and sign in from there.</p>
           </section>
         </main>
-        <div class="p2-welcome__aside" aria-hidden="true"></div>
       </div>
     </#if>
   </body>

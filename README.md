@@ -162,7 +162,7 @@ There are 3 examples of CSS themes that can be loaded using the property above. 
 
 ### Welcome theme
 
-Once an administrative user exists, Keycloak's stock welcome theme redirects the server's root URL to the Administration Console, so anyone who visits the bare hostname lands on the `master` realm's login page. The `phasetwo-ui` welcome theme shows a neutral page there instead, telling the visitor to return to the application they came from. It has no admin console link and no product branding, and it follows the default look of the `phasetwo-ui` login theme: the same colors, card, type and split layout, in light and dark mode. While no administrative user exists, it behaves like the stock theme and offers the create-user form to local requests.
+Once an administrative user exists, Keycloak's stock welcome theme redirects the server's root URL to the Administration Console, so anyone who visits the bare hostname lands on the `master` realm's login page. The `phasetwo-ui` welcome theme shows a neutral page there instead, telling the visitor to return to the application they came from. It has no admin console link and no product branding, and it follows the default look of the `phasetwo-ui` login theme: the same colors, card and type, as a single centered card in light and dark mode. While no administrative user exists, it behaves like the stock theme and offers the create-user form to local requests.
 
 The welcome theme is server-wide rather than per realm, so select it with a server option:
 

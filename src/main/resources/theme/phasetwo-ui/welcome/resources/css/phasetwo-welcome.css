@@ -1,9 +1,9 @@
 /*
  * The neutral page that the server's bare hostname shows once an administrative user exists.
  * It follows the default look of the phasetwo-ui login theme (themes/phasetwo-ui/src/login):
- * its colors, card, radius and type, and its split layout with the brand-colored panel on the
- * left. There is no realm on this page, so the login theme's defaults apply, never a realm's
- * brand tokens. Dark mode follows the parent theme's dark-mode class (kcDarkModeClass).
+ * its colors, card, radius and type, in a single centered column (the login page's split
+ * layout has nothing to put beside the card here). There is no realm on this page, so the login
+ * theme's defaults apply, never a realm's brand tokens. Dark mode follows the parent theme's dark-mode class (kcDarkModeClass).
  */
 
 .p2-welcome {
@@ -15,8 +15,6 @@
   --p2-border: oklch(0.922 0 0);
   --p2-primary: #3b82f6;
   --p2-primary-foreground: #ffffff;
-  --p2-aside: var(--p2-background);
-  --p2-grid-line: oklch(0.145 0 0 / 6%);
 
   display: grid;
   min-height: 100vh;
@@ -39,8 +37,6 @@
   --p2-border: oklch(1 0 0 / 10%);
   --p2-primary: oklch(0.922 0 0);
   --p2-primary-foreground: oklch(0.205 0 0);
-  --p2-aside: color-mix(in oklch, var(--p2-primary) 5%, var(--p2-background));
-  --p2-grid-line: oklch(1 0 0 / 6%);
 }
 
 .p2-welcome__main {
@@ -88,10 +84,6 @@
   color: var(--p2-muted-foreground);
 }
 
-.p2-welcome__aside {
-  display: none;
-}
-
 /* Like the login theme's sm: breakpoint: the card gets its surface and border. */
 @media (min-width: 640px) {
   .p2-welcome__card {
@@ -103,26 +95,3 @@
   }
 }
 
-/* Like the login theme's lg: breakpoint: brand-colored left panel, quiet grid on the right. */
-@media (min-width: 1024px) {
-  .p2-welcome {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .p2-welcome__main {
-    padding: 2.5rem;
-    background: var(--p2-primary);
-  }
-
-  .p2-welcome__aside {
-    display: block;
-    position: relative;
-    overflow: hidden;
-    background-color: var(--p2-aside);
-    background-image: linear-gradient(var(--p2-grid-line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--p2-grid-line) 1px, transparent 1px);
-    background-size: 2.5rem 2.5rem;
-    -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
-    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 75%);
-  }
-}

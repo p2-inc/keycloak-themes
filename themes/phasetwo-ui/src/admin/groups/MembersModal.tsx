@@ -10,16 +10,31 @@
 // @ts-nocheck
 
 import type UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation";
-import { Button, Modal, ModalVariant, Label } from "../../shared/@patternfly/react-core";
+import {
+  Button,
+  EmptyState,
+  Label,
+  Modal,
+  ModalVariant,
+  Text,
+  TextContent,
+  Toolbar,
+  ToolbarContent,
+  ToolbarItem,
+} from "../../shared/@patternfly/react-core";
 import { InfoCircleIcon } from "../../shared/@patternfly/react-icons";
 import { differenceBy } from "lodash-es";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAdminClient } from "../admin-client";
 import { useAlerts } from "../../shared/keycloak-ui-shared";
-import { ListEmptyState } from "../../shared/keycloak-ui-shared";
 import { KeycloakDataTable } from "../../shared/keycloak-ui-shared";
 import { emptyFormatter } from "../util";
+import { UserLookup, UserLookupChips } from "../phaseII/user/UserLookup";
+import {
+  buildUserLookupParams,
+  type UserLookupFilter,
+} from "../phaseII/user/user-lookup";
 
 type MemberModalProps = {
   membersQuery: (first?: number, max?: number) => Promise<UserRepresentation[]>;
@@ -51,13 +66,35 @@ export const MemberModal = ({
   const { t } = useTranslation();
   const { addError } = useAlerts();
   const [selectedRows, setSelectedRows] = useState<UserRepresentation[]>([]);
+  // Phase Two: exact lookups only; nothing is listed until a user is looked up.
+  const [filters, setFilters] = useState<UserLookupFilter[]>([]);
+  const [key, setKey] = useState(0);
 
-  const loader = async (first?: number, max?: number, search?: string) => {
+  const applyFilters = (next: UserLookupFilter[]) => {
+    setFilters(next);
+    setKey(key + 1);
+  };
+
+  const lookup = (
+    <ToolbarItem style={{ flex: "1 1 28rem", minWidth: 0 }}>
+      <UserLookup
+        filters={filters}
+        onChange={applyFilters}
+        multi={false}
+        showAttributes={false}
+      />
+    </ToolbarItem>
+  );
+
+  const loader = async (first?: number, max?: number) => {
+    const lookupParams = buildUserLookupParams(filters);
+    if (!lookupParams) return [];
+
     const members = await membersQuery(first, max);
     const params: { [name: string]: string | number } = {
       first: first!,
       max: max! + members.length,
-      search: search || "",
+      ...lookupParams,
     };
 
     try {
@@ -98,17 +135,28 @@ export const MemberModal = ({
       ]}
     >
       <KeycloakDataTable
+        key={key}
         loader={loader}
         isPaginated
         ariaLabelKey="titleUsers"
-        searchPlaceholderKey="searchForUser"
+        isSearching={filters.length !== 0}
+        toolbarItem={lookup}
+        subToolbar={
+          <UserLookupChips filters={filters} onChange={applyFilters} />
+        }
         canSelectAll
         onSelect={(rows) => setSelectedRows([...rows])}
         emptyState={
-          <ListEmptyState
-            message={t("noUsersFound")}
-            instructions={t("emptyInstructions")}
-          />
+          <>
+            <Toolbar>
+              <ToolbarContent>{lookup}</ToolbarContent>
+            </Toolbar>
+            <EmptyState data-testid="empty-state" variant="lg">
+              <TextContent>
+                <Text>{t("userLookupAddMemberEmpty")}</Text>
+              </TextContent>
+            </EmptyState>
+          </>
         }
         columns={[
           {

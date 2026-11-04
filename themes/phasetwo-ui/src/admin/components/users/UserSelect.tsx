@@ -29,13 +29,14 @@ import {
   TextInputGroupUtilities,
 } from "../../../shared/@patternfly/react-core";
 import { TimesIcon } from "../../../shared/@patternfly/react-icons";
-import { debounce } from "lodash-es";
+import { debounce, uniqBy } from "lodash-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useAdminClient } from "../../admin-client";
 import useToggle from "../../utils/useToggle";
 import type { ComponentProps } from "../dynamic/components";
+import { buildUserPickerSearches } from "../../phaseII/user/user-lookup";
 
 type UserSelectVariant = "typeaheadMulti" | "typeahead";
 
@@ -92,12 +93,17 @@ export const UserSelect = ({
     [values],
   );
 
+  // Phase Two: exact username/email/ID lookups instead of an infix
+  // `username` match, which scans the user table on every keystroke.
   useFetch(
-    async () =>
-      adminClient.users.find({
-        username: search,
-        max: 20,
-      }),
+    async () => {
+      const searches = buildUserPickerSearches(search);
+      if (!searches.length) return [];
+      const results = await Promise.all(
+        searches.map((s) => adminClient.users.find({ search: s, max: 20 })),
+      );
+      return uniqBy(results.flat(), "id");
+    },
     setSearchedUsers,
     [search],
   );
@@ -164,9 +170,15 @@ export const UserSelect = ({
                       setInputValue(value);
                       debounceFn(value);
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        debounceFn.flush();
+                      }
+                    }}
                     autoComplete="off"
                     innerRef={textInputRef}
-                    placeholderText={t("selectAUser")}
+                    placeholderText={t("userLookupPickerPlaceholder")}
                     {...(field.value && {
                       "aria-activedescendant": field.value,
                     })}

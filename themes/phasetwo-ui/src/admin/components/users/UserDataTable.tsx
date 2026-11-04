@@ -22,16 +22,12 @@ import {
   AlertVariant,
   Button,
   ButtonVariant,
-  Chip,
-  ChipGroup,
   EmptyState,
-  FlexItem,
   Label,
   Text,
   TextContent,
   Toolbar,
   ToolbarContent,
-  ToolbarItem,
   Tooltip,
 } from "../../../shared/@patternfly/react-core";
 import {
@@ -47,7 +43,6 @@ import { useAdminClient } from "../../admin-client";
 import { fetchRealmInfo } from "../../context/auth/admin-ui-endpoint";
 import { UiRealmInfo } from "../../context/auth/uiRealmInfo";
 import { useRealm } from "../../context/realm-context/RealmContext";
-import { SearchType } from "../../user/details/SearchFilter";
 import { toAddUser } from "../../user/routes/AddUser";
 import { toUser } from "../../user/routes/User";
 import { emptyFormatter } from "../../util";
@@ -55,17 +50,11 @@ import { useConfirmDialog } from "../confirm-dialog/ConfirmDialog";
 import { BruteUser, findUsers } from "../role-mapping/resource";
 import { UserDataTableToolbarItems } from "./UserDataTableToolbarItems";
 import { NetworkError } from "@keycloak/keycloak-admin-client";
-
-export type UserFilter = {
-  exact: boolean;
-  userAttribute: UserAttribute[];
-};
-
-export type UserAttribute = {
-  name: string;
-  displayName: string;
-  value: string;
-};
+import { UserLookupChips } from "../../phaseII/user/UserLookup";
+import {
+  buildUserLookupParams,
+  type UserLookupFilter,
+} from "../../phaseII/user/user-lookup";
 
 const UserDetailLink = (user: BruteUser) => {
   const { t } = useTranslation();
@@ -132,16 +121,10 @@ export function UserDataTable() {
   const { realm: realmName, realmRepresentation: realm } = useRealm();
   const navigate = useNavigate();
   const [uiRealmInfo, setUiRealmInfo] = useState<UiRealmInfo>({});
-  const [searchUser, setSearchUser] = useState("");
   const [selectedRows, setSelectedRows] = useState<UserRepresentation[]>([]);
-  const [searchType, setSearchType] = useState<SearchType>("default");
-  const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
-  const [activeFilters, setActiveFilters] = useState<UserFilter>({
-    exact: false,
-    userAttribute: [],
-  });
+  // Phase Two: exact-match filters only; see phaseII/user/user-lookup.ts.
+  const [filters, setFilters] = useState<UserLookupFilter[]>([]);
   const [profile, setProfile] = useState<UserProfileConfig>({});
-  const [query, setQuery] = useState("");
 
   const [key, setKey] = useState(0);
   const refresh = () => setKey(key + 1);
@@ -169,28 +152,19 @@ export function UserDataTable() {
     [],
   );
 
-  const loader = async (first?: number, max?: number, search?: string) => {
-    const params: { [name: string]: string | number | boolean } = {
-      first: first!,
-      max: max!,
-      q: query!,
-    };
+  const loader = async (first?: number, max?: number) => {
+    const lookup = buildUserLookupParams(filters);
 
-    const searchParam = search || searchUser || "";
-    if (searchParam) {
-      params.search = searchParam;
-    }
-
-    if (activeFilters.exact) params.exact = true;
-
-    if (!listUsers && !(params.search || params.q)) {
+    if (!listUsers && !lookup) {
       return [];
     }
 
     try {
       return await findUsers(adminClient, {
         briefRepresentation: true,
-        ...params,
+        first: first!,
+        max: max!,
+        ...lookup,
       });
     } catch (error) {
       if (uiRealmInfo.userProfileProvidersEnabled) {
@@ -248,110 +222,35 @@ export function UserDataTable() {
   //should *only* list users when no user federation is configured
   const listUsers = !uiRealmInfo.userProfileProvidersEnabled;
 
-  const clearAllFilters = () => {
-    setActiveFilters({ exact: false, userAttribute: [] });
-    setSearchUser("");
-    setQuery("");
+  const applyFilters = (next: UserLookupFilter[]) => {
+    setFilters(next);
     refresh();
   };
 
-  const createQueryString = (filters: UserFilter) => {
-    return filters.userAttribute
-      .map((filter) => `${filter.name}:${filter.value}`)
-      .join(" ");
-  };
-
-  const searchUserWithAttributes = () => {
-    const attributes = createQueryString(activeFilters);
-    setQuery(attributes);
-    refresh();
-  };
-
-  const createAttributeSearchChips = () => {
-    return (
-      <FlexItem>
-        {activeFilters.userAttribute.length > 0 && (
-          <>
-            {Object.values(activeFilters.userAttribute).map((entry) => {
-              return (
-                <ChipGroup
-                  className="pf-v5-u-mt-md pf-v5-u-mr-md"
-                  data-testid="user-attribute-search-chips-group"
-                  key={entry.name}
-                  categoryName={
-                    entry.displayName.length ? entry.displayName : entry.name
-                  }
-                  isClosable
-                  onClick={(event) => {
-                    event.stopPropagation();
-
-                    const filtered = [...activeFilters.userAttribute].filter(
-                      (chip) => chip.name !== entry.name,
-                    );
-                    const active = {
-                      userAttribute: filtered,
-                      exact: activeFilters.exact,
-                    };
-
-                    setActiveFilters(active);
-                    setQuery(createQueryString(active));
-                    refresh();
-                  }}
-                >
-                  <Chip key={entry.name} isReadOnly>
-                    {entry.value}
-                  </Chip>
-                </ChipGroup>
-              );
-            })}
-          </>
-        )}
-      </FlexItem>
-    );
-  };
+  const clearAllFilters = () => applyFilters([]);
 
   const toolbar = () => {
     return (
       <UserDataTableToolbarItems
-        searchDropdownOpen={searchDropdownOpen}
-        setSearchDropdownOpen={setSearchDropdownOpen}
         realm={realm}
         hasSelectedRows={selectedRows.length === 0}
         toggleDeleteDialog={toggleDeleteDialog}
         toggleUnlockUsersDialog={toggleUnlockUsersDialog}
         goToCreate={goToCreate}
-        searchType={searchType}
-        setSearchType={setSearchType}
-        searchUser={searchUser}
-        setSearchUser={setSearchUser}
-        activeFilters={activeFilters}
-        setActiveFilters={setActiveFilters}
-        refresh={refresh}
+        filters={filters}
+        setFilters={applyFilters}
         profile={profile}
-        clearAllFilters={clearAllFilters}
-        createAttributeSearchChips={createAttributeSearchChips}
-        searchUserWithAttributes={searchUserWithAttributes}
       />
     );
   };
 
   const subtoolbar = () => {
-    if (!activeFilters.userAttribute.length) {
+    if (!filters.length) {
       return;
     }
     return (
       <div className="user-attribute-search-form-subtoolbar">
-        <ToolbarItem>{createAttributeSearchChips()}</ToolbarItem>
-        <ToolbarItem>
-          <Button
-            variant="link"
-            onClick={() => {
-              clearAllFilters();
-            }}
-          >
-            {t("clearAllFilters")}
-          </Button>
-        </ToolbarItem>
+        <UserLookupChips filters={filters} onChange={applyFilters} />
       </div>
     );
   };
@@ -361,9 +260,7 @@ export function UserDataTable() {
       <DeleteConfirm />
       <UnlockUsersConfirm />
       <KeycloakDataTable
-        isSearching={
-          searchUser !== "" || activeFilters.userAttribute.length !== 0
-        }
+        isSearching={filters.length !== 0}
         key={key}
         loader={loader}
         isPaginated

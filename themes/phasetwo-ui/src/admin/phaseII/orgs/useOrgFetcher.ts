@@ -139,6 +139,14 @@ export default function useOrgFetcher(realm: string) {
     return (data ?? []) as PhaseTwoOrganizationUserRepresentation[];
   }
 
+  async function isOrgMember(orgId: string, userId: string) {
+    const { response } = await client.GET(
+      "/{realm}/orgs/{orgId}/members/{userId}",
+      { params: { path: { realm, orgId, userId } } },
+    );
+    return response.status === 204;
+  }
+
   async function addOrgMember(orgId: string, userId: string) {
     await client.PUT("/{realm}/orgs/{orgId}/members/{userId}", {
       params: { path: { realm, orgId, userId } },
@@ -586,6 +594,7 @@ export default function useOrgFetcher(realm: string) {
     getPortalLink,
     getRolesForOrg,
     getUserAttributesForOrgMember,
+    isOrgMember,
     linkIDPtoOrg,
     listOrgRolesForUser,
     org,

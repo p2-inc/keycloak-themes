@@ -17,62 +17,37 @@ import {
   Dropdown,
   DropdownItem,
   DropdownList,
-  InputGroup,
-  InputGroupItem,
   MenuToggle,
-  SearchInput,
   ToolbarItem,
 } from "../../../shared/@patternfly/react-core";
-import { ArrowRightIcon, EllipsisVIcon } from "../../../shared/@patternfly/react-icons";
-import { ReactNode, useState } from "react";
+import { EllipsisVIcon } from "../../../shared/@patternfly/react-icons";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useAccess } from "../../context/access/Access";
-import { SearchDropdown, SearchType } from "../../user/details/SearchFilter";
-import DropdownPanel from "../dropdown-panel/DropdownPanel";
-import { UserFilter } from "./UserDataTable";
-import { UserDataTableAttributeSearchForm } from "./UserDataTableAttributeSearchForm";
+import { UserLookup } from "../../phaseII/user/UserLookup";
+import type { UserLookupFilter } from "../../phaseII/user/user-lookup";
 
 type UserDataTableToolbarItemsProps = {
-  searchDropdownOpen: boolean;
-  setSearchDropdownOpen: (open: boolean) => void;
   realm: RealmRepresentation;
   hasSelectedRows: boolean;
   toggleDeleteDialog: () => void;
   toggleUnlockUsersDialog: () => void;
   goToCreate: () => void;
-  searchType: SearchType;
-  setSearchType: (searchType: SearchType) => void;
-  searchUser: string;
-  setSearchUser: (searchUser: string) => void;
-  activeFilters: UserFilter;
-  setActiveFilters: (activeFilters: UserFilter) => void;
-  refresh: () => void;
+  filters: UserLookupFilter[];
+  setFilters: (filters: UserLookupFilter[]) => void;
   profile: UserProfileConfig;
-  clearAllFilters: () => void;
-  createAttributeSearchChips: () => ReactNode;
-  searchUserWithAttributes: () => void;
 };
 
 export function UserDataTableToolbarItems({
-  searchDropdownOpen,
-  setSearchDropdownOpen,
   realm,
   hasSelectedRows,
   toggleDeleteDialog,
   toggleUnlockUsersDialog,
   goToCreate,
-  searchType,
-  setSearchType,
-  searchUser,
-  setSearchUser,
-  activeFilters,
-  setActiveFilters,
-  refresh,
+  filters,
+  setFilters,
   profile,
-  clearAllFilters,
-  createAttributeSearchChips,
-  searchUserWithAttributes,
 }: UserDataTableToolbarItemsProps) {
   const { t } = useTranslation();
   const [kebabOpen, setKebabOpen] = useState(false);
@@ -85,86 +60,17 @@ export function UserDataTableToolbarItems({
   // permissions of every group.
   const isManager = hasAccess("query-users");
 
+  // Phase Two: one exact-match lookup replaces the Default/Attribute search
+  // modes, whose prefix and infix matching scan the whole user table.
   const searchItem = () => {
     return (
-      <ToolbarItem>
-        <InputGroup>
-          <InputGroupItem>
-            <SearchDropdown
-              searchType={searchType}
-              onSelect={(searchType) => {
-                clearAllFilters();
-                setSearchType(searchType);
-              }}
-            />
-          </InputGroupItem>
-          {searchType === "default" && defaultSearchInput()}
-          {searchType === "attribute" && attributeSearchInput()}
-        </InputGroup>
-      </ToolbarItem>
-    );
-  };
-
-  const defaultSearchInput = () => {
-    return (
-      <ToolbarItem>
-        <SearchInput
-          data-testid="table-search-input"
-          placeholder={t("searchForUser")}
-          aria-label={t("search")}
-          value={searchUser}
-          onSearch={(_, _v, attribute) => {
-            setSearchUser(attribute["haswords"]);
-            refresh();
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              const target = e.target as HTMLInputElement;
-              setSearchUser(target.value);
-              refresh();
-            }
-          }}
-          onClear={() => {
-            setSearchUser("");
-            refresh();
-          }}
+      <ToolbarItem style={{ flex: "1 1 32rem", minWidth: 0 }}>
+        <UserLookup
+          filters={filters}
+          onChange={setFilters}
+          profile={profile}
         />
       </ToolbarItem>
-    );
-  };
-
-  const attributeSearchInput = () => {
-    return (
-      <>
-        <DropdownPanel
-          data-testid="select-attributes-dropdown"
-          buttonText={t("selectAttributes")}
-          setSearchDropdownOpen={setSearchDropdownOpen}
-          searchDropdownOpen={searchDropdownOpen}
-          width="15vw"
-        >
-          <UserDataTableAttributeSearchForm
-            activeFilters={activeFilters}
-            setActiveFilters={setActiveFilters}
-            profile={profile}
-            createAttributeSearchChips={createAttributeSearchChips}
-            clearAllFilters={clearAllFilters}
-            searchUserWithAttributes={() => {
-              searchUserWithAttributes();
-              setSearchDropdownOpen(false);
-            }}
-          />
-        </DropdownPanel>
-        <Button
-          icon={<ArrowRightIcon />}
-          variant="control"
-          onClick={() => {
-            searchUserWithAttributes();
-            setSearchDropdownOpen(false);
-          }}
-          aria-label={t("searchAttributes")}
-        />
-      </>
     );
   };
 

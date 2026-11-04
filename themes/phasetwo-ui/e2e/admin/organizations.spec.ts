@@ -15,8 +15,11 @@ import { test, expect } from "@playwright/test";
 import {
   getAdminToken,
   findOrgByName,
+  findUserId,
   deleteOrg,
+  removeMember,
 } from "../helpers/api";
+import { LOOKUP_ADA } from "../helpers/user-lookup-fixtures";
 
 const KC_BASE = process.env.KC_BASE_URL ?? "http://localhost:8080/auth";
 const KC_REALM = process.env.KC_REALM ?? "phasetwo-ui";
@@ -27,6 +30,13 @@ test.afterAll(async () => {
   const token = await getAdminToken();
   const org = await findOrgByName(token, UI_ORG_NAME);
   if (org) await deleteOrg(token, org.id);
+
+  // Undo the member added by "can invite/add a member via the UI".
+  const fixtureOrg = await findOrgByName(token, "e2e-test-org");
+  const userId = await findUserId(token, LOOKUP_ADA.username);
+  if (fixtureOrg && userId) {
+    await removeMember(token, fixtureOrg.id, userId).catch(() => {});
+  }
 });
 
 // ── Organizations list ────────────────────────────────────────────────────────
@@ -89,16 +99,17 @@ test("can invite/add a member via the UI", async ({ page }) => {
   const addButton = page.getByRole("button", { name: /add member|invite/i });
   await addButton.click();
 
-  // Search for a user in the modal
-  const searchInput = page
-    .getByRole("dialog")
-    .getByRole("searchbox")
-    .or(page.getByRole("dialog").getByPlaceholder(/search|username/i));
-  await searchInput.fill("org-member");
-  await page.keyboard.press("Enter");
+  // Look up a user who is not a member yet (existing members are hidden)
+  const searchInput = page.getByRole("dialog").getByTestId("user-lookup-value");
+  await searchInput.fill(LOOKUP_ADA.username);
+  await searchInput.press("Enter");
 
   // Select the user from results
-  await page.getByRole("dialog").getByText("org-member").click();
+  await page
+    .getByRole("dialog")
+    .getByRole("row", { name: new RegExp(LOOKUP_ADA.username) })
+    .getByRole("checkbox")
+    .check();
 
   // Confirm
   const confirmBtn = page.getByRole("dialog").getByRole("button", {
@@ -107,7 +118,9 @@ test("can invite/add a member via the UI", async ({ page }) => {
   await confirmBtn.click();
 
   // Member should appear in the list
-  await expect(page.getByText("org-member")).toBeVisible({ timeout: 10_000 });
+  await expect(
+    page.getByRole("link", { name: LOOKUP_ADA.username, exact: true })
+  ).toBeVisible({ timeout: 10_000 });
 });
 
 // ── Roles tab ─────────────────────────────────────────────────────────────────

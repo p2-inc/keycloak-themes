@@ -20,6 +20,7 @@
 # admin/assets/img_avatar.svg
 # admin/assets/logo.svg
 # admin/dashboard/Dashboard.tsx
+# admin/groups/MembersModal.tsx
 # admin/identity-providers/IdentityProvidersSection.tsx
 # admin/realm-settings/GeneralTab.tsx
 # admin/realm-settings/RealmSettingsTabs.tsx
@@ -31,6 +32,9 @@
 # email/html/template.ftl
 # login/pages/PageIndex.tsx
 # admin/components/form/FormAccess.tsx
+# admin/components/users/UserDataTable.tsx
+# admin/components/users/UserDataTableToolbarItems.tsx
+# admin/components/users/UserSelect.tsx
 # admin/components/view-header/ViewHeader.tsx
 # admin/context/access/Access.tsx
 # admin/realm-settings/routes/RealmSettings.tsx
@@ -179,7 +183,6 @@
 /admin/groups/GroupTable.tsx
 /admin/groups/Members.tsx
 /admin/groups/MembershipsModal.tsx
-/admin/groups/MembersModal.tsx
 /admin/groups/routes.ts
 /admin/groups/SubGroupsContext.tsx
 /admin/i18n/i18n.ts
@@ -529,10 +532,7 @@
 /admin/components/time-selector/TimeSelector.tsx
 /admin/components/time-selector/TimeSelectorControl.tsx
 /admin/components/time-selector/TimeSelectorForm.tsx
-/admin/components/users/UserDataTable.tsx
 /admin/components/users/UserDataTableAttributeSearchForm.tsx
-/admin/components/users/UserDataTableToolbarItems.tsx
-/admin/components/users/UserSelect.tsx
 /admin/components/wizard-section-header/wizard-section-header.css
 /admin/components/wizard-section-header/WizardSectionHeader.tsx
 /admin/context/auth/admin-ui-endpoint.ts

@@ -7,8 +7,10 @@ import { defineConfig, devices } from "@playwright/test";
  *
  * Default (api-only):
  *   pnpm test:e2e
- *   Runs pure REST API tests against the Docker Keycloak container.
- *   No browser required. Validates org CRUD, member management, role assignment.
+ *   Runs pure REST API tests against the Docker Keycloak container, plus the
+ *   unit tests in e2e/unit (no Keycloak needed: `pnpm test:e2e --project unit`).
+ *   No browser required. Validates org CRUD, member management, role assignment,
+ *   and the exact-match user lookup.
  *
  * Integration (full browser + api):
  *   PLAYWRIGHT_INTEGRATION=true pnpm test:e2e
@@ -52,6 +54,12 @@ export default defineConfig({
         ]
       : []),
 
+    // ── Unit tests (always run — no browser or Keycloak needed) ────────────
+    {
+      name: "unit",
+      testMatch: /unit\/.+\.spec\.ts/,
+    },
+
     // ── API tests (always run — no browser needed) ─────────────────────────
     {
       name: "api",
@@ -63,7 +71,11 @@ export default defineConfig({
       ? [
           {
             name: "admin-ui",
-            testIgnore: [/auth\.setup\.ts/, /api\/.+\.spec\.ts/],
+            testIgnore: [
+              /auth\.setup\.ts/,
+              /api\/.+\.spec\.ts/,
+              /unit\/.+\.spec\.ts/,
+            ],
             use: {
               ...devices["Desktop Chrome"],
               storageState: "e2e/.auth/admin.json",

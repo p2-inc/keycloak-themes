@@ -260,6 +260,102 @@ export async function findUserId(
   return users.find((u) => u.username === username)?.id;
 }
 
+export interface User {
+  id: string;
+  username: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  attributes?: Record<string, string[]>;
+}
+
+/** GET /admin/realms/{realm}/users with arbitrary query params. */
+export async function searchUsers(
+  token: string,
+  params: Record<string, string>
+): Promise<User[]> {
+  const qs = new URLSearchParams(params);
+  const res = await fetch(
+    `${KC_BASE}/admin/realms/${KC_REALM}/users?${qs}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (!res.ok) throw new Error(`Failed to search users: ${res.status}`);
+  return typed<User[]>(res);
+}
+
+/** Creates the user if no user has this username yet; returns its id. */
+export async function ensureUser(
+  token: string,
+  user: Omit<User, "id">
+): Promise<string> {
+  const existing = await findUserId(token, user.username);
+  if (existing) return existing;
+  const res = await fetch(`${KC_BASE}/admin/realms/${KC_REALM}/users`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ enabled: true, ...user }),
+  });
+  if (!res.ok) throw new Error(`Failed to create user: ${res.status}`);
+  return res.headers.get("Location")!.split("/").pop()!;
+}
+
+/**
+ * Adds an admin-editable attribute to the realm's user profile, if missing.
+ * Unmanaged attributes are off by default, so a custom attribute has to be
+ * declared before users can carry it.
+ */
+export async function ensureUserProfileAttribute(
+  token: string,
+  name: string,
+  displayName: string
+): Promise<void> {
+  const url = `${KC_BASE}/admin/realms/${KC_REALM}/users/profile`;
+  const headers = { Authorization: `Bearer ${token}` };
+  const res = await fetch(url, { headers });
+  if (!res.ok) throw new Error(`Failed to get user profile: ${res.status}`);
+  const profile = (await res.json()) as {
+    attributes: Array<{ name: string }>;
+  };
+  if (profile.attributes.some((a) => a.name === name)) return;
+  profile.attributes.push({
+    name,
+    displayName,
+    permissions: { view: ["admin"], edit: ["admin"] },
+    multivalued: false,
+  } as { name: string });
+  const put = await fetch(url, {
+    method: "PUT",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify(profile),
+  });
+  if (!put.ok) throw new Error(`Failed to update user profile: ${put.status}`);
+}
+
+// ── Groups ────────────────────────────────────────────────────────────────────
+
+/** Creates a top-level group if none has this name yet; returns its id. */
+export async function ensureGroup(token: string, name: string): Promise<string> {
+  const headers = { Authorization: `Bearer ${token}` };
+  const res = await fetch(
+    `${KC_BASE}/admin/realms/${KC_REALM}/groups?search=${encodeURIComponent(name)}&exact=true`,
+    { headers }
+  );
+  if (!res.ok) throw new Error(`Failed to find group: ${res.status}`);
+  const groups = (await res.json()) as Array<{ id: string; name: string }>;
+  const existing = groups.find((g) => g.name === name);
+  if (existing) return existing.id;
+  const post = await fetch(`${KC_BASE}/admin/realms/${KC_REALM}/groups`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+  if (!post.ok) throw new Error(`Failed to create group: ${post.status}`);
+  return post.headers.get("Location")!.split("/").pop()!;
+}
+
 export async function getUserOrgs(
   token: string,
   userId: string

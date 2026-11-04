@@ -58,6 +58,11 @@ When a new Keycloak version is released, the Phase II customizations need to be 
   - This folder contains a new tab for the User details view.
   - In `admin-ui/src/user/routes/User.tsx` > UserTab add `user-orgs`
   - In `admin-ui/src/user/EditUser.tsx` import `UserOrgs`, add the `userOrgsTab` and add the `<Tab><UsersOrgs />...`
+- User lookup (`phaseII/user/user-lookup.ts`, `phaseII/user/UserLookup.tsx`)
+  - Every user search sends exact, indexed requests only. Keycloak's default `search` param runs a prefix LIKE that scans the whole user table, which is unusable on realms with millions of users.
+  - `admin/components/users/UserDataTable.tsx` and `UserDataTableToolbarItems.tsx` use `UserLookup` and `UserLookupChips` in place of the Default/Attribute search modes; the loader builds its params with `buildUserLookupParams`.
+  - `admin/groups/MembersModal.tsx` uses `UserLookup` in single-lookup mode and lists nothing until a user is looked up.
+  - `admin/components/users/UserSelect.tsx` fetches with `buildUserPickerSearches` instead of `username: search`.
 - Custom Styles
   - This folder contains all the Custom Styles UI. It exists mostly independent of other code, but does import components from the `ui-shared` and the `src/components` folder.
 - Realm Settings Attributes Tab `RealmSettingsTabs.tsx`
@@ -75,7 +80,7 @@ When a new Keycloak version is released, the Phase II customizations need to be 
 - **custom-styles** — Custom Styles UI, mostly independent; imports from `ui-shared` and `src/components`
 - **navigation** — Extensions nav group component
 - **access** — `ExtendedAccessType` extending KC's `AccessType` with org permissions
-- **user** — `UserOrgs` tab component for the user details view
+- **user** — `UserOrgs` tab component for the user details view, and the exact-match user lookup (`user-lookup.ts`, `UserLookup.tsx`)
 - **realm-settings** — Realm attributes tab component
 
 ## Building

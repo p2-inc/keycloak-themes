@@ -7,6 +7,8 @@
  *   process.env.TEST_ORG_ID        — id of "e2e-test-org"
  *   process.env.TEST_ORG_ADMIN_ID  — user id of "org-admin"
  *   process.env.TEST_ORG_MEMBER_ID — user id of "org-member"
+ *
+ * It also creates the user lookup fixtures (helpers/user-lookup-fixtures.ts).
  */
 
 import {
@@ -17,6 +19,7 @@ import {
   addMember,
   grantOrgRole,
 } from "./helpers/api";
+import { ensureLookupFixtures } from "./helpers/user-lookup-fixtures";
 
 const ORG_NAME = "e2e-test-org";
 
@@ -44,6 +47,10 @@ export default async function globalSetup() {
   }
 
   process.env.TEST_ORG_ID = orgId;
+
+  // ── User lookup fixtures ───────────────────────────────────────────────────
+  await ensureLookupFixtures(token);
+  console.log("[global-setup] User lookup fixtures ready");
 
   // ── Resolve user IDs ───────────────────────────────────────────────────────
   const orgAdminId = await findUserId(token, "org-admin");

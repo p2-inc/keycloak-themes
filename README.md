@@ -187,6 +187,14 @@ What an override contains depends on how the selected theme is rendered:
 - **`phasetwo-ui` (and any other FreeMarker theme)** — the override is the **action content**, keyed on `.ftl`. The theme's own `email/html/template.ftl` shell still supplies the logo, footer and brand colours, and the override is placed inside it, so an overridden template keeps its branding. Brand elements are set separately, under **Styles** → **Emails**; overrides are for the content within them. Use `${link}`, `${realmName}` and the shell's `class="btn"` in the content.
 - **Legacy `attributes*` themes** — rendered with mustache, where the override is the whole document, keyed on `.mustache`. Unchanged from previous releases.
 
+**The `phasetwo-ui` email logo requires the [Email Sender](#email-sender) provider.** The shell references the logo as an inline attachment (`src="cid:logoLight"`), and only this extension's email sender attaches it — the realm logo from **Styles** → **Emails** if set, otherwise the default Phase Two logo. With Keycloak's default sender the email arrives with a broken `<img>` (the admin preview still looks right, because it embeds the image directly). Set the following for `start` or `start-dev`, alongside the [Mustache template](#mustache-templates) flags:
+
+```
+--spi-email-sender-provider=ext-email-override --spi-email-sender-ext-email-override-enabled=true
+```
+
+No other `ext-email-override-*` variables are needed for this; without them, realms keep sending through their own SMTP settings.
+
 The legacy `attributes` theme names are served by a `ThemeProvider` that supplies the attribute-backed templates directly, with `mustache` as the default base theme. Which engine renders a given template is decided by the theme's `templateType` property, with a per-template fallback to mustache for templates a FreeMarker theme does not ship.
 
 Messages can be overridden with the following key format:
@@ -264,7 +272,7 @@ If you wish to set the global overrides, you can set the following variables:
 
 #### Attachments
 
-This implementation also includes an SPI `MessageBuilderProvider` that allows modifying the email message once it has been templated, but before it is sent. This is meant to allow adding headers and attachments. This is done by implementing a single `updateMessage` method that provides the [Message](https://jakarta.ee/specifications/platform/9/apidocs/jakarta/mail/message) and [Multipart](https://jakarta.ee/specifications/platform/9/apidocs/jakarta/mail/multipart) objects.
+This implementation also includes an SPI `MessageBuilderProvider` that allows modifying the email message once it has been templated, but before it is sent. This is meant to allow adding headers and attachments. It is only invoked by the [Email Sender](#email-sender) provider above; the default implementation uses it to attach the inline email logo. This is done by implementing a single `updateMessage` method that provides the [Message](https://jakarta.ee/specifications/platform/9/apidocs/jakarta/mail/message) and [Multipart](https://jakarta.ee/specifications/platform/9/apidocs/jakarta/mail/multipart) objects.
 
 ### JAR Folder Theme Provider
 

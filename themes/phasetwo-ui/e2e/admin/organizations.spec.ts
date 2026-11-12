@@ -7,6 +7,7 @@
  *   - View org detail
  *   - Members tab — add a member
  *   - Roles tab — assign a role to a member
+ *   - Invitations — role picker contents, POST body and 401 handling
  *
  * Run with: PLAYWRIGHT_INTEGRATION=true pnpm test:e2e
  */
@@ -155,4 +156,87 @@ test("can assign a role to a member via the UI", async ({ page }) => {
 
   // No error should be shown
   await expect(page.getByRole("alert", { name: /error/i })).not.toBeVisible();
+});
+
+// ── Invitations — role picker ─────────────────────────────────────────────────
+//
+// The POST is intercepted, so these tests check what the UI sends and how it
+// reacts, without creating invitations or depending on the server's role rules
+// (p2-inc/keycloak-orgs#517). The test admin has realm `manage-organizations`,
+// so every org role is offered.
+
+async function openInviteModal(page: import("@playwright/test").Page) {
+  await page.goto(`${ADMIN_CONSOLE}/#/${KC_REALM}/ext-organizations`);
+  await page.getByRole("link", { name: "e2e-test-org" }).click();
+  await page.getByRole("tab", { name: /invitations/i }).click();
+  await page.getByTestId("addInvitation").click();
+  return page.getByRole("dialog");
+}
+
+test("invitation role picker sends no roles by default", async ({ page }) => {
+  let body: Record<string, unknown> | undefined;
+  await page.route("**/orgs/*/invitations", async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    body = route.request().postDataJSON();
+    await route.fulfill({ status: 201 });
+  });
+
+  const dialog = await openInviteModal(page);
+  const rolesInput = dialog.getByPlaceholder(/select roles/i);
+  await expect(rolesInput).toBeVisible({ timeout: 10_000 });
+
+  await dialog.getByTestId("email-input").fill("no-roles@example.com");
+  await dialog.getByTestId("createinvitation").click();
+
+  await expect(dialog).not.toBeVisible({ timeout: 10_000 });
+  expect(body?.email).toBe("no-roles@example.com");
+  expect(body?.roles).toBeUndefined();
+});
+
+test("invitation role picker offers every org role and sends the selection", async ({
+  page,
+}) => {
+  let body: Record<string, unknown> | undefined;
+  await page.route("**/orgs/*/invitations", async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    body = route.request().postDataJSON();
+    await route.fulfill({ status: 201 });
+  });
+
+  const dialog = await openInviteModal(page);
+  await dialog.getByTestId("email-input").fill("with-roles@example.com");
+
+  const rolesInput = dialog.getByPlaceholder(/select roles/i);
+  await rolesInput.click();
+  // A default org role the test admin does not hold as an org member.
+  await dialog.getByRole("option", { name: "view-members", exact: true }).click();
+
+  await dialog.getByTestId("createinvitation").click();
+
+  await expect(dialog).not.toBeVisible({ timeout: 10_000 });
+  expect(body?.roles).toEqual(["view-members"]);
+});
+
+test("a 401 for the selected roles keeps the invite modal open", async ({
+  page,
+}) => {
+  await page.route("**/orgs/*/invitations", async (route) => {
+    if (route.request().method() !== "POST") return route.fallback();
+    await route.fulfill({
+      status: 401,
+      contentType: "application/json",
+      body: JSON.stringify({ error: "Unauthorized" }),
+    });
+  });
+
+  const dialog = await openInviteModal(page);
+  await dialog.getByTestId("email-input").fill("denied@example.com");
+  await dialog.getByPlaceholder(/select roles/i).click();
+  await dialog.getByRole("option", { name: "view-members", exact: true }).click();
+  await dialog.getByTestId("createinvitation").click();
+
+  await expect(
+    page.getByText(/not allowed to assign one or more of the selected roles/i)
+  ).toBeVisible({ timeout: 10_000 });
+  await expect(dialog).toBeVisible();
 });

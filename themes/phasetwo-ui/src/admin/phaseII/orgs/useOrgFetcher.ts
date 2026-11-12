@@ -58,6 +58,17 @@ function getResponseError(error: unknown, response: Response): Error {
   return new Error(message);
 }
 
+/** A failed org API call that keeps the HTTP status for callers to branch on. */
+export class OrgApiError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "OrgApiError";
+    this.status = status;
+  }
+}
+
 export default function useOrgFetcher(realm: string) {
   const { adminClient } = useAdminClient();
   const client = usePhaseTwoClient();
@@ -193,14 +204,18 @@ export default function useOrgFetcher(realm: string) {
     email: string,
     send: boolean,
     redirectUri: string,
+    roles: string[] = [],
   ) {
     const { error, response } = await client.POST("/{realm}/orgs/{orgId}/invitations", {
       params: { path: { realm, orgId } },
-      body: { email, send, redirectUri },
+      body: { email, send, redirectUri, ...(roles.length > 0 ? { roles } : {}) },
     });
 
     if (!response.ok) {
-      throw getResponseError(error, response);
+      throw new OrgApiError(
+        getResponseError(error, response).message,
+        response.status,
+      );
     }
   }
 

@@ -17,10 +17,10 @@ import type RoleRepresentation from "@keycloak/keycloak-admin-client/lib/defs/ro
 import { useTranslation } from "react-i18next";
 import { useAlerts } from "@/shared/keycloak-ui-shared";
 
-import { emptyFormatter } from "../../util";
 import type { IRowData } from "@patternfly/react-table";
 import { NewOrgRoleModal } from "./modals/NewOrgRoleModal";
 import { EditOrgRoleModal } from "./modals/EditOrgRoleModal";
+import "./org-roles.css";
 
 type OrgRolesProps = {
   org: OrgRepresentation;
@@ -145,6 +145,7 @@ export default function OrgRoles({ org, refresh: orgRefresh }: OrgRolesProps) {
                 <Button
                   key={role.id}
                   variant="link"
+                  className="p2-org-role-text"
                   onClick={() => setEditRoleModalVisibility(role)}
                   size="sm"
                   isInline
@@ -158,7 +159,7 @@ export default function OrgRoles({ org, refresh: orgRefresh }: OrgRolesProps) {
                   {role.name}
                 </Button>
               ) : (
-                <div>
+                <div className="p2-org-role-text">
                   <Badge
                     key={role.id}
                     isRead
@@ -173,7 +174,11 @@ export default function OrgRoles({ org, refresh: orgRefresh }: OrgRolesProps) {
           {
             name: "description",
             displayKey: "description",
-            cellFormatters: [emptyFormatter()],
+            cellRenderer: (role: RoleRepresentation) => (
+              <span className="p2-org-role-text">
+                {role.description || "—"}
+              </span>
+            ),
           },
         ]}
         emptyState={

@@ -1,0 +1,12 @@
+/* Role names and descriptions can be 255 characters with no spaces. Let them
+   wrap at any character so they never widen the table past the viewport and
+   push the row's actions (kebab) menu out of reach. */
+.p2-org-role-text {
+  overflow-wrap: anywhere;
+}
+
+/* PatternFly buttons don't wrap; the name link has to. */
+.pf-v5-c-button.p2-org-role-text {
+  white-space: normal;
+  text-align: start;
+}

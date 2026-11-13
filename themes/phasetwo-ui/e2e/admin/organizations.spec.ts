@@ -240,3 +240,50 @@ test("a 401 for the selected roles keeps the invite modal open", async ({
   ).toBeVisible({ timeout: 10_000 });
   await expect(dialog).toBeVisible();
 });
+
+// ── Roles — very long names (#128) ────────────────────────────────────────────
+//
+// Role names can be 255 characters. One that long used to stretch the table
+// past the viewport, leaving the row's kebab menu (and so Delete) out of reach.
+// The role list and the DELETE are intercepted, so nothing is created.
+
+test("a role with a 255-character name can be deleted at 1280px", async ({
+  page,
+}) => {
+  const longName = "a".repeat(255);
+  await page.setViewportSize({ width: 1280, height: 720 });
+
+  let deletedUrl: string | undefined;
+  await page.route("**/orgs/*/roles", async (route) => {
+    if (route.request().method() !== "GET") return route.fallback();
+    await route.fulfill({
+      json: [
+        { id: "long-name", name: longName, description: "d".repeat(255) },
+        { id: "view-roles", name: "view-roles" },
+      ],
+    });
+  });
+  await page.route("**/orgs/*/roles/*", async (route) => {
+    if (route.request().method() !== "DELETE") return route.fallback();
+    deletedUrl = route.request().url();
+    await route.fulfill({ status: 204 });
+  });
+
+  await page.goto(`${ADMIN_CONSOLE}/#/${KC_REALM}/ext-organizations`);
+  await page.getByRole("link", { name: "e2e-test-org" }).click();
+  await page.getByRole("tab", { name: /roles/i }).click();
+
+  const row = page.getByRole("row").filter({ hasText: longName });
+  const kebab = row.getByRole("button", { name: /kebab toggle/i });
+  await expect(kebab).toBeVisible({ timeout: 10_000 });
+
+  // The kebab sits inside the viewport without any horizontal scrolling.
+  const box = (await kebab.boundingBox())!;
+  expect(box.x + box.width).toBeLessThanOrEqual(1280);
+
+  await kebab.click();
+  await page.getByRole("menuitem", { name: /delete role/i }).click();
+  await page.getByTestId("confirm").click();
+
+  await expect.poll(() => deletedUrl).toContain(`/roles/${longName}`);
+});

@@ -50,7 +50,8 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
    * the packaged templates there, and keep using it.
    */
   static FreeMarkerProvider freeMarkerFor(Theme theme, FreeMarkerProvider shared) {
-    if (theme instanceof AttributeOverlayTheme overlay && overlay.hasTemplateOverrides()) {
+    if (theme instanceof AttributeOverlayTheme
+        && ((AttributeOverlayTheme) theme).hasTemplateOverrides()) {
       return UNCACHED_FREEMARKER;
     }
     return shared;

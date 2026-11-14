@@ -19,14 +19,41 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakUriInfo;
 import org.keycloak.models.RealmModel;
 import org.keycloak.theme.FreeMarkerException;
+import org.keycloak.theme.KeycloakSanitizerMethod;
 import org.keycloak.theme.Theme;
+import org.keycloak.theme.freemarker.DefaultFreeMarkerProvider;
+import org.keycloak.theme.freemarker.FreeMarkerProvider;
 import org.keycloak.utils.StringUtil;
 
 @JBossLog
 public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailTemplateProvider {
 
+  /**
+   * Parses the template on every render. Stateless without a cache, so one instance serves every
+   * session.
+   */
+  private static final FreeMarkerProvider UNCACHED_FREEMARKER =
+      new DefaultFreeMarkerProvider(null, new KeycloakSanitizerMethod());
+
   public FreeMarkerAndMustacheEmailTemplateProvider(KeycloakSession session) {
     super(session);
+  }
+
+  /**
+   * Picks the FreeMarker provider an email in {@code theme} may be rendered with.
+   *
+   * <p>Keycloak's template cache is keyed by {@code <type>/<theme name>/<template>}. The overlay
+   * keeps the selected theme's name, so every realm on that theme shares one entry per template,
+   * and an entry parsed from a realm's override would be sent to the other realms' users. A realm
+   * with template overrides therefore renders uncached: its overrides never enter the shared cache,
+   * and an edited override takes effect on the next email. Realms without overrides only ever put
+   * the packaged templates there, and keep using it.
+   */
+  static FreeMarkerProvider freeMarkerFor(Theme theme, FreeMarkerProvider shared) {
+    if (theme instanceof AttributeOverlayTheme overlay && overlay.hasTemplateOverrides()) {
+      return UNCACHED_FREEMARKER;
+    }
+    return shared;
   }
 
   /**
@@ -71,6 +98,7 @@ public class FreeMarkerAndMustacheEmailTemplateProvider extends FreeMarkerEmailT
         log.debugf("Using mustache template for %s in theme %s", template, theme.getName());
         return processMustacheTemplate(subjectKey, subjAttr, template, attr);
       } else {
+        freeMarker = freeMarkerFor(theme, freeMarker);
         return super.processTemplate(subjectKey, subjAttr, template, attr);
       }
     } catch (IOException e) {

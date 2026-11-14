@@ -217,6 +217,8 @@ Overrides layered on a packaged email theme (e.g. `phasetwo-ui`) work with theme
 --spi-theme-cache-themes=false
 ```
 
+Template caching (`--spi-theme-cache-templates`, on by default in `start`) can stay enabled. Keycloak caches parsed templates per theme, not per realm, so the `freemarker-plus-mustache` email template provider renders the emails of any realm that has a `_providerConfig.theme.email.templates.*` attribute without that cache. An override is therefore never sent to another realm's users, and an edited override applies to the next email without a restart. Realms without template overrides, and all other theme types such as login, keep using the template cache. This applies only when the `freemarker-plus-mustache` provider is enabled as described below; mustache templates are parsed on every email and were never cached.
+
 ### Mustache templates
 
 The implementation of `EmailTemplateProvider` that allows the use of mustache.js templates will need to override the default implementation in Keycloak. This has to be specified as an SPI override at startup. If you want to use it, you will need to set the following command line flags for `start` or `start-dev`:

@@ -1,6 +1,7 @@
 package io.phasetwo.keycloak.themes.theme;
 
 import static io.phasetwo.keycloak.themes.theme.AttributeTheme.EMAIL_MESSAGE_ATTRIBUTE_PREFIX;
+import static io.phasetwo.keycloak.themes.theme.AttributeTheme.EMAIL_TEMPLATE_ATTRIBUTE_PREFIX;
 import static io.phasetwo.keycloak.themes.theme.AttributeTheme.LEGACY_EMAIL_MESSAGE_ATTRIBUTE_PREFIX;
 import static io.phasetwo.keycloak.themes.theme.AttributeTheme.REALM_ATTRIBUTE_KEY;
 import static io.phasetwo.keycloak.themes.theme.AttributeTheme.templateKey;
@@ -87,6 +88,18 @@ public class AttributeOverlayTheme implements Theme {
 
   private Optional<String> getAttribute(String key) {
     return Optional.ofNullable(getAttributes().get(key));
+  }
+
+  /**
+   * Whether the current realm overrides any email template.
+   *
+   * <p>Keycloak caches parsed templates under {@code <type>/<theme name>/<template>}, a key with no
+   * realm in it, so a template parsed from one realm's override would be served to every realm on
+   * the same theme. Callers use this to keep such a realm's emails out of that cache.
+   */
+  public boolean hasTemplateOverrides() {
+    String prefix = EMAIL_TEMPLATE_ATTRIBUTE_PREFIX + ".";
+    return getAttributes().keySet().stream().anyMatch(k -> k.startsWith(prefix));
   }
 
   private static synchronized Path getTmpDir() throws IOException {

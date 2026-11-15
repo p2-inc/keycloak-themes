@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -54,7 +53,6 @@ public class EmailTemplateCacheTest extends AbstractResourceTest {
    * email, not A's override.
    */
   @Test
-  @Disabled("https://github.com/p2-inc/keycloak-themes/issues/110")
   void anOverrideInOneRealmIsNotSentToAnotherRealmsUsers() throws Exception {
     Keycloak keycloak = getKeycloak();
     String realmA = createRealm(keycloak, "cache-override-a");
@@ -72,6 +70,37 @@ public class EmailTemplateCacheTest extends AbstractResourceTest {
 
     keycloak.realm(realmB).users().get(userB.getId()).sendVerifyEmail();
     assertThat(bodyOfOnlyMessageTo("user-b@example.com"), not(containsString("REALM-A-MARKER")));
+  }
+
+  /**
+   * The other send order: realm F, without an override, renders the template first. Realm E must
+   * still get its own override, including after editing it and after dropping it, and F must keep
+   * getting the theme's email.
+   */
+  @Test
+  void aRealmGetsItsOwnOverrideAfterAnotherRealmRenderedTheTemplate() throws Exception {
+    Keycloak keycloak = getKeycloak();
+    String realmE = createRealm(keycloak, "cache-order-e");
+    String realmF = createRealm(keycloak, "cache-order-f");
+    String key = templateKey("html/email-verification.ftl");
+
+    sendVerifyEmail(keycloak, realmF, "user-f1@example.com");
+    assertThat(bodyOfOnlyMessageTo("user-f1@example.com"), not(containsString("REALM-E-MARKER")));
+
+    setRealmAttribute(keycloak.realm(realmE), key, "<p>REALM-E-MARKER-1</p>");
+    sendVerifyEmail(keycloak, realmE, "user-e1@example.com");
+    assertThat(bodyOfOnlyMessageTo("user-e1@example.com"), containsString("REALM-E-MARKER-1"));
+
+    setRealmAttribute(keycloak.realm(realmE), key, "<p>REALM-E-MARKER-2</p>");
+    sendVerifyEmail(keycloak, realmE, "user-e2@example.com");
+    assertThat(bodyOfOnlyMessageTo("user-e2@example.com"), containsString("REALM-E-MARKER-2"));
+
+    sendVerifyEmail(keycloak, realmF, "user-f2@example.com");
+    assertThat(bodyOfOnlyMessageTo("user-f2@example.com"), not(containsString("REALM-E-MARKER")));
+
+    removeRealmAttribute(keycloak.realm(realmE), key);
+    sendVerifyEmail(keycloak, realmE, "user-e3@example.com");
+    assertThat(bodyOfOnlyMessageTo("user-e3@example.com"), not(containsString("REALM-E-MARKER")));
   }
 
   /**
@@ -133,6 +162,19 @@ public class EmailTemplateCacheTest extends AbstractResourceTest {
     attributes.put(key, value);
     rep.setAttributes(attributes);
     realm.update(rep);
+  }
+
+  void removeRealmAttribute(RealmResource realm, String key) {
+    RealmRepresentation rep = realm.toRepresentation();
+    Map<String, String> attributes = new HashMap<>(rep.getAttributes());
+    attributes.remove(key);
+    rep.setAttributes(attributes);
+    realm.update(rep);
+  }
+
+  void sendVerifyEmail(Keycloak keycloak, String realm, String email) {
+    UserRepresentation user = createUser(keycloak, realm, email);
+    keycloak.realm(realm).users().get(user.getId()).sendVerifyEmail();
   }
 
   UserRepresentation createUser(Keycloak keycloak, String realm, String email) {

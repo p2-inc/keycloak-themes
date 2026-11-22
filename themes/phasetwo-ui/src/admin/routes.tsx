@@ -1,5 +1,5 @@
 /**
- * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260502.0.0.
+ * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260700.0.3.
  * To relinquish ownership and restore this file to its original content, run the following command:
  * 
  * $ npx keycloakify own --path "admin/routes.tsx" --revert
@@ -12,9 +12,8 @@
 import type { ExtendedAccessType } from "./phaseII/access/access";
 import type { TFunction } from "i18next";
 import type { ComponentType } from "react";
-import type { NonIndexRouteObject, RouteObject } from "react-router-dom";
+import type { NonIndexRouteObject } from "react-router-dom";
 import { PageNotFoundSection } from "./PageNotFoundSection";
-import { Root } from "./Root";
 import authenticationRoutes from "./authentication/routes";
 import clientScopesRoutes from "./client-scopes/routes";
 import clientRoutes from "./clients/routes";
@@ -37,11 +36,11 @@ import stylesRoutes from "./phaseII/custom-styles/routes";
 
 export type AppRouteObjectHandle = {
   access: ExtendedAccessType | ExtendedAccessType[];
+  breadcrumb?: (t: TFunction) => string | ComponentType<any>;
 };
 
 export interface AppRouteObject extends NonIndexRouteObject {
   path: string;
-  breadcrumb?: (t: TFunction) => string | ComponentType<any>;
   handle: AppRouteObjectHandle;
 }
 
@@ -75,9 +74,3 @@ export const routes: AppRouteObject[] = [
   ...orgRoutes,
   ...stylesRoutes,
 ];
-
-export const RootRoute: RouteObject = {
-  path: "/",
-  element: <Root />,
-  children: routes,
-};

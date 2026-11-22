@@ -5,6 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Phase Two</title>
+    <!--
+      Pre-paint canvas fallback. Each theme type's early-color-scheme.js (under
+      public/keycloak-theme/) sets the real scheme and an inline background before
+      first paint, which overrides this. It only applies if that script is missing,
+      and in Storybook or the Vite dev server. Colors match the login --background
+      in src/login/index.css.
+    -->
+    <style>
+      :root { color-scheme: light dark; background-color: #f5f5f5; }
+      @media (prefers-color-scheme: dark) { :root { background-color: #0a0a0a; } }
+    </style>
   </head>
   <body>
     <div id="root"></div>

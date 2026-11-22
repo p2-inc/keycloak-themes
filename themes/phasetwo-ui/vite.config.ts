@@ -22,6 +22,8 @@ export default defineConfig({
       themeVersion: "0.0.1",
       environmentVariables: [
         { name: "SHOW_DARK_MODE_TOGGLE", default: "false" },
+        // Input placeholders in the starter's form pages; off keeps the current look.
+        { name: "SHADCN_THEME_PLACEHOLDER", default: "false" },
       ],
       // Custom translation keys (defined in src/login/i18n.ts via
       // withCustomTranslations) are used only inside the React bundle, so

@@ -13,7 +13,7 @@ import {
   label,
   useEnvironment,
 } from "../../shared/keycloak-ui-shared";
-import type { Environment } from "../environment";
+import type { Environment } from "../environment-types";
 import {
   Card,
   CardBody,

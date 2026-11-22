@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 import { useAlerts, useEnvironment } from "@/shared/keycloak-ui-shared";
 
 import { useRealm } from "../../context/realm-context/RealmContext";
-import type { Environment } from "../../environment";
+import type { Environment } from "../../environment-types";
 import useOrgFetcher, {
   type OrganizationScimRepresentation,
 } from "./useOrgFetcher";

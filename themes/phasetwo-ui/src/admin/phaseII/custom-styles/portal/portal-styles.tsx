@@ -24,7 +24,7 @@ import ColorFormGroup from "../components/color-form-group";
 import { FormattedLink } from "../../../components/external-link/FormattedLink";
 import helpUrls from "../../../help-urls";
 import { useRealm } from "../../../context/realm-context/RealmContext";
-import type { Environment } from "../../../environment";
+import type { Environment } from "../../../environment-types";
 
 import "./portal-styles.css";
 

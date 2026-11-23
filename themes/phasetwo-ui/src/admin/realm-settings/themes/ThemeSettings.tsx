@@ -1,5 +1,5 @@
 /**
- * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260502.0.0.
+ * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260700.0.3.
  * To relinquish ownership and restore this file to its original content, run the following command:
  *
  * $ npx keycloakify own --path "admin/realm-settings/themes/ThemeSettings.tsx" --revert
@@ -103,6 +103,7 @@ export const ThemeSettingsTab = ({ realm, save }: ThemeSettingsTabProps) => {
               themeTypes.login.map((theme) => ({
                 key: theme.name,
                 value: theme.name,
+                description: theme.description,
               })),
             )}
           />
@@ -117,6 +118,7 @@ export const ThemeSettingsTab = ({ realm, save }: ThemeSettingsTabProps) => {
               themeTypes.account.map((theme) => ({
                 key: theme.name,
                 value: theme.name,
+                description: theme.description,
               })),
             )}
           />
@@ -131,6 +133,7 @@ export const ThemeSettingsTab = ({ realm, save }: ThemeSettingsTabProps) => {
               themeTypes.admin.map((theme) => ({
                 key: theme.name,
                 value: theme.name,
+                description: theme.description,
               })),
             )}
           />
@@ -145,6 +148,7 @@ export const ThemeSettingsTab = ({ realm, save }: ThemeSettingsTabProps) => {
               themeTypes.email.map((theme) => ({
                 key: theme.name,
                 value: theme.name,
+                description: theme.description,
               })),
             )}
           />

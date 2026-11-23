@@ -1,5 +1,5 @@
 /**
- * This file has been claimed for ownership from @keycloakify/keycloak-ui-shared version 260502.0.0.
+ * This file has been claimed for ownership from @keycloakify/keycloak-ui-shared version 260700.0.3.
  * To relinquish ownership and restore this file to its original content, run the following command:
  * 
  * $ npx keycloakify own --path "shared/keycloak-ui-shared/controls/table/KeycloakDataTable.tsx" --revert
@@ -153,6 +153,7 @@ function DataTable<T>({
   useEffect(() => {
     if (canSelectAll) {
       const selectAllCheckbox = document.getElementsByName("check-all").item(0);
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- DOM query can return null at runtime
       if (selectAllCheckbox) {
         const checkbox = selectAllCheckbox as HTMLInputElement;
         checkbox.indeterminate =
@@ -330,11 +331,16 @@ export type LoaderFunction<T> = (
   search?: string,
 ) => Promise<T[]>;
 
+export type SignaledLoader<T> = {
+  readonly signal: any;
+  loader: LoaderFunction<T>;
+};
+
 export type DataListProps<T> = Omit<
   TableProps,
   "rows" | "cells" | "onSelect"
 > & {
-  loader: T[] | LoaderFunction<T>;
+  loader: T[] | LoaderFunction<T> | SignaledLoader<T>;
   onSelect?: (value: T[]) => void;
   canSelectAll?: boolean;
   detailColumns?: DetailField<T>[];
@@ -449,6 +455,7 @@ export function KeycloakDataTable<T>({
             data: value,
             disableSelection: disabledRow,
             disableActions: disabledRow,
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- lodash get performs dynamic property access at runtime
             selected: !!selected.find((v) => get(v, "id") === get(value, "id")),
             isOpen: isDetailColumnsEnabled(value) ? false : undefined,
             cells: renderCell(columns, value),
@@ -512,24 +519,27 @@ export function KeycloakDataTable<T>({
         setFirst(0);
       }
       prevSearch.current = search;
-      const data =
+      const loaderFn =
         typeof loader === "function"
-          ? key === prevKey.current && unPaginatedData
-            ? unPaginatedData
-            : await loader(loadFirst, max + 1, search)
-          : loader;
+          ? loader
+          : "loader" in loader
+            ? loader.loader
+            : async () => loader;
+      const data = await loaderFn(loadFirst, max + 1, search);
 
       let nextPaginationCount: number | undefined;
 
       if (isPaginated) {
         nextPaginationCount = getPaginatedItemCount(loadFirst, max, data.length);
 
+        // Phase Two: when a page comes back exactly full, probe one row past it
+        // so the paginator knows whether a next page exists.
         if (
           nextPaginationCount !== undefined &&
-          typeof loader === "function" &&
+          !Array.isArray(loader) &&
           data.length === max
         ) {
-          const probe = await loader(loadFirst + max, 1, search);
+          const probe = await loaderFn(loadFirst + max, 1, search);
 
           if (probe.length > 0) {
             nextPaginationCount = undefined;
@@ -562,7 +572,11 @@ export function KeycloakDataTable<T>({
       first,
       max,
       search,
-      typeof loader !== "function" ? loader : undefined,
+      typeof loader !== "function"
+        ? "signal" in loader
+          ? loader.signal
+          : loader
+        : undefined,
     ],
   );
 

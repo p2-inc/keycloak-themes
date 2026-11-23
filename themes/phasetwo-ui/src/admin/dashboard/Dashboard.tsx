@@ -1,5 +1,5 @@
 /**
- * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260502.0.0.
+ * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260700.0.3.
  * To relinquish ownership and restore this file to its original content, run the following command:
  *
  * $ npx keycloakify own --path "admin/dashboard/Dashboard.tsx" --revert
@@ -8,12 +8,8 @@
 import FeatureRepresentation, {
   FeatureType,
 } from "@keycloak/keycloak-admin-client/lib/defs/featureRepresentation";
-import {
-  HelpItem,
-  label,
-  useEnvironment,
-} from "../../shared/keycloak-ui-shared";
-import type { Environment } from "../environment";
+import { HelpItem, useEnvironment } from "../../shared/keycloak-ui-shared";
+import type { Environment } from "../environment-types";
 import {
   Card,
   CardBody,
@@ -44,6 +40,7 @@ import {
 } from "../components/routable-tabs/RoutableTabs";
 import { useRealm } from "../context/realm-context/RealmContext";
 import { useServerInfo } from "../context/server-info/ServerInfoProvider";
+import { resolveDisplayName } from "../util";
 import useLocaleSort, { mapByKey } from "../utils/useLocaleSort";
 import { ProviderInfo } from "./ProviderInfo";
 import { DashboardTab, toDashboard } from "./routes/Dashboard";
@@ -60,26 +57,25 @@ type FeatureItemProps = {
 
 const FeatureItem = ({ feature }: FeatureItemProps) => {
   const { t } = useTranslation();
+  const color =
+    feature.type === FeatureType.Default ||
+    feature.type === FeatureType.DisabledByDefault
+      ? "green"
+      : feature.type === FeatureType.Preview ||
+          feature.type === FeatureType.PreviewDisabledByDefault
+        ? "blue"
+        : feature.type === FeatureType.Experimental
+          ? "orange"
+          : "grey";
   return (
     <ListItem className="pf-v5-u-mb-sm">
       {feature.name}&nbsp;
-      {feature.type === FeatureType.Experimental && (
-        <Label color="orange">{t("experimental")}</Label>
-      )}
-      {feature.type === FeatureType.Preview && (
-        <Label color="blue">{t("preview")}</Label>
-      )}
-      {feature.type === FeatureType.PreviewDisabledByDefault && (
-        <Label color="blue">{t("preview")}</Label>
-      )}
-      {feature.type === FeatureType.Default && (
-        <Label color="green">{t("supported")}</Label>
-      )}
-      {feature.type === FeatureType.DisabledByDefault && (
-        <Label color="green">{t("supported")}</Label>
-      )}
-      {feature.type === FeatureType.Deprecated && (
-        <Label color="grey">{t("deprecated")}</Label>
+      <Label color={color}>{t(feature.type.toLowerCase())}</Label>
+      {feature.deprecated && feature.type !== FeatureType.Deprecated && (
+        <>
+          &nbsp;
+          <Label color="grey">{t("deprecated")}</Label>
+        </>
       )}
     </ListItem>
   );
@@ -88,7 +84,7 @@ const FeatureItem = ({ feature }: FeatureItemProps) => {
 const RealmDashboard = () => {
   const { realm, realmRepresentation: realmInfo } = useRealm();
   const { stats } = useDashboardStats();
-  const realmDisplayName = label(
+  const realmDisplayName = resolveDisplayName(
     useTranslation().t,
     realmInfo?.displayName,
     realm,
@@ -119,12 +115,12 @@ const ServerInfoDashboard = () => {
   );
 
   const disabledFeatures = useMemo(
-    () => sortedFeatures.filter((f) => !f.enabled) || [],
+    () => sortedFeatures.filter((f) => !f.enabled),
     [sortedFeatures],
   );
 
   const enabledFeatures = useMemo(
-    () => sortedFeatures.filter((f) => f.enabled) || [],
+    () => sortedFeatures.filter((f) => f.enabled),
     [sortedFeatures],
   );
 
@@ -276,7 +272,6 @@ export default function DashboardSection() {
   const { realm } = useRealm();
   const { environment } = useEnvironment<Environment>();
   const isMasterRealm = realm === environment.masterRealm;
-
   return (
     <>
       <RealmDashboard />

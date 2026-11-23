@@ -1,5 +1,5 @@
 /**
- * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260502.0.0.
+ * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260700.0.3.
  * To relinquish ownership and restore this file to its original content, run the following command:
  * 
  * $ npx keycloakify own --path "admin/realm-settings/GeneralTab.tsx" --revert
@@ -20,6 +20,7 @@ import {
   KeycloakSpinner,
   SelectControl,
   TextControl,
+  useAlerts,
   useEnvironment,
   useFetch,
 } from "../../shared/keycloak-ui-shared";
@@ -31,14 +32,14 @@ import {
   StackItem,
 } from "../../shared/@patternfly/react-core";
 import { useEffect, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useAdminClient } from "../admin-client";
 import { DefaultSwitchControl } from "../components/SwitchControl";
 import { FormattedLink } from "../components/external-link/FormattedLink";
 import { FixedButtonsGroup } from "../components/form/FixedButtonGroup";
 import { FormAccess } from "../components/form/FormAccess";
-import { KeyValueInput } from "../components/key-value-form/KeyValueInput";
+import { RealmLoAMapping } from "../components/realm-loa-mapping/RealmLoAMapping";
 import { useRealm } from "../context/realm-context/RealmContext";
 import {
   addTrailingSlash,
@@ -48,6 +49,11 @@ import {
 import useIsFeatureEnabled, { Feature } from "../utils/useIsFeatureEnabled";
 import { UIRealmRepresentation } from "./RealmSettingsTabs";
 import { SIGNATURE_ALGORITHMS } from "../clients/add/SamlSignature";
+import type { RealmLoAMappingType } from "../components/realm-loa-mapping/RealmLoAMapping";
+import {
+  deleteRealmSsfQueuedEvents,
+  useSsfTransmitterDisableConfirmDialog,
+} from "./ssf/SsfTransmitterDisableConfirmDialog";
 
 type RealmSettingsGeneralTabProps = {
   realm: UIRealmRepresentation;
@@ -113,6 +119,8 @@ function RealmSettingsGeneralTabForm({
 
   const { t } = useTranslation();
   const { realm: realmName } = useRealm();
+  const { adminClient } = useAdminClient();
+  const { addAlert, addError } = useAlerts();
   const form = useForm<FormFields>();
   const {
     control,
@@ -126,6 +134,42 @@ function RealmSettingsGeneralTabForm({
     Feature.AdminFineGrainedAuthzV2,
   );
   const isOpenid4vciEnabled = isFeatureEnabled(Feature.OpenId4VCI);
+  const isStepUpAuthenticationSaml = isFeatureEnabled(
+    Feature.StepUpAuthenticationSaml,
+  );
+  const isScimApiEnabled = isFeatureEnabled(Feature.ScimApi);
+
+  const isSsfEnabled = isFeatureEnabled(Feature.Ssf);
+
+  const ssfTransmitterEnabled = useWatch({
+    control,
+    name: convertAttributeNameToForm<FormFields>(
+      "attributes.ssf.transmitterEnabled",
+    ) as any,
+  });
+
+  // Disabling the transmitter at the realm level has cascading effects
+  // (silent receiver pause, queued events deferred or dead-lettered after
+  // outbox-pending-max-age, all SSF endpoints 404). Surface those to the
+  // admin so the off transition is a deliberate choice rather than an
+  // accidental flip. The toggle's onChange below opens this dialog when
+  // going from on to off; cancelling reverts the field back to "true".
+  const [toggleSsfDisableDialog, SsfDisableConfirm] =
+    useSsfTransmitterDisableConfirmDialog({
+      onConfirm: () => {
+        // No-op: the inner Controller already flipped the field to "false"
+        // when the admin clicked the switch; confirming just lets that
+        // value stand until the user hits the form's Save button.
+      },
+      onCancel: () => {
+        setValue(
+          convertAttributeNameToForm<FormFields>(
+            "attributes.ssf.transmitterEnabled",
+          ) as any,
+          "true",
+        );
+      },
+    });
 
   const setupForm = () => {
     convertToFormValues(realm, setValue);
@@ -135,13 +179,18 @@ function RealmSettingsGeneralTabForm({
         UNMANAGED_ATTRIBUTE_POLICIES[0],
     );
     if (realm.attributes?.["acr.loa.map"]) {
-      const result = Object.entries(
+      const acrLoaMap = Object.entries(
         JSON.parse(realm.attributes["acr.loa.map"]),
-      ).flatMap(([key, value]) => ({ key, value }));
-      result.concat({ key: "", value: "" });
+      ).flatMap(([acr, loa]) => ({ acr, loa }) as RealmLoAMappingType);
+
+      if (isStepUpAuthenticationSaml && realm.attributes["acr.uri.map"]) {
+        const acrUriMap = JSON.parse(realm.attributes["acr.uri.map"]);
+        acrLoaMap.forEach((row) => (row.uri = acrUriMap?.[row.acr]));
+      }
+
       setValue(
         convertAttributeNameToForm("attributes.acr.loa.map") as any,
-        result,
+        acrLoaMap,
       );
     }
   };
@@ -156,6 +205,31 @@ function RealmSettingsGeneralTabForm({
         delete upConfig.unmanagedAttributePolicy;
       } else {
         upConfig.unmanagedAttributePolicy = unmanagedAttributePolicy;
+      }
+
+      // Detect a true -> false transition on the SSF Transmitter realm
+      // toggle so we can drop queued events as part of the same save
+      // flow. Compare the persisted previous state to the new form
+      // value — captured before save() so the comparison is well-defined
+      // regardless of when the actual write happens.
+      const wasSsfTransmitterEnabled =
+        realm.attributes?.["ssf.transmitterEnabled"] === "true";
+      const isSsfTransmitterEnabledAfter =
+        ssfTransmitterEnabled?.toString() === "true";
+
+      if (wasSsfTransmitterEnabled && !isSsfTransmitterEnabledAfter) {
+        // Cleanup runs BEFORE save while the SSF admin resource is
+        // still reachable. Once save() persists transmitterEnabled=false,
+        // SsfAdminRealmResourceProviderFactory gates /ssf/* off and the
+        // DELETE would 404. Best-effort: a cleanup failure surfaces as
+        // a toast but doesn't block the disable — outbox-pending-max-age
+        // backstops any leftover PENDING rows.
+        try {
+          await deleteRealmSsfQueuedEvents(adminClient, realmName);
+          addAlert(t("ssfTransmitterDisableEventsCleared"));
+        } catch (error) {
+          addError("ssfTransmitterDisableEventsClearFailed", error);
+        }
       }
 
       await save({ ...data, upConfig });
@@ -196,7 +270,11 @@ function RealmSettingsGeneralTabForm({
               />
             )}
           </FormGroup>
-          <TextControl name="displayName" label={t("displayName")} />
+          <TextControl
+            name="displayName"
+            label={t("displayName")}
+            labelIcon={t("realmDisplayNameHelp")}
+          />
           <TextControl name="displayNameHtml" label={t("htmlDisplayName")} />
           <TextControl
             name={convertAttributeNameToForm("attributes.frontendUrl")}
@@ -221,14 +299,19 @@ function RealmSettingsGeneralTabForm({
             fieldId="acrToLoAMapping"
             labelIcon={
               <HelpItem
-                helpText={t("acrToLoAMappingHelp")}
+                helpText={
+                  isStepUpAuthenticationSaml
+                    ? t("acrToLoAMappingRealmSamlHelp")
+                    : t("acrToLoAMappingHelp")
+                }
                 fieldLabelId="acrToLoAMapping"
               />
             }
           >
-            <KeyValueInput
+            <RealmLoAMapping
               label={t("acrToLoAMapping")}
               name={convertAttributeNameToForm("attributes.acr.loa.map")}
+              uri={isStepUpAuthenticationSaml}
             />
           </FormGroup>
           <DefaultSwitchControl
@@ -256,6 +339,33 @@ function RealmSettingsGeneralTabForm({
               label={t("verifiableCredentialsEnabled")}
               labelIcon={t("verifiableCredentialsEnabledHelp")}
             />
+          )}
+          {isScimApiEnabled && (
+            <DefaultSwitchControl
+              name="scimApiEnabled"
+              label={t("scimApiEnabled")}
+              labelIcon={t("scimApiEnabledHelp")}
+            />
+          )}
+          {isSsfEnabled && (
+            <>
+              <DefaultSwitchControl
+                name={convertAttributeNameToForm<FormFields>(
+                  "attributes.ssf.transmitterEnabled",
+                )}
+                label={t("ssfTransmitterEnabled")}
+                labelIcon={t("ssfTransmitterEnabledHelp")}
+                stringify
+                onChange={(_e, checked) => {
+                  // Off transition only — surface the consequences before
+                  // the admin commits the form save. Cancelling reverts.
+                  if (!checked) {
+                    toggleSsfDisableDialog();
+                  }
+                }}
+              />
+              <SsfDisableConfirm />
+            </>
           )}
           <SelectControl
             name="unmanagedAttributePolicy"
@@ -317,6 +427,16 @@ function RealmSettingsGeneralTabForm({
                       serverBaseUrl,
                     )}.well-known/openid-credential-issuer/realms/${realmName}`}
                     title={t("oid4vcIssuerMetadata")}
+                  />
+                </StackItem>
+              )}
+              {isSsfEnabled && ssfTransmitterEnabled?.toString() === "true" && (
+                <StackItem>
+                  <FormattedLink
+                    href={`${addTrailingSlash(
+                      serverBaseUrl,
+                    )}realms/${realmName}/.well-known/ssf-configuration`}
+                    title={t("ssfConfigurationMetadata")}
                   />
                 </StackItem>
               )}

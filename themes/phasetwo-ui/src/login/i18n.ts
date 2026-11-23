@@ -24,6 +24,13 @@ const { I18nProvider, useI18n } = i18nBuilder
       "organization.pickPlaceholder": "Pick an organization to continue",
       "identity-provider-login-last-used": "Last used",
       attemptedUsernameLoggingInAs: "Logging in as",
+      // Used by the starter's form pages when SHADCN_THEME_PLACEHOLDER=true.
+      usernamePlaceholder: "Enter your username",
+      usernameOrEmailPlaceholder: "Enter your username or email",
+      emailPlaceholder: "Enter your email",
+      passwordPlaceholder: "Enter your password",
+      newPasswordPlaceholder: "Enter your new password",
+      confirmPasswordPlaceholder: "Confirm your password",
       // Magic Link
       magicLinkConfirmation:
         "Check your email, and click on the link to log in!",

@@ -1,5 +1,5 @@
 /**
- * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260502.0.0.
+ * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260700.0.3.
  * To relinquish ownership and restore this file to its original content, run the following command:
  * 
  * $ npx keycloakify own --path "admin/components/view-header/ViewHeader.tsx" --revert
@@ -56,6 +56,8 @@ export type ViewHeaderProps = {
   divider?: boolean;
   helpTextKey?: string;
   isReadOnly?: boolean;
+  actionDropdownTitle?: string;
+  noTranslate?: boolean;
 };
 
 export type ViewHeaderBadge = {
@@ -81,6 +83,8 @@ export const ViewHeader = ({
   divider = true,
   helpTextKey,
   isReadOnly = false,
+  actionDropdownTitle = "action",
+  noTranslate = false,
 }: ViewHeaderProps) => {
   const { t, i18n } = useTranslation();
   const { enabled } = useHelp();
@@ -110,7 +114,9 @@ export const ViewHeader = ({
                     component="h1"
                     data-testid="view-header"
                   >
-                    {i18n.exists(titleKey) ? t(titleKey) : titleKey}
+                    {noTranslate || !i18n.exists(titleKey)
+                      ? titleKey
+                      : t(titleKey)}
                   </Text>
                 </TextContent>
               </LevelItem>
@@ -189,7 +195,7 @@ export const ViewHeader = ({
                           onClick={onDropdownToggle}
                           data-testid="action-dropdown"
                         >
-                          {t("action")}
+                          {t(actionDropdownTitle)}
                         </MenuToggle>
                       )}
                       isOpen={isDropdownOpen}

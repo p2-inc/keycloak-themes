@@ -3,11 +3,11 @@
 # === Owned files start ===
 # === Owned files end =====
 
-# === @keycloakify/keycloak-admin-ui v260502.0.0 ===
+# === @keycloakify/keycloak-admin-ui v260700.0.3 ===
 /admin/early-color-scheme.js
 
-# === @keycloakify/keycloak-account-ui v260502.0.2 ===
+# === @keycloakify/keycloak-account-ui v260700.0.4 ===
 /account/early-color-scheme.js
 
-# === @oussemasahbeni/keycloakify-login-shadcn v250004.0.20 ===
+# === @oussemasahbeni/keycloakify-login-shadcn v250004.0.24 ===
 /early-color-scheme.js

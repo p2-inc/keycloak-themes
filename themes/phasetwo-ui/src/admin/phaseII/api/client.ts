@@ -3,7 +3,7 @@ import createClient from "openapi-fetch";
 import type { paths, components } from "./phasetwo-schema.d.ts";
 import { useAdminClient } from "../../admin-client";
 import { useEnvironment } from "@/shared/keycloak-ui-shared";
-import type { Environment } from "../../environment";
+import type { Environment } from "../../environment-types";
 
 export type { components };
 export type PhaseTwoClient = ReturnType<typeof createClient<paths>>;

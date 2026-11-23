@@ -5,7 +5,9 @@
  * $ npx keycloakify own --path "login/index.css" --revert
  */
 
-@import url(./assets/fonts/inter/inter.css) layer(base);
+/* Starter 250004.0.22+ ships fonts as @fontsource packages instead of
+   login/assets/fonts. */
+@import "@fontsource-variable/inter";
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -59,7 +61,7 @@
 @layer utilities {
   body.kcBodyClass {
     @apply bg-none bg-no-repeat bg-center bg-fixed;
-    font-family: "Inter var", sans-serif;
+    font-family: "Inter Variable", sans-serif;
   }
 
   body.oauth {

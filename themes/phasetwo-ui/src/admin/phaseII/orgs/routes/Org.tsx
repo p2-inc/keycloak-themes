@@ -26,8 +26,8 @@ const OrgDetails = lazy(() => import("../OrgDetails"));
 export const OrgRoute: AppRouteObject = {
   path: "/:realm/ext-organizations/:orgId/:tab",
   element: <OrgDetails />,
-  breadcrumb: (t) => t("orgDetails"),
   handle: {
+    breadcrumb: (t) => t("orgDetails"),
     access: hasOrganizationsAccess,
   },
 };

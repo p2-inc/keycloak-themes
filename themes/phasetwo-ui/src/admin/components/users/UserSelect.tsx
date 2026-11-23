@@ -1,5 +1,5 @@
 /**
- * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260502.0.0.
+ * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260700.0.3.
  * To relinquish ownership and restore this file to its original content, run the following command:
  * 
  * $ npx keycloakify own --path "admin/components/users/UserSelect.tsx" --revert
@@ -24,6 +24,7 @@ import {
   Select,
   SelectList,
   SelectOption,
+  Spinner,
   TextInputGroup,
   TextInputGroupMain,
   TextInputGroupUtilities,
@@ -45,6 +46,9 @@ type UserSelectProps = Omit<ComponentProps, "convertToName"> & {
   isRequired?: boolean;
 };
 
+const USER_SEARCH_LIMIT = 20;
+const SHOW_MORE = "show-more";
+
 export const UserSelect = ({
   name,
   label,
@@ -65,12 +69,26 @@ export const UserSelect = ({
 
   const [open, toggleOpen, setOpen] = useToggle();
   const [selectedUsers, setSelectedUsers] = useState<UserRepresentation[]>([]);
-  const [searchedUsers, setSearchedUsers] = useState<UserRepresentation[]>([]);
+  const [pageUsers, setPageUsers] = useState<UserRepresentation[]>([]);
+  const [exactMatch, setExactMatch] = useState<UserRepresentation>();
+  const [first, setFirst] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [search, setSearch] = useState("");
   const textInputRef = useRef<HTMLInputElement>();
 
-  const debounceFn = useCallback(debounce(setSearch, 500), []);
+  const debounceFn = useCallback(
+    debounce((value: string) => {
+      setFirst(0);
+      setHasMore(false);
+      setLoadingMore(false);
+      setPageUsers([]);
+      setExactMatch(undefined);
+      setSearch(value);
+    }, 500),
+    [],
+  );
 
   useFetch(
     async () => {
@@ -104,7 +122,12 @@ export const UserSelect = ({
       );
       return uniqBy(results.flat(), "id");
     },
-    setSearchedUsers,
+    (found) => {
+      // Exact lookups return a handful of users, so there is nothing to page.
+      setPageUsers(found);
+      setHasMore(false);
+      setLoadingMore(false);
+    },
     [search],
   );
 
@@ -114,6 +137,16 @@ export const UserSelect = ({
       setInputValue("");
     }
   }, [values]);
+
+  const searchedUsers = useMemo(() => {
+    if (!exactMatch) {
+      return pageUsers;
+    }
+    return [
+      exactMatch,
+      ...pageUsers.filter((user) => user.id !== exactMatch.id),
+    ];
+  }, [exactMatch, pageUsers]);
 
   const users = useMemo(
     () => [...selectedUsers, ...searchedUsers],
@@ -150,6 +183,8 @@ export const UserSelect = ({
         render={({ field }) => (
           <Select
             id={name!}
+            isScrollable
+            maxMenuHeight="300px"
             onOpenChange={toggleOpen}
             toggle={(ref) => (
               <MenuToggle
@@ -203,7 +238,7 @@ export const UserSelect = ({
                                 }}
                               >
                                 {
-                                  users.find((u) => u?.id === selection)
+                                  users.find((u) => u.id === selection)
                                     ?.username
                                 }
                               </Chip>
@@ -217,10 +252,16 @@ export const UserSelect = ({
                       <Button
                         variant="plain"
                         onClick={() => {
+                          debounceFn.cancel();
                           setInputValue("");
+                          setFirst(0);
+                          setHasMore(false);
+                          setLoadingMore(false);
+                          setPageUsers([]);
+                          setExactMatch(undefined);
                           setSearch("");
                           field.onChange([]);
-                          textInputRef?.current?.focus();
+                          textInputRef.current?.focus();
                         }}
                         aria-label="Clear input value"
                       >
@@ -235,6 +276,11 @@ export const UserSelect = ({
             selected={field.value}
             onSelect={(_, v) => {
               const option = v?.toString();
+              if (option === SHOW_MORE) {
+                setLoadingMore(true);
+                setFirst((f) => f + USER_SEARCH_LIMIT);
+                return;
+              }
               if (variant !== "typeaheadMulti") {
                 const removed = field.value.includes(option);
 
@@ -247,7 +293,7 @@ export const UserSelect = ({
                 setInputValue(
                   removed
                     ? ""
-                    : users.find((u) => u?.id === option)?.username || "",
+                    : users.find((u) => u.id === option)?.username || "",
                 );
                 setOpen(false);
               } else {
@@ -261,7 +307,27 @@ export const UserSelect = ({
             }}
             aria-label={t(name!)}
           >
-            <SelectList>{convert(searchedUsers)}</SelectList>
+            <SelectList>
+              {convert(searchedUsers)}
+              {hasMore && (
+                <SelectOption
+                  key={SHOW_MORE}
+                  value={SHOW_MORE}
+                  isDisabled={loadingMore}
+                  aria-label={
+                    loadingMore ? t("spinnerLoading") : t("showMoreUsers")
+                  }
+                >
+                  {loadingMore ? (
+                    <>
+                      <Spinner size="sm" /> {t("spinnerLoading")}
+                    </>
+                  ) : (
+                    t("showMore")
+                  )}
+                </SelectOption>
+              )}
+            </SelectList>
           </Select>
         )}
       />

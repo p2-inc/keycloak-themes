@@ -1,5 +1,5 @@
 /**
- * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260502.0.0.
+ * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260700.0.3.
  * To relinquish ownership and restore this file to its original content, run the following command:
  *
  * $ npx keycloakify own --path "admin/PageHeader.tsx" --revert
@@ -24,15 +24,22 @@ import { HelpHeader } from "./components/help-enabler/HelpHeader";
 import { useAccess } from "./context/access/Access";
 import { useRealm } from "./context/realm-context/RealmContext";
 import { toDashboard } from "./dashboard/routes/Dashboard";
+import type { Environment } from "./environment-types";
 import { usePreviewLogo } from "./realm-settings/themes/LogoContext";
 import { joinPath } from "./utils/joinPath";
+import { useIsFeatureDisabled, Feature } from "./utils/useIsFeatureEnabled";
 import useToggle from "./utils/useToggle";
 import { MastheadStats } from "./phaseII/dashboard/MastheadStats";
 
 const ManageAccountDropdownItem = () => {
   const { keycloak } = useEnvironment();
-
   const { t } = useTranslation();
+  const isFeatureDisabled = useIsFeatureDisabled();
+
+  if (isFeatureDisabled(Feature.AccountV3)) {
+    return null;
+  }
+
   return (
     <DropdownItem
       key="manage account"
@@ -104,7 +111,7 @@ const userDropdownItems = (isMasterRealm: boolean, isManager: boolean) => [
 ];
 
 export const Header = () => {
-  const { environment, keycloak } = useEnvironment();
+  const { environment, keycloak } = useEnvironment<Environment>();
   const { t } = useTranslation();
   const { realm } = useRealm();
   const { hasAccess } = useAccess();
@@ -112,7 +119,7 @@ export const Header = () => {
   const contextLogo = usePreviewLogo();
   const customLogo = contextLogo?.logo;
 
-  const isMasterRealm = realm === "master";
+  const isMasterRealm = realm === environment.masterRealm;
   const isManager = hasAccess("manage-realm");
 
   const url = useHref(toDashboard({ realm }));
@@ -125,7 +132,7 @@ export const Header = () => {
       features={{ hasManageAccount: false }}
       brand={{
         href: logoUrl,
-        src: customLogo
+        src: customLogo?.trim()
           ? customLogo.startsWith("/")
             ? joinPath(environment["resourceUrl"], customLogo)
             : customLogo

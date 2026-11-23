@@ -1,5 +1,5 @@
 /**
- * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260502.0.0.
+ * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260700.0.3.
  * To relinquish ownership and restore this file to its original content, run the following command:
  * 
  * $ npx keycloakify own --path "admin/components/users/UserDataTable.tsx" --revert
@@ -137,7 +137,7 @@ export function UserDataTable() {
           adminClient.users.getProfile(),
         ]);
       } catch (error) {
-        if (error instanceof NetworkError && error?.response?.status === 403) {
+        if (error instanceof NetworkError && error.response.status === 403) {
           // "User Profile" attributes not available for Users Attribute search, when admin user does not have view- or manage-realm realm-management role
           return [{}, {}] as [UiRealmInfo, UserProfileConfig];
         } else {
@@ -215,7 +215,7 @@ export function UserDataTable() {
 
   const goToCreate = () => navigate(toAddUser({ realm: realmName }));
 
-  if (uiRealmInfo.userProfileProvidersEnabled === undefined || !realm) {
+  if (uiRealmInfo.userProfileProvidersEnabled === undefined) {
     return <KeycloakSpinner />;
   }
 

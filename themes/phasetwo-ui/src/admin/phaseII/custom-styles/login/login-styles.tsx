@@ -20,7 +20,7 @@ import { ColorPicker } from "../components/ColorPicker";
 import { useAdminClient } from "../../../admin-client";
 import { useEnvironment } from "@/shared/keycloak-ui-shared";
 import { useRealm } from "../../../context/realm-context/RealmContext";
-import type { Environment } from "../../../environment";
+import type { Environment } from "../../../environment-types";
 import {
   BASE_TOKENS,
   darkTokenName,

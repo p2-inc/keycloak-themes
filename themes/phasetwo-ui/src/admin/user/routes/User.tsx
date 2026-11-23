@@ -1,5 +1,5 @@
 /**
- * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260502.0.0.
+ * This file has been claimed for ownership from @keycloakify/keycloak-admin-ui version 260700.0.3.
  * To relinquish ownership and restore this file to its original content, run the following command:
  * 
  * $ npx keycloakify own --path "admin/user/routes/User.tsx" --revert
@@ -25,7 +25,9 @@ export type UserTab =
   | "role-mapping"
   | "identity-provider-links"
   | "events"
-  | "user-orgs";
+  | "user-orgs"
+  | "workflows"
+  | "verifiable-credentials";
 
 export type UserParams = {
   realm: string;
@@ -38,9 +40,9 @@ const EditUser = lazy(() => import("../EditUser"));
 export const UserRoute: AppRouteObject = {
   path: "/:realm/users/:id/:tab",
   element: <EditUser />,
-  breadcrumb: (t) => t("userDetails"),
   handle: {
     access: "query-users",
+    breadcrumb: (t) => t("userDetails"),
   },
 };
 

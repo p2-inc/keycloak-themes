@@ -16,10 +16,47 @@ public class OverridableEmailSenderProviderFactory extends DefaultEmailSenderPro
 
   private Integer maxEmails;
   private Map<String, String> conf;
+  private final LocalEmailCounter localCounter = new LocalEmailCounter();
+  private volatile EmailCounter counter;
 
   @Override
   public OverridableEmailSenderProvider create(KeycloakSession session) {
-    return new OverridableEmailSenderProvider(session, getEmailAuthenticators(), conf, maxEmails);
+    return new OverridableEmailSenderProvider(
+        session, getEmailAuthenticators(), conf, maxEmails, counter(session));
+  }
+
+  /**
+   * The counter behind the {@code maxEmails} limit, resolved on first use: the shared {@value
+   * InfinispanEmailCounter#CACHE_NAME} Infinispan cache, defined here if the Infinispan
+   * configuration does not declare it. If that cannot be had, the limit is still enforced, per
+   * node, and a single WARN says so.
+   */
+  EmailCounter counter(KeycloakSession session) {
+    EmailCounter c = counter;
+    if (c == null) {
+      synchronized (this) {
+        c = counter;
+        if (c == null) {
+          c = resolveCounter(session);
+          counter = c;
+        }
+      }
+    }
+    return c;
+  }
+
+  private EmailCounter resolveCounter(KeycloakSession session) {
+    try {
+      return new FallbackEmailCounter(InfinispanEmailCounter.create(session), localCounter);
+    } catch (Exception e) {
+      log.warnf(
+          e,
+          "Could not get the %s Infinispan cache; the limit of %d emails per realm per day is"
+              + " enforced per node instead of per cluster.",
+          InfinispanEmailCounter.CACHE_NAME,
+          maxEmails);
+      return localCounter;
+    }
   }
 
   public static final String[] PROPERTY_NAMES = {

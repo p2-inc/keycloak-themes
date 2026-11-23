@@ -244,13 +244,17 @@ This implementation also includes an SPI `AttributesBuilderProvider` that allows
 
 This includes an implementation of `EmailSenderProvider` which behaves as the default, unless you specify variables to configure provider defaults. In this case, any realm that does not have an SMTP server set up will default to use the values set in the variables. This is useful in environments where a single SMTP server is used by many realms, and the Keycloak administrator does not want to distribute credentials to every realm administrator.
 
-This can also be useful in environments where you want to allow realms to "test" Keycloak's email sending without having to configure an SMTP server. For this use case, we have also included a counter in the distributed cache that is used to limit the number of emails that are sent using the global configuration, in order to prevent spammers from exploiting the free email capability. This can be configured with the `max-emails` variable. To use the limiting functionality, you must have a distributed or replicated cache configuration for `counterCache` in your Infinispan XML cache configuration. E.g.:
+This can also be useful in environments where you want to allow realms to "test" Keycloak's email sending without having to configure an SMTP server. For this use case, we have also included a counter that limits the number of emails each realm can send per day using the global configuration, in order to prevent spammers from exploiting the free email capability. This can be configured with the `max-emails` variable. The limit does not apply to realms that have their own SMTP server configured. Emails over the limit are dropped without an error; the first one dropped for a realm on a given day is logged at WARN.
+
+The counter is kept in an Infinispan cache named `counterCache`. If your Infinispan XML cache configuration does not declare it, the provider defines it at startup: replicated (synchronous) when Keycloak runs clustered, so all nodes count against one limit, and local otherwise. To configure it yourself, declare it in the XML, which takes precedence, e.g.:
 
 ```xml
     <replicated-cache name="counterCache">
       <expiration lifespan="-1"/>
     </replicated-cache>
 ```
+
+If the cache cannot be obtained at all, the provider logs one WARN and counts on each node separately, so a cluster of N nodes allows up to N times `max-emails` per realm per day.
 
 If you wish to set the global overrides, you can set the following variables:
 

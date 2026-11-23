@@ -20,13 +20,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import lombok.extern.jbosslog.JBossLog;
-import org.infinispan.Cache;
 import org.keycloak.common.enums.HostnameVerificationPolicy;
-import org.keycloak.connections.infinispan.InfinispanConnectionProvider;
 import org.keycloak.email.EmailAuthenticator;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailSenderProvider;
@@ -44,7 +41,7 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
   private final Map<String, String> conf;
   private final Integer maxEmails;
   private final String cacheKey;
-  private Cache<String, Integer> counterCache;
+  private final EmailCounter counter;
 
   private static final String SUPPORTED_SSL_PROTOCOLS = getSupportedSslProtocols();
   private final Map<EmailAuthenticator.AuthenticatorType, EmailAuthenticator> authenticators;
@@ -53,18 +50,14 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
       KeycloakSession session,
       Map<EmailAuthenticator.AuthenticatorType, EmailAuthenticator> authenticators,
       Map<String, String> conf,
-      Integer maxEmails) {
+      Integer maxEmails,
+      EmailCounter counter) {
     this.session = session;
     this.authenticators = authenticators;
     this.conf = conf;
     this.maxEmails = maxEmails;
+    this.counter = counter;
     this.cacheKey = getCacheKey();
-    try {
-      this.counterCache =
-          session.getProvider(InfinispanConnectionProvider.class).getCache("counterCache", true);
-    } catch (Exception e) {
-      log.debugf("Error loading counterCache %s", e);
-    }
   }
 
   @Override
@@ -92,19 +85,27 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
     }
   }
 
-  private boolean canSend() {
-    if (cacheKey == null || counterCache == null) return true;
-    Integer count = counterCache.get(cacheKey);
-    log.infof("Count for %s is %d / %d", cacheKey, count, maxEmails);
-    if (count == null || count <= maxEmails) return true;
-    else return false;
-  }
-
-  private Integer increment() {
-    if (cacheKey == null || counterCache == null) return 0;
-    else
-      return counterCache.compute(
-          cacheKey, (key, value) -> (value == null) ? 1 : value + 1, 1, TimeUnit.DAYS);
+  /**
+   * Counts an email that is about to go out through the global SMTP configuration, and decides
+   * whether it may. The count is taken before sending, so concurrent sends cannot all pass a check
+   * made before any of them was counted. A negative {@code maxEmails} means no limit.
+   */
+  boolean reserveSend() {
+    if (cacheKey == null || maxEmails == null || maxEmails < 0) return true;
+    int count = counter.increment(cacheKey);
+    if (count <= maxEmails) {
+      log.debugf("Email count for %s is %s of %s", cacheKey, count, maxEmails);
+      return true;
+    }
+    if (count == maxEmails + 1) {
+      log.warnf(
+          "Realm %s reached its limit of %d emails per day through the global SMTP configuration;"
+              + " further emails are dropped until tomorrow",
+          session.getContext().getRealm().getName(), maxEmails);
+    } else {
+      log.debugf("Email limit reached for %s, dropping email %s of %s", cacheKey, count, maxEmails);
+    }
+    return false;
   }
 
   @Override
@@ -115,12 +116,8 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
       log.debug("Using customer override email sender");
       doSend(config, user, subject, textBody, htmlBody);
     } else {
-      if (canSend()) {
+      if (reserveSend()) {
         doSend(conf, user, subject, textBody, htmlBody);
-        Integer count = increment();
-        log.infof("Email count %d for %s", count, cacheKey);
-      } else {
-        log.infof("Unable to send email for limit %d %s", maxEmails, cacheKey);
       }
     }
   }
@@ -133,12 +130,8 @@ public class OverridableEmailSenderProvider implements EmailSenderProvider {
       log.debug("Using customer override email sender");
       doSend(config, address, subject, textBody, htmlBody);
     } else {
-      if (canSend()) {
+      if (reserveSend()) {
         doSend(conf, address, subject, textBody, htmlBody);
-        Integer count = increment();
-        log.infof("Email count %d for %s", count, cacheKey);
-      } else {
-        log.infof("Unable to send email for limit %d %s", maxEmails, cacheKey);
       }
     }
   }

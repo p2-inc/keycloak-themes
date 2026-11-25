@@ -44,6 +44,7 @@
 # login/components/UserProfileFormFields/SelectTag.tsx
 # login/pages/delete-account-confirm/Page.tsx
 # login/pages/delete-credential/Page.tsx
+# login/pages/login/Form.tsx
 # login/pages/login-config-totp/Page.tsx
 # login/pages/login-idp-link-confirm-override/Page.tsx
 # login/pages/login-idp-link-email/Page.tsx
@@ -51,6 +52,7 @@
 # login/pages/login-page-expired/Page.tsx
 # login/pages/login-verify-email/Page.tsx
 # login/pages/logout-confirm/Page.tsx
+# login/pages/register/Form.tsx
 # login/pages/webauthn-authenticate/Page.tsx
 # shared/@patternfly/react-core/index.tsx
 # shared/keycloak-ui-shared/controls/table/KeycloakDataTable.tsx
@@ -1166,7 +1168,6 @@
 /login/pages/link-idp-action/index.ts
 /login/pages/link-idp-action/Page.stories.tsx
 /login/pages/link-idp-action/Page.tsx
-/login/pages/login/Form.tsx
 /login/pages/login/index.ts
 /login/pages/login/Info.tsx
 /login/pages/login/Page.stories.tsx
@@ -1229,7 +1230,6 @@
 /login/pages/login-x509-info/Page.tsx
 /login/pages/logout-confirm/index.ts
 /login/pages/logout-confirm/Page.stories.tsx
-/login/pages/register/Form.tsx
 /login/pages/register/index.ts
 /login/pages/register/Page.stories.tsx
 /login/pages/register/Page.tsx

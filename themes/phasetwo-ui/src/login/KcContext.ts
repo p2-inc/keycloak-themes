@@ -22,7 +22,27 @@ export type KcContextExtension = {
     darkMode?: boolean;
 };
 
+// Set by keycloak-magic-link's Cloudflare Turnstile Username Password Form and registration
+// form action. Absent when Turnstile isn't configured for the step.
+type TurnstileFields = {
+    turnstileRequired?: boolean;
+    turnstileSiteKey?: string;
+    turnstileAction?: string;
+};
+
 export type KcContextExtensionPerPage = {
+    "login.ftl": TurnstileFields;
+    "register.ftl": TurnstileFields;
+    // keycloak-magic-link's standalone Cloudflare Turnstile validation step.
+    "cf-captcha.ftl": {
+        auth?: {
+            selectedCredential?: string;
+        };
+        captchaRequired: boolean;
+        captchaSiteKey: string;
+        captchaAction: string;
+        captchaLanguage?: string;
+    };
     "otp-form.ftl": {
         auth: {
             attemptedUsername: string;

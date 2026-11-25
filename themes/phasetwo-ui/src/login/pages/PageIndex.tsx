@@ -67,6 +67,9 @@ const Page_login_recaptcha = lazy(() => import("./extensions/login-recaptcha"));
 // Extension pages — bot-protection
 const Page_bp_captcha = lazy(() => import("./extensions/bot-protection/bp-captcha"));
 
+// Extension pages — Cloudflare Turnstile (keycloak-magic-link)
+const Page_cf_captcha = lazy(() => import("./extensions/cloudflare-turnstile/cf-captcha"));
+
 export function PageIndex() {
     const { kcContext } = useKcContext();
 
@@ -178,6 +181,9 @@ export function PageIndex() {
                     // Extension pages — bot-protection
                     case "bp-captcha.ftl":
                         return <Page_bp_captcha />;
+                    // Extension pages — Cloudflare Turnstile
+                    case "cf-captcha.ftl":
+                        return <Page_cf_captcha />;
                 }
             })()}
         </Suspense>
